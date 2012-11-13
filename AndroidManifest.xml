@@ -46,10 +46,7 @@
         </activity>
         <activity
             android:name=".SplashActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleInstance"
-            android:excludeFromRecents="true"
-            android:noHistory="true">
+            android:label="@string/app_name">
             <!-- 不在最近列表中保存 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
