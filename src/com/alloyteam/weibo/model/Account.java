@@ -41,6 +41,10 @@ public class Account {
 	 */
 	public Date invalidTime;
 	
+	/**
+	 * isDefault 是否默认帐号
+	 */
+	public boolean isDefault;
 	
 	
 }
