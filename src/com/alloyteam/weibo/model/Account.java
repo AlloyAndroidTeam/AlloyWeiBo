@@ -13,9 +13,25 @@ import java.util.Date;
 public class Account {
 	
 	/**
-	 * 帐号名字
+	 * 帐号id
 	 */
-	public String name;
+	public String uid;
+	
+	/**
+	 * 昵称
+	 */
+	public String nick;
+	
+	
+	/**
+	 * 头像url
+	 */
+	public String avator;
+	
+	/**
+	 * 微博类型, 1: 新浪, 2: 腾讯
+	 */
+	public int type;
 	
 	public String openId;
 	

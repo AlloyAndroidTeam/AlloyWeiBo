@@ -5,7 +5,6 @@
 package com.alloyteam.net;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -14,7 +13,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -111,7 +109,8 @@ public class HttpConnection implements Runnable {
 					if (data != null) {
 						Bundle bundle = (Bundle) data;
 						String result = bundle.getString("callbackkey");
-						listener.onResponse(result == "fail", result);
+						boolean success = result == "fail";
+						listener.onResponse(success, success ? result : null);
 					}
 				}
 				break;
@@ -138,6 +137,7 @@ public class HttpConnection implements Runnable {
 //				BasicNameValuePair valuesPair = new BasicNameValuePair("args",
 //						data);
 //				params.add(data);
+//				httpPost.setParams(params);
 				httpPost.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
 				httpResponse = httpClient.execute(httpPost);
 				if (isHttpSuccessExecuted(httpResponse)) {
