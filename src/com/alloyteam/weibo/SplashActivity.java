@@ -3,6 +3,7 @@ package com.alloyteam.weibo;
 import java.util.ArrayList;
 
 import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.DBHelper;
 import com.alloyteam.weibo.model.*;
 
 import android.app.Activity;
@@ -44,7 +45,8 @@ public class SplashActivity extends Activity {
 	 * @return 是否有默认帐号
 	 */
 	private boolean hasAccount(){
-		ArrayList<Account> list = AccountManager.getAccounts();
+		DBHelper dbHelper = DBHelper.getInstance(SplashActivity.this);
+		ArrayList<Account> list = AccountManager.getAccounts(dbHelper);
 		if(list != null && list.size() > 0){
 			return true;
 		}

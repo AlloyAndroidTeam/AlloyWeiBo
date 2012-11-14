@@ -19,6 +19,8 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static final String DB_NAME = "alloyweibo.db";
 	public static final String ACCOUNT_TABLE_NAME = "account";
 
+	public static DBHelper dbHelper;
+	
 	/**
 	 * @param context
 	 * @param name
@@ -28,6 +30,13 @@ public class DBHelper extends SQLiteOpenHelper {
 	public DBHelper(Context context) {
 		super(context, DB_NAME, null, DATABASE_VERSION);
 		
+	}
+	
+	public static DBHelper getInstance(Context context){
+		if(dbHelper == null){
+			dbHelper = new DBHelper(context);
+		}
+		return dbHelper;
 	}
 
 	/*

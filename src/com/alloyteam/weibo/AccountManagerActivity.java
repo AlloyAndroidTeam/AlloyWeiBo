@@ -37,7 +37,7 @@ public class AccountManagerActivity extends Activity {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_account_manager);
 		
-		dbHelper = new DBHelper(this);
+		dbHelper = DBHelper.getInstance(this);
 		
 		Button addButton = (Button) findViewById(R.id.addNewAccount);
 		addButton.setOnClickListener(new OnClickListener() {
