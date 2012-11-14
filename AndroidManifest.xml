@@ -15,44 +15,57 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:launchMode="singleTask" >
+
             <!-- 被调用后，如果在栈中存在，则栈中原本处于其后面的activity全被destroy -->
         </activity>
-        
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_main"
             android:launchMode="singleTask" >
+
             <!-- 被调用后，如果在栈中存在，则栈中原本处于其后面的activity全被destroy -->
         </activity>
         <activity
             android:name=".SettingActivity"
             android:label="@string/title_activity_main"
             android:launchMode="singleTask" >
+
             <!-- 被调用后，如果在栈中存在，则栈中原本处于其后面的activity全被destroy -->
         </activity>
-        
-        
         <activity
             android:name="AccountManagerActivity"
             android:label="@string/account_manager"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance" >
+
             <!-- 被调用后，如果在栈中存在，则其在栈中顺序被提到最前，其它activity顺序依次后退 -->
         </activity>
         <activity
             android:name=".PostActivity"
             android:label="@string/post"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance" >
+
             <!-- 被调用后，如果在栈中存在，则其在栈中顺序被提到最前，其它activity顺序依次后退 -->
         </activity>
         <activity
             android:name=".SplashActivity"
+            android:excludeFromRecents="true"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
-            android:excludeFromRecents="true"
-            android:noHistory="true">
+            android:noHistory="true" >
+
             <!-- 不在最近列表中保存 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AuthActivity"
+            android:label="@string/title_activity_auth" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

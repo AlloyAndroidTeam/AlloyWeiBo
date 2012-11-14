@@ -17,6 +17,10 @@ public class Account {
 	 */
 	public String name;
 	
+	public String openId;
+	
+	public String openKey;
+	
 	/**
 	 * token
 	 */

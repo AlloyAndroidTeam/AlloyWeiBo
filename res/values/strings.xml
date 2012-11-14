@@ -7,5 +7,6 @@
     <string name="account_manager">帐号管理</string>
     <string name="time_line">时间线</string>
     <string name="post">发送</string>
+    <string name="title_activity_auth">AuthActivity</string>
 
 </resources>
