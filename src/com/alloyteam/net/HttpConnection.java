@@ -44,12 +44,12 @@ public class HttpConnection implements Runnable {
 
 	private String url;
 	private int method;
-	private String data;
+	private ArrayList<NameValuePair> data;
 	private HttpConnectionListener listener;
 
 	private HttpClient httpClient;
 
-	public void create(int method, String url, String data,
+	public void create(int method, String url, ArrayList<NameValuePair> data,
 			HttpConnectionListener listener) {
 		this.method = method;
 		this.url = url;
@@ -62,11 +62,11 @@ public class HttpConnection implements Runnable {
 		create(GET, url, null, listener);
 	}
 
-	public void post(String url, String data, HttpConnectionListener listener) {
+	public void post(String url, ArrayList<NameValuePair> data, HttpConnectionListener listener) {
 		create(POST, url, data, listener);
 	}
 
-	public void put(String url, String data) {
+	public void put(String url, ArrayList<NameValuePair> data) {
 		create(PUT, url, data, listener);
 	}
 
@@ -93,7 +93,7 @@ public class HttpConnection implements Runnable {
 		 * @param result
 		 *            请求返回的结果
 		 */
-		public void onResponse(Boolean success, String result);
+		public void onResponse(boolean success, String result);
 
 	}
 
@@ -134,11 +134,11 @@ public class HttpConnection implements Runnable {
 				break;
 			case POST:
 				HttpPost httpPost = new HttpPost(url);
-				List<NameValuePair> params = new ArrayList<NameValuePair>();
-				BasicNameValuePair valuesPair = new BasicNameValuePair("args",
-						data);
-				params.add(valuesPair);
-				httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+//				List<NameValuePair> params = new ArrayList<NameValuePair>();
+//				BasicNameValuePair valuesPair = new BasicNameValuePair("args",
+//						data);
+//				params.add(data);
+				httpPost.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
 				httpResponse = httpClient.execute(httpPost);
 				if (isHttpSuccessExecuted(httpResponse)) {
 					String result = EntityUtils.toString(httpResponse
