@@ -5,19 +5,14 @@
 package com.alloyteam.weibo.logic;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 
-import com.alloyteam.weibo.AuthActivity;
-import com.alloyteam.weibo.MainActivity;
 import com.alloyteam.weibo.model.Account;
 
 /**
@@ -26,26 +21,66 @@ import com.alloyteam.weibo.model.Account;
  */
 public class AccountManager {
 
-	public static Handler authHandler;
-
+	static final String TAG = "AccountManager";
+	
+	
 	/**
-	 * 打开授权页进行授权
+	 * 添加帐号
 	 */
-	public static void auth(Context context, int type, Handler handler) {
-		if (type == Constants.TENCENT) {
-			Intent intent = new Intent(context, AuthActivity.class);
-			intent.putExtra("getCodeUrl", Constants.TencentApi.OAUTH_GET_CODE);
-			intent.putExtra("getTokenUrl", Constants.TencentApi.OAUTH_GET_ACCESS_TOKEN);
-			
-			context.startActivity(intent);
-		}
+	public static void addAccount(Account account) {
+		Log.v(TAG, "addAccount: " + account);
+		DBHelper dbHelper = DBHelper.getInstance();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put("uid", account.uid);
+		values.put("nick", account.nick);
+		values.put("type", account.type);
+		
+		values.put("openId", account.openId);
+		values.put("openKey", account.openKey);
+		values.put("accessToken", account.accessToken);
+		values.put("refreshToken", account.refreshToken);
+		values.put("isDefault",  account.isDefault ? 1 : 0);
+		values.put("invalidTime", account.invalidTime.getTime());
+		values.put("authTime", account.authTime.getTime());
+				
+		long result = db.insert(DBHelper.ACCOUNT_TABLE_NAME, null, values);
+		
+		Log.v(TAG, "addAccount result: " + result);
 	}
 
 	/**
-	 * 删除授权
+	 * 删除帐号
 	 */
-	public static void removeAuth() {
-		
+	public static void removeAccount(Account account) {
+		Log.v(TAG, "addAccount: " + account);
+	}
+	
+	/**
+	 * 根据 account.uid 读取 account
+	 * @param uid
+	 */
+	public static Account getAccount(String uid, int type){
+		DBHelper dbHelper = DBHelper.getInstance();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+				null, // Columns to return
+				"uid=? and type=?", // SQL WHERE
+				new String[]{uid, type + ""}, // Selection Args
+				null, // SQL GROUP BY
+				null, // SQL HAVING
+				null // SQL ORDER BY
+				);
+		Account account = null;
+		if (cursor.moveToFirst()) {
+			account = new Account();
+			parseCursorToAccount(account, cursor);
+		}
+		if (cursor != null && !cursor.isClosed()) {
+			cursor.close();
+		}
+		Log.v(TAG, "getAccount: " + account);
+		return account;
 	}
 
 	/**
@@ -53,7 +88,8 @@ public class AccountManager {
 	 * 
 	 * @return
 	 */
-	public static ArrayList<Account> getAccounts(DBHelper dbHelper) {
+	public static ArrayList<Account> getAccounts() {
+		DBHelper dbHelper = DBHelper.getInstance();
 		ArrayList<Account> list = new ArrayList<Account>();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
@@ -66,20 +102,8 @@ public class AccountManager {
 				);
 		if (cursor.moveToFirst()) {
 			do {
-				int index = 0;
 				Account account = new Account();
-				account.uid = cursor.getString(index++);
-				account.nick = cursor.getString(index++);
-				account.type = cursor.getInt(index++);
-				
-				account.openId = cursor.getString(index++);
-				account.openKey = cursor.getString(index++);
-				account.accessToken = cursor.getString(index++);
-				account.refreshToken = cursor.getString(index++);
-				
-				account.invalidTime = new Date(Date.parse(cursor.getString(index++)));
-				account.authTime = new Date(Date.parse(cursor.getString(index++)));
-				
+				parseCursorToAccount(account, cursor);
 				
 				list.add(account);
 			} while (cursor.moveToNext());
@@ -94,6 +118,22 @@ public class AccountManager {
 
 	/****************************** 私有函数 ***************************/
 
+	private static void parseCursorToAccount(Account account, Cursor cursor){
+		int index = 0;
+		account.id = cursor.getInt(index++);
+		account.uid = cursor.getString(index++);
+		account.nick = cursor.getString(index++);
+		account.type = cursor.getInt(index++);
+		
+		account.openId = cursor.getString(index++);
+		account.openKey = cursor.getString(index++);
+		account.accessToken = cursor.getString(index++);
+		account.refreshToken = cursor.getString(index++);
+		account.isDefault = cursor.getInt(index++) == 1;
+		
+		account.invalidTime = new Date(cursor.getLong(index++));
+		account.authTime = new Date(cursor.getLong(index++));
+	}
 	
 
 }

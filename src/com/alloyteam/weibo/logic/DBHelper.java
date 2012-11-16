@@ -15,11 +15,13 @@ import android.util.Log;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 6;
 	public static final String DB_NAME = "alloyweibo.db";
 	public static final String ACCOUNT_TABLE_NAME = "account";
 
 	public static DBHelper dbHelper;
+	public static Context dbContext;
+	
 	
 	/**
 	 * @param context
@@ -27,14 +29,18 @@ public class DBHelper extends SQLiteOpenHelper {
 	 * @param factory
 	 * @param version
 	 */
-	public DBHelper(Context context) {
+	private DBHelper(Context context) {
 		super(context, DB_NAME, null, DATABASE_VERSION);
 		
 	}
 	
-	public static DBHelper getInstance(Context context){
+	public static void init(Context context){
+		dbContext = context;
+	}
+	
+	public static DBHelper getInstance(){
 		if(dbHelper == null){
-			dbHelper = new DBHelper(context);
+			dbHelper = new DBHelper(dbContext);
 		}
 		return dbHelper;
 	}
@@ -49,13 +55,15 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String sql = "CREATE TABLE IF NOT EXISTS " + ACCOUNT_TABLE_NAME
-				+ "(uid varchar primary key, "
+				+ "(id integer primary key autoincrement, "
+				+ "uid varchar, "
 				+ "nick varchar, "
 				+ "type int, "
 				+ "openId varchar, "
 				+ "openKey varchar, "
 				+ "accessToken varchar, "
 				+ "refreshToken varchar, "
+				+ "isDefault int, "
 				+ "invalidTime varchar, " 
 				+ "authTime varchar)";
 		db.execSQL(sql);

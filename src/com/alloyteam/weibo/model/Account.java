@@ -13,6 +13,11 @@ import java.util.Date;
 public class Account {
 
 	/**
+	 * 在数据库中的id
+	 */
+	public int id;
+	
+	/**
 	 * 帐号id
 	 */
 	public String uid;
@@ -61,4 +66,13 @@ public class Account {
 	 */
 	public boolean isDefault;
 
+	@Override
+	public String toString() {
+		return "Account [uid=" + uid + ", nick=" + nick + ", avator=" + avator
+				+ ", type=" + type + ", openId=" + openId + ", openKey="
+				+ openKey + ", accessToken=" + accessToken + ", refreshToken="
+				+ refreshToken + ", authTime=" + authTime + ", invalidTime="
+				+ invalidTime + ", isDefault=" + isDefault + "]";
+	}
+	
 }
