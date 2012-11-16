@@ -56,28 +56,20 @@ public class AccountManagerActivity extends Activity {
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setTitle("选择帐号类型");
-				builder.setView(listView);
-
-				final AlertDialog dialog = builder.create();
-
-				listView.setOnItemClickListener(new OnItemClickListener() {
-
+				builder.setItems(providers, new DialogInterface.OnClickListener() {
 					@Override
-					public void onItemClick(AdapterView<?> arg0, View view,
-							int index, long arg3) {
+					public void onClick(DialogInterface dialog, int index) {
 						Log.v(TAG, index + " click");
-						RadioButton radioBtn = (RadioButton) view
-								.findViewById(R.id.providerSelect);
-						radioBtn.setChecked(true);
-						dialog.dismiss();
 						Activity context = AccountManagerActivity.this;
 						int type = index + 1;
 						Intent intent = new Intent(context, AuthActivity.class);
 						intent.putExtra("type", type);
-						//context.startActivityForResult(intent, type);
 						context.startActivity(intent);
-					}
+				    }
 				});
+				builder.setNegativeButton("取消",  null);
+				AlertDialog dialog = builder.create();
+				dialog.setCanceledOnTouchOutside(false);
 				dialog.show();
 
 			}
