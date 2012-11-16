@@ -74,7 +74,8 @@ public class AccountManagerActivity extends Activity {
 						int type = index + 1;
 						Intent intent = new Intent(context, AuthActivity.class);
 						intent.putExtra("type", type);
-						context.startActivityForResult(intent, type);
+						//context.startActivityForResult(intent, type);
+						context.startActivity(intent);
 					}
 				});
 				dialog.show();
@@ -89,11 +90,22 @@ public class AccountManagerActivity extends Activity {
 
 	}
 
+	@Override 
+	protected void onNewIntent(Intent intent){
+		super.onNewIntent(intent);
+		String action = intent.getStringExtra("action");
+		Log.i(TAG,"onNewIntent "+action);
+		if (action.equals("addAccount")) {
+			String uid = intent.getStringExtra("uid");
+			int type = intent.getIntExtra("type", 0);
+			Account account = AccountManager.getAccount(uid, type);
+			accountListAdatper.add(account);
+			Log.v(TAG, "onActivityResult: " + uid + " added.");
+		}
+	}
+	
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onActivityResult(int, int,
-	 * android.content.Intent)
+	 * @deprecated {不需要这个方式}
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,

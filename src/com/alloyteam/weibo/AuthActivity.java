@@ -92,9 +92,10 @@ public class AuthActivity extends Activity {
     	Bundle values = Utility.parseUrl(url, "#");
     	
     	Activity context = AuthActivity.this;
-		Intent intent = new Intent();
-		context.setResult(accountType, intent);
-		
+		//Intent intent = new Intent();
+		//context.setResult(accountType, intent);
+		Intent intent = new Intent(context,AccountManagerActivity.class);
+    	
     	String uid =  values.getString("name");
     	if(AccountManager.exists(uid, accountType)){
     		Toast.makeText(AuthActivity.this, "该帐号已绑定，请勿重复绑定", 1000).show();
@@ -121,6 +122,7 @@ public class AuthActivity extends Activity {
 		intent.putExtra("action", "addAccount");
 		intent.putExtra("uid", account.uid);
 		intent.putExtra("type", account.type);
+		startActivity(intent);
 		context.finish();
     }
 }
