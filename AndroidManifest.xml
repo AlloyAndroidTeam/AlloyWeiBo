@@ -36,7 +36,7 @@
         <activity
             android:name="AccountManagerActivity"
             android:label="@string/account_manager"
-            android:launchMode="singleInstance" >
+             >
 
             <!-- 被调用后，如果在栈中存在，则其在栈中顺序被提到最前，其它activity顺序依次后退 -->
         </activity>

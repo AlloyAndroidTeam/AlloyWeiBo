@@ -90,18 +90,18 @@ public class AuthActivity extends Activity {
     private void handleAuthResult(WebView view, String url){
 //    	Log.v(TAG, "handleAuthResult: " + url);
     	Bundle values = Utility.parseUrl(url, "#");
+    	
     	Activity context = AuthActivity.this;
-		Intent intent = new Intent(context, AccountManagerActivity.class);
+		Intent intent = new Intent();
+		context.setResult(accountType, intent);
 		
-    	Account account;
     	String uid =  values.getString("name");
-    	account = AccountManager.getAccount(uid, accountType);
-    	if(account != null){
+    	if(AccountManager.exists(uid, accountType)){
     		Toast.makeText(AuthActivity.this, "该帐号已绑定，请勿重复绑定", 1000).show();
-    		context.startActivity(intent);
+    		context.finish();
     		return;
     	}
-    	account = new Account();
+    	Account account = new Account();
     	account.type = accountType;
     	account.uid = uid;
     	
@@ -120,6 +120,7 @@ public class AuthActivity extends Activity {
     	
 		intent.putExtra("action", "addAccount");
 		intent.putExtra("uid", account.uid);
-		context.startActivity(intent);
+		intent.putExtra("type", account.type);
+		context.finish();
     }
 }

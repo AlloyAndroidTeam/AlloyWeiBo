@@ -10,6 +10,7 @@ import com.alloyteam.weibo.model.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -73,7 +74,7 @@ public class AccountManagerActivity extends Activity {
 						int type = index + 1;
 						Intent intent = new Intent(context, AuthActivity.class);
 						intent.putExtra("type", type);
-						context.startActivity(intent);
+						context.startActivityForResult(intent, type);
 					}
 				});
 				dialog.show();
@@ -88,29 +89,33 @@ public class AccountManagerActivity extends Activity {
 
 	}
 
-	@Override
-	protected void onNewIntent(Intent intent){
-		String uid = intent.getStringExtra("uid");
-
-		Log.v(TAG, "onNewIntent: " + uid + " added.");
-	}
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see android.app.Activity#onRestart()
+	 * @see android.app.Activity#onActivityResult(int, int,
+	 * android.content.Intent)
 	 */
 	@Override
-	protected void onRestart() {
-		super.onRestart();
-		Intent intent = this.getIntent();
-		String uid = intent.getStringExtra("uid");
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+		// Log.v(TAG, "onActivityResult: " + requestCode + ":" + resultCode);
 
-		Log.v(TAG, "onRestart: " + uid + " added.");
+		String action = intent.getStringExtra("action");
+		if (action.equals("addAccount")) {
+			String uid = intent.getStringExtra("uid");
+			int type = intent.getIntExtra("type", 0);
+			Account account = AccountManager.getAccount(uid, type);
+			accountListAdatper.add(account);
+			Log.v(TAG, "onActivityResult: " + uid + " added.");
+		}
+
 	}
 
 	class AccountViewHolder {
 		Button deleteButton;
 		TextView description;
+		TextView provider;
 	}
 
 	class AccountListAdatper extends ArrayAdapter<Account> {
@@ -144,8 +149,8 @@ public class AccountManagerActivity extends Activity {
 
 				holder.description = (TextView) convertView
 						.findViewById(R.id.descTextView);
-				holder.deleteButton = (Button) convertView
-						.findViewById(R.id.deleteAccountBtn);
+				holder.deleteButton = (Button) convertView.findViewById(R.id.accountDelBtn);
+				holder.provider = (TextView) convertView.findViewById(R.id.accountProviderDesc);
 
 				convertView.setTag(holder);
 
@@ -154,15 +159,38 @@ public class AccountManagerActivity extends Activity {
 				holder = (AccountViewHolder) convertView.getTag();
 			}
 
-			Account account = this.getItem(position);
+			final Account account = this.getItem(position);
 			String desc = "";
 			if (account.type == Constants.TENCENT) {
-				desc += "腾讯微博: ";
+				desc += "腾讯微博";
 			} else if (account.type == Constants.SINA) {
-				desc += "新浪微博: ";
+				desc += "新浪微博";
 			}
-			desc += account.uid + "(" + account.nick + ")";
+			holder.provider.setText(desc);
+			desc = account.uid + "(" + account.nick + ")";
 			holder.description.setText(desc);
+
+			holder.deleteButton.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					new AlertDialog.Builder(AccountManagerActivity.this)
+							.setMessage("您确定要解除绑定吗?")
+							.setPositiveButton(R.string.ensure_text,
+									new AlertDialog.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											AccountManager
+													.removeAccount(account);
+											accountListAdatper.remove(account);
+										}
+
+									}).show();
+
+				}
+			});
 
 			return convertView;
 		}

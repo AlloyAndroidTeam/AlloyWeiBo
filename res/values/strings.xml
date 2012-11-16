@@ -10,5 +10,6 @@
     <string name="title_activity_auth">帐号授权</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="add_account">+添加帐号</string>
+    <string name="ensure_text">确定</string>
 
 </resources>

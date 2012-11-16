@@ -15,7 +15,7 @@ import android.util.Log;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-	public static final int DATABASE_VERSION = 6;
+	public static final int DATABASE_VERSION = 8;
 	public static final String DB_NAME = "alloyweibo.db";
 	public static final String ACCOUNT_TABLE_NAME = "account";
 

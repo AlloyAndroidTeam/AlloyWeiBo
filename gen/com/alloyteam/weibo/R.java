@@ -22,26 +22,27 @@ public final class R {
         public static final int tab_text_selector=0x7f020008;
     }
     public static final class id {
-        public static final int RelativeLayout1=0x7f070008;
-        public static final int accountList=0x7f070005;
-        public static final int addNewAccount=0x7f070004;
-        public static final int authProgressBar=0x7f070007;
-        public static final int authWebView=0x7f070006;
-        public static final int btn_account_manager=0x7f07000a;
-        public static final int btn_group=0x7f07000c;
-        public static final int btn_post=0x7f07000b;
-        public static final int deleteAccountBtn=0x7f070000;
+        public static final int RelativeLayout1=0x7f070009;
+        public static final int accountDelBtn=0x7f070002;
+        public static final int accountList=0x7f070006;
+        public static final int accountProviderDesc=0x7f070000;
+        public static final int addNewAccount=0x7f070005;
+        public static final int authProgressBar=0x7f070008;
+        public static final int authWebView=0x7f070007;
+        public static final int btn_account_manager=0x7f07000b;
+        public static final int btn_group=0x7f07000d;
+        public static final int btn_post=0x7f07000c;
         public static final int descTextView=0x7f070001;
-        public static final int editText1=0x7f07000e;
-        public static final int lv_main_timeline=0x7f07000d;
-        public static final int menu_settings=0x7f070013;
-        public static final int providerDesc=0x7f070002;
-        public static final int providerSelect=0x7f070003;
-        public static final int tab_item_icon=0x7f070011;
-        public static final int tab_item_text=0x7f070012;
-        public static final int tabsLayout=0x7f070010;
-        public static final int textView1=0x7f07000f;
-        public static final int tv_home_title=0x7f070009;
+        public static final int editText1=0x7f07000f;
+        public static final int lv_main_timeline=0x7f07000e;
+        public static final int menu_settings=0x7f070014;
+        public static final int providerDesc=0x7f070003;
+        public static final int providerSelect=0x7f070004;
+        public static final int tab_item_icon=0x7f070012;
+        public static final int tab_item_text=0x7f070013;
+        public static final int tabsLayout=0x7f070011;
+        public static final int textView1=0x7f070010;
+        public static final int tv_home_title=0x7f07000a;
     }
     public static final class layout {
         public static final int account_manager_item=0x7f030000;
@@ -64,6 +65,7 @@ public final class R {
         public static final int account_manager=0x7f040004;
         public static final int add_account=0x7f040009;
         public static final int app_name=0x7f040000;
+        public static final int ensure_text=0x7f04000a;
         public static final int hello_world=0x7f040001;
         public static final int menu_settings=0x7f040002;
         public static final int post=0x7f040006;
