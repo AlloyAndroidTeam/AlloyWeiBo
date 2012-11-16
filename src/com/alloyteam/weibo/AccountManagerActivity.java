@@ -95,7 +95,7 @@ public class AccountManagerActivity extends Activity {
 		super.onNewIntent(intent);
 		String action = intent.getStringExtra("action");
 		Log.i(TAG,"onNewIntent "+action);
-		if (action.equals("addAccount")) {
+		if (action!=null && action.equals("addAccount")) {
 			String uid = intent.getStringExtra("uid");
 			int type = intent.getIntExtra("type", 0);
 			Account account = AccountManager.getAccount(uid, type);
