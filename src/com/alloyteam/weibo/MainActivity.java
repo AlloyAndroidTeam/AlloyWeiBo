@@ -21,6 +21,7 @@ import android.widget.TabHost.TabSpec;
  */
 public class MainActivity extends TabActivity {
 
+	public static final String TAG = "MainActivity"; 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,6 +41,11 @@ public class MainActivity extends TabActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
+    }
+    
+    @Override
+    protected void onNewIntent(Intent intent){
+    	super.onNewIntent(intent);
     }
 
 	private TabHost mTabHost;
