@@ -1,4 +1,4 @@
-package com.example.my;
+package com.alloyteam.weibo.model;
 
 public class Weibo {
 	

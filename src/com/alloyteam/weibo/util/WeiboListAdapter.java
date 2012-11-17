@@ -1,10 +1,13 @@
-package com.example.my;
+package com.alloyteam.weibo.util;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+
+import com.alloyteam.weibo.R;
+import com.alloyteam.weibo.model.Weibo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

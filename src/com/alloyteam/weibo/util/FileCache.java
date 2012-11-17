@@ -1,4 +1,4 @@
-package com.example.my;
+package com.alloyteam.weibo.util;
 
 import java.io.File;
 
@@ -10,8 +10,8 @@ public class FileCache {
         private File cacheDir;
 
         public FileCache(Context context) {
-                // Èç¹ûÓÐSD¿¨ÔòÔÚSD¿¨ÖÐ½¨Ò»¸öLazyListµÄÄ¿Â¼´æ·Å»º´æµÄÍ¼Æ¬
-                // Ã»ÓÐSD¿¨¾Í·ÅÔÚÏµÍ³µÄ»º´æÄ¿Â¼ÖÐ
+                // ï¿½ï¿½ï¿½ï¿½ï¿½SDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½SDï¿½ï¿½ï¿½Ð½ï¿½Ò»ï¿½ï¿½LazyListï¿½ï¿½Ä¿Â¼ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½Í¼Æ¬
+                // Ã»ï¿½ï¿½SDï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ÏµÍ³ï¿½Ä»ï¿½ï¿½ï¿½Ä¿Â¼ï¿½ï¿½
                 if (android.os.Environment.getExternalStorageState().equals(
                                 android.os.Environment.MEDIA_MOUNTED))
                         cacheDir = new File(
@@ -24,7 +24,7 @@ public class FileCache {
         }
 
         public File getFile(String url) {
-                // ½«urlµÄhashCode×÷Îª»º´æµÄÎÄ¼þÃû
+                // ï¿½ï¿½urlï¿½ï¿½hashCodeï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
                 String filename = String.valueOf(url.hashCode());
                 // Another possible solution
                 // String filename = URLEncoder.encode(url);

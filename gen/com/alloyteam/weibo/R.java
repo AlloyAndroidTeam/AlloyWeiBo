@@ -11,15 +11,21 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_action_search=0x7f020000;
-        public static final int ic_launcher=0x7f020001;
-        public static final int tab_bg_home=0x7f020002;
-        public static final int tab_bg_home_normal=0x7f020003;
-        public static final int tab_bg_home_selected=0x7f020004;
-        public static final int tab_bg_normal=0x7f020005;
-        public static final int tab_bg_selected=0x7f020006;
-        public static final int tab_bg_selector=0x7f020007;
-        public static final int tab_text_selector=0x7f020008;
+        public static final int avatar=0x7f020000;
+        public static final int darkgray=0x7f02000c;
+        public static final int flower=0x7f020001;
+        public static final int ic_action_search=0x7f020002;
+        public static final int ic_launcher=0x7f020003;
+        public static final int silver=0x7f02000e;
+        public static final int start=0x7f020004;
+        public static final int tab_bg_home=0x7f020005;
+        public static final int tab_bg_home_normal=0x7f020006;
+        public static final int tab_bg_home_selected=0x7f020007;
+        public static final int tab_bg_normal=0x7f020008;
+        public static final int tab_bg_selected=0x7f020009;
+        public static final int tab_bg_selector=0x7f02000a;
+        public static final int tab_text_selector=0x7f02000b;
+        public static final int white=0x7f02000d;
     }
     public static final class id {
         public static final int RelativeLayout1=0x7f070009;
@@ -33,15 +39,26 @@ public final class R {
         public static final int btn_group=0x7f07000d;
         public static final int btn_post=0x7f07000c;
         public static final int descTextView=0x7f070001;
-        public static final int editText1=0x7f07000f;
+        public static final int editText1=0x7f070012;
+        public static final int imageView1=0x7f070016;
+        public static final int imageView2=0x7f070019;
+        public static final int imageView3=0x7f07001d;
+        public static final int listView1=0x7f070010;
         public static final int lv_main_timeline=0x7f07000e;
-        public static final int menu_settings=0x7f070014;
+        public static final int menu_settings=0x7f07001f;
         public static final int providerDesc=0x7f070003;
         public static final int providerSelect=0x7f070004;
-        public static final int tab_item_icon=0x7f070012;
-        public static final int tab_item_text=0x7f070013;
-        public static final int tabsLayout=0x7f070011;
-        public static final int textView1=0x7f070010;
+        public static final int relativeLayout1=0x7f07001a;
+        public static final int tab_item_icon=0x7f070014;
+        public static final int tab_item_text=0x7f070015;
+        public static final int tabsLayout=0x7f070013;
+        public static final int textView1=0x7f070011;
+        public static final int textView2=0x7f070017;
+        public static final int textView3=0x7f070018;
+        public static final int textView4=0x7f07001b;
+        public static final int textView5=0x7f07001c;
+        public static final int textView6=0x7f07001e;
+        public static final int tv_home_loading=0x7f07000f;
         public static final int tv_home_title=0x7f07000a;
     }
     public static final class layout {
@@ -51,10 +68,15 @@ public final class R {
         public static final int activity_auth=0x7f030003;
         public static final int activity_home=0x7f030004;
         public static final int activity_main=0x7f030005;
-        public static final int activity_post=0x7f030006;
-        public static final int activity_setting=0x7f030007;
-        public static final int activity_splash=0x7f030008;
-        public static final int tab_item=0x7f030009;
+        public static final int activity_my=0x7f030006;
+        public static final int activity_post=0x7f030007;
+        public static final int activity_setting=0x7f030008;
+        public static final int activity_splash=0x7f030009;
+        public static final int rect_gray=0x7f03000a;
+        public static final int selector=0x7f03000b;
+        public static final int tab_item=0x7f03000c;
+        public static final int weibo_item=0x7f03000d;
+        public static final int weibo_item_type2=0x7f03000e;
     }
     public static final class menu {
         public static final int activity_auth=0x7f060000;

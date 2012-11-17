@@ -1,4 +1,4 @@
-package com.example.my;
+package com.alloyteam.weibo.util;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,14 +11,14 @@ import android.util.Log;
 
 public class MemoryCache {
     private static final String TAG = "MemoryCache";
-    // ·ÅÈë»º´æÊ±ÊÇ¸öÍ¬²½²Ù×÷
-    // LinkedHashMap¹¹Ôì·½·¨µÄ×îºóÒ»¸ö²ÎÊıtrue´ú±íÕâ¸ömapÀïµÄÔªËØ½«°´ÕÕ×î½üÊ¹ÓÃ´ÎÊıÓÉÉÙµ½¶àÅÅÁĞ£¬¼´LRU
-    // ÕâÑùµÄºÃ´¦ÊÇÈç¹ûÒª½«»º´æÖĞµÄÔªËØÌæ»»£¬ÔòÏÈ±éÀú³ö×î½ü×îÉÙÊ¹ÓÃµÄÔªËØÀ´Ìæ»»ÒÔÌá¸ßĞ§ÂÊ
+    // ï¿½ï¿½ï¿½ë»ºï¿½ï¿½Ê±ï¿½Ç¸ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // LinkedHashMapï¿½ï¿½ï¿½ì·½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½trueï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mapï¿½ï¿½ï¿½Ôªï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ùµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ£ï¿½ï¿½ï¿½LRU
+    // ï¿½ï¿½ï¿½ï¿½ÄºÃ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½Ôªï¿½ï¿½ï¿½æ»»ï¿½ï¿½ï¿½ï¿½ï¿½È±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ôªï¿½ï¿½ï¿½ï¿½ï¿½æ»»ï¿½ï¿½ï¿½ï¿½ï¿½Ğ§ï¿½ï¿½
     private Map<String, Bitmap> cache = Collections
                     .synchronizedMap(new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
-    // »º´æÖĞÍ¼Æ¬ËùÕ¼ÓÃµÄ×Ö½Ú£¬³õÊ¼0£¬½«Í¨¹ı´Ë±äÁ¿ÑÏ¸ñ¿ØÖÆ»º´æËùÕ¼ÓÃµÄ¶ÑÄÚ´æ
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½Õ¼ï¿½Ãµï¿½ï¿½Ö½Ú£ï¿½ï¿½ï¿½Ê¼0ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½Ë±ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ÃµÄ¶ï¿½ï¿½Ú´ï¿½
     private long size = 0;// current allocated size
-    // »º´æÖ»ÄÜÕ¼ÓÃµÄ×î´ó¶ÑÄÚ´æ
+    // ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½Õ¼ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
     private long limit = 1000000;// max memory in bytes
 
     public MemoryCache() {
@@ -54,13 +54,13 @@ public class MemoryCache {
     }
 
     /**
-     * ÑÏ¸ñ¿ØÖÆ¶ÑÄÚ´æ£¬Èç¹û³¬¹ı½«Ê×ÏÈÌæ»»×î½ü×îÉÙÊ¹ÓÃµÄÄÇ¸öÍ¼Æ¬»º´æ
+     * ï¿½Ï¸ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Ú´æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ»»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½ï¿½Ç¸ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
      * 
      */
     private void checkSize() {
             Log.i(TAG, "cache size=" + size + " length=" + cache.size());
             if (size > limit) {
-                    // ÏÈ±éÀú×î½ü×îÉÙÊ¹ÓÃµÄÔªËØ
+                    // ï¿½È±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ôªï¿½ï¿½
                     Iterator<Entry<String, Bitmap>> iter = cache.entrySet().iterator();
                     while (iter.hasNext()) {
                             Entry<String, Bitmap> entry = iter.next();
@@ -78,7 +78,7 @@ public class MemoryCache {
     }
 
     /**
-     * Í¼Æ¬Õ¼ÓÃµÄÄÚ´æ
+     * Í¼Æ¬Õ¼ï¿½Ãµï¿½ï¿½Ú´ï¿½
      * 
      * @param bitmap
      * @return

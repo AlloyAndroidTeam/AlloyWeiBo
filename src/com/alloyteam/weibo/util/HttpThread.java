@@ -1,4 +1,4 @@
-package com.example.my;
+package com.alloyteam.weibo.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -21,7 +21,7 @@ public class HttpThread extends Thread {
 	}
 	
 	@Override
-	public void run() // Ïß³Ì´¦ÀíµÄÄÚÈÝ
+	public void run() // ï¿½ß³Ì´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 		Log.d("run","start");
 		String s=getFromAssets(mActivity,"weibo.json");
@@ -33,7 +33,7 @@ public class HttpThread extends Thread {
     public static class MyHandler extends Handler {
     	final HttpCallback mHttpCallback;
 
-        MyHandler(final HttpCallback httpCallback) {
+        public MyHandler(final HttpCallback httpCallback) {
         	mHttpCallback=httpCallback;
         }
 

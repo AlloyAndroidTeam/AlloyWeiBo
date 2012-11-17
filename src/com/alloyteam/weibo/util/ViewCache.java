@@ -1,4 +1,6 @@
-package com.example.my;
+package com.alloyteam.weibo.util;
+
+import com.alloyteam.weibo.R;
 
 import android.view.View;
 import android.widget.ImageView;

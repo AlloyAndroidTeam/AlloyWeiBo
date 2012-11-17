@@ -1,0 +1,5 @@
+<resources>
+    <drawable name="darkgray">#dddddddd</drawable>
+    <drawable name="white">#FFFFFFFF</drawable>
+    <drawable name="silver">#00ffffff</drawable>   <!-- 透明色 -->
+</resources>

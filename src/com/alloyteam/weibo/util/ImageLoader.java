@@ -1,4 +1,4 @@
-package com.example.my;
+package com.alloyteam.weibo.util;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import com.alloyteam.weibo.R;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,7 +25,7 @@ public class ImageLoader {
 	FileCache fileCache;
 	private Map<ImageView, String> imageViews = Collections
 			.synchronizedMap(new WeakHashMap<ImageView, String>());
-	// Ïß³Ì³Ø
+	// çº¿ç¨‹æ± 
 	ExecutorService executorService;
 
 	public ImageLoader(Context context) {
@@ -31,14 +33,14 @@ public class ImageLoader {
 		executorService = Executors.newFixedThreadPool(5);
 	}
 
-	// µ±½øÈëlistviewÊ±Ä¬ÈÏµÄÍ¼Æ¬£¬¿É»»³ÉÄã×Ô¼ºµÄÄ¬ÈÏÍ¼Æ¬
+	// å½“è¿›å…¥listviewæ—¶é»˜è®¤çš„å›¾ç‰‡ï¼Œå¯æ¢æˆä½ è‡ªå·±çš„é»˜è®¤å›¾ç‰‡
 	final int stub_id = R.drawable.avatar;
 
-	// ×îÖ÷ÒªµÄ·½·¨
+	// æœ€ä¸»è¦çš„æ–¹æ³•
 	public void displayImage(String url, ImageView imageView,
 			ImageCallback callback) {
 		imageViews.put(imageView, url);
-		// ÏÈ´ÓÄÚ´æ»º´æÖĞ²éÕÒ
+		// å…ˆä»å†…å­˜ç¼“å­˜ä¸­æŸ¥æ‰¾
 
 		Bitmap bitmap = memoryCache.get(url);
 		if (bitmap != null) {
@@ -49,7 +51,7 @@ public class ImageLoader {
 				imageView.setImageBitmap(bitmap);
 			}
 		} else {
-			// ÈôÃ»ÓĞµÄ»°Ôò¿ªÆôĞÂÏß³Ì¼ÓÔØÍ¼Æ¬
+			// è‹¥æ²¡æœ‰çš„è¯åˆ™å¼€å¯æ–°çº¿ç¨‹åŠ è½½å›¾ç‰‡
 			queuePhoto(url, imageView, callback);
 			imageView.setImageResource(stub_id);
 		}
@@ -65,10 +67,10 @@ public class ImageLoader {
 		/*
 		 * File f = fileCache.getFile(url);
 		 * 
-		 * // ÏÈ´ÓÎÄ¼ş»º´æÖĞ²éÕÒÊÇ·ñÓĞ Bitmap b = decodeFile(f); if (b != null) return b;
+		 * // å…ˆä»æ–‡ä»¶ç¼“å­˜ä¸­æŸ¥æ‰¾æ˜¯å¦æœ‰ Bitmap b = decodeFile(f); if (b != null) return b;
 		 */
 
-		// ×îºó´ÓÖ¸¶¨µÄurlÖĞÏÂÔØÍ¼Æ¬
+		// æœ€åä»æŒ‡å®šçš„urlä¸­ä¸‹è½½å›¾ç‰‡
 		try {
 			Bitmap bitmap = null;
 			URL imageUrl = new URL(url);
@@ -90,7 +92,7 @@ public class ImageLoader {
 		}
 	}
 
-	// decodeÕâ¸öÍ¼Æ¬²¢ÇÒ°´±ÈÀıËõ·ÅÒÔ¼õÉÙÄÚ´æÏûºÄ£¬ĞéÄâ»ú¶ÔÃ¿ÕÅÍ¼Æ¬µÄ»º´æ´óĞ¡Ò²ÊÇÓĞÏŞÖÆµÄ
+	// decodeè¿™ä¸ªå›¾ç‰‡å¹¶ä¸”æŒ‰æ¯”ä¾‹ç¼©æ”¾ä»¥å‡å°‘å†…å­˜æ¶ˆè€—ï¼Œè™šæ‹Ÿæœºå¯¹æ¯å¼ å›¾ç‰‡çš„ç¼“å­˜å¤§å°ä¹Ÿæ˜¯æœ‰é™åˆ¶çš„
 	private Bitmap decodeFile(InputStream f) {
 
 		// decode image size
@@ -142,7 +144,7 @@ public class ImageLoader {
 			if (imageViewReused(photoToLoad))
 				return;
 			BitmapDisplayer bd = new BitmapDisplayer(bmp,photoToLoad);			
-			// ¸üĞÂµÄ²Ù×÷·ÅÔÚUIÏß³ÌÖĞ
+			// æ›´æ–°çš„æ“ä½œæ”¾åœ¨UIçº¿ç¨‹ä¸­
 			Activity a = (Activity) photoToLoad.imageView.getContext();
 			a.runOnUiThread(bd);
 			// bd.run();
@@ -150,7 +152,7 @@ public class ImageLoader {
 	}
 
 	/**
-	 * ·ÀÖ¹Í¼Æ¬´íÎ»
+	 * é˜²æ­¢å›¾ç‰‡é”™ä½
 	 * 
 	 * @param photoToLoad
 	 * @return
@@ -162,7 +164,7 @@ public class ImageLoader {
 		return false;
 	}
 
-	// ÓÃÓÚÔÚUIÏß³ÌÖĞ¸üĞÂ½çÃæ
+	// ç”¨äºåœ¨UIçº¿ç¨‹ä¸­æ›´æ–°ç•Œé¢
 	class BitmapDisplayer implements Runnable {
 		Bitmap bitmap;
 		PhotoToLoad photoToLoad;

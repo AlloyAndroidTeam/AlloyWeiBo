@@ -1,4 +1,4 @@
-package com.example.my;
+package com.alloyteam.weibo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import com.alloyteam.weibo.model.*;
+import com.alloyteam.weibo.util.HttpThread;
+import com.alloyteam.weibo.util.WeiboListAdapter;
 
 public class MyActivity extends Activity {
 	ListView mylist;
