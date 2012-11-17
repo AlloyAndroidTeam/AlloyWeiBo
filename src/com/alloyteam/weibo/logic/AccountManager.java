@@ -107,6 +107,11 @@ public class AccountManager {
 		return result;
 	}
 
+	/** 获取默认帐号
+	 * 
+	 * 
+	 */
+	
 	/**
 	 * 获取当前已经授权的帐号列表
 	 * 
