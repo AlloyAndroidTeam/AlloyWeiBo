@@ -7,11 +7,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.alloyteam.net.HttpConnection;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.HttpThread;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
-import android.accounts.AccountManager;
+import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.logic.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import android.widget.ListView;
  */
 public class HomeActivity extends Activity {
 	public static final String TAG = "HomeActivity";
+	public ListView mylist;
 	
 	private Handler mainHandler = new Handler(){
 		@Override
@@ -84,68 +87,74 @@ public class HomeActivity extends Activity {
 		findViewById(R.id.btn_group).setOnClickListener(listener);
 		findViewById(R.id.btn_post).setOnClickListener(listener);
 		
-        final ListView mylist = (ListView) findViewById(R.id.lv_main_timeline);
-        mylist.setOnItemClickListener(timelineClickListener );
-        final Activity context=this;
-        new HttpThread(new HttpThread.MyHandler(
-			new HttpThread.HttpCallback(){
-				public void onResponse(JSONObject obj){
-					try{
-						List<Weibo> list=new ArrayList<Weibo>();
-			        	JSONObject data =  obj.getJSONObject("data");
-			        	JSONArray info = data.getJSONArray("info");
-			        	Log.d("json","parse");
-			        	for(int i=0;i<info.length();++i){
-				        	JSONObject item = info.getJSONObject(i);
-				        	String text = item.getString("text");
-				        	String name = item.getString("name");
-				        	String avatarUrl=item.getString("head")+"/50";
-				        	int type=item.getInt("type");
-				        	Weibo weibo=new Weibo(name,text,avatarUrl);
-				        	long timestamp=item.getLong("timestamp");
-				            weibo.type=type;
-				            weibo.timestamp=timestamp;
-				            if(type==2){
-					            JSONObject source=item.getJSONObject("source");
-					        	String text2 = source.getString("text");
-					        	String name2 = source.getString("name");
-					        	String avatarUrl2=source.getString("head")+"/50";
-				        		weibo.mText2=text2;
-				        		weibo.mAvatarUrl2=avatarUrl2;
-				        		weibo.mName2=name2;
-				            	if(source.get("image")!=JSONObject.NULL){
-				            		Log.d("my","image");
-				            		JSONArray images=source.getJSONArray("image");
-				            		weibo.mImage=images.getString(0);
-				            	}
-				            	weibo.count = item.getInt("count");
-				            }
-				            else{
-				            	if(item.get("image")!=JSONObject.NULL){
-				            		Log.d("my","image");
-				            		JSONArray images=item.getJSONArray("image");
-				            		weibo.mImage=images.getString(0);
-				            	}
-				            }
-				            list.add(weibo);
-				        }
-			            WeiboListAdapter ila=new WeiboListAdapter(context,list);
-			            mylist.setAdapter(ila);
-			            TextView text=(TextView) context.findViewById(R.id.tv_home_loading);
-			            text.setVisibility(View.GONE);
-			            //LayoutParams lp=(LayoutParams) mylist.getLayoutParams();
-			            //lp.leftMargin=0;
-			            //mylist.setLayoutParams(lp);
-			        }
-					catch (JSONException je)  
-		            {  
-		                Log.d("json","error");
-		            }  
-    			}
-			}
-		),"",this).start();
+		getHomeLine();
 	}
 	
+	public void getHomeLine(){
+        mylist = (ListView) findViewById(R.id.lv_main_timeline);
+        mylist.setOnItemClickListener(timelineClickListener );
+        Account account=AccountManager.getDefaultAccount();
+        final Activity context=this;
+        if(account==null)return;
+        account.getHomeLine(0, 0, 10, 0, 0, "json", new HttpConnection.HttpConnectionListener() {		
+			public void onResponse(boolean success, String result) {
+				//Log.d("my",result);
+				if(!success)return;
+				try{
+					List<Weibo> list=new ArrayList<Weibo>();
+					JSONObject obj=new JSONObject(result);
+		        	JSONObject data =  obj.getJSONObject("data");
+		        	JSONArray info = data.getJSONArray("info");
+		        	Log.d("json","parse");
+		        	for(int i=0;i<info.length();++i){
+			        	JSONObject item = info.getJSONObject(i);
+			        	String text = item.getString("text");
+			        	String name = item.getString("name");
+			        	String avatarUrl=item.getString("head")+"/50";
+			        	int type=item.getInt("type");
+			        	Weibo weibo=new Weibo(name,text,avatarUrl);
+			        	long timestamp=item.getLong("timestamp");
+			            weibo.type=type;
+			            weibo.timestamp=timestamp;
+			            if(type==2){
+				            JSONObject source=item.getJSONObject("source");
+				        	String text2 = source.getString("text");
+				        	String name2 = source.getString("name");
+				        	String avatarUrl2=source.getString("head")+"/50";
+			        		weibo.mText2=text2;
+			        		weibo.mAvatarUrl2=avatarUrl2;
+			        		weibo.mName2=name2;
+			            	if(source.get("image")!=JSONObject.NULL){
+			            		Log.d("my","image");
+			            		JSONArray images=source.getJSONArray("image");
+			            		weibo.mImage=images.getString(0);
+			            	}
+			            	weibo.count = item.getInt("count");
+			            }
+			            else{
+			            	if(item.get("image")!=JSONObject.NULL){
+			            		Log.d("my","image");
+			            		JSONArray images=item.getJSONArray("image");
+			            		weibo.mImage=images.getString(0);
+			            	}
+			            }
+			            list.add(weibo);
+			        }
+		            WeiboListAdapter ila=new WeiboListAdapter(context,list);
+		            mylist.setAdapter(ila);
+		            TextView text=(TextView) context.findViewById(R.id.tv_home_loading);
+		            text.setVisibility(View.GONE);
+		            //LayoutParams lp=(LayoutParams) mylist.getLayoutParams();
+		            //lp.leftMargin=0;
+		            //mylist.setLayoutParams(lp);
+		        }
+				catch (JSONException je)  
+	            {  
+	                Log.d("json","error");
+	            }
+			}
+        });		
+	}
 	@Override
 	protected void onResume(){
 		super.onResume();

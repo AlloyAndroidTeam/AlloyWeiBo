@@ -6,6 +6,11 @@ package com.alloyteam.weibo.model;
 
 import java.util.Date;
 
+import android.util.Log;
+
+import com.alloyteam.net.HttpConnection;
+import com.alloyteam.weibo.logic.Constants;
+
 /**
  * @author azraellong
  * 
@@ -75,4 +80,22 @@ public class Account {
 				+ invalidTime + ", isDefault=" + isDefault + "]";
 	}
 	
+	/**
+	 * 获取主页时间线
+	 * pageflag 分页标识（0：第一页，1：向下翻页，2：向上翻页）
+	 * pagetime 本页起始时间（第一页：填0，向上翻页：填上一次请求返回的第一条记录时间，向下翻页：填上一次请求返回的最后一条记录时间）
+	 * reqnum 每次请求记录的条数（1-70条）
+	 * type 拉取类型
+	 * contenttype 内容过滤
+	 * oauth_consumer_key=APP_KEY&access_token=ACCESSTOKEN&openid=OPENID&clientip=CLIENTIP&oauth_version=2.a&scope=all
+	 */
+	public void getHomeLine(int pageflag, int pagetime, int reqnum, int type, int contenttype, String format, HttpConnection.HttpConnectionListener listener){
+    	String url = Constants.Tencent.HOME_TIMELINE +
+    			"?oauth_consumer_key="+Constants.Tencent.APP_KEY+"&access_token="+accessToken+"&openid="+openId+"&clientip=127.0.0.1&oauth_version=2.a&scope=all";
+    	url+="&pageflag="+pageflag+"&pagetime="+pagetime+"&reqnum="+reqnum+"&type="+type+"contenttype="+contenttype+"&format="+format+"&t="+System.currentTimeMillis();
+    	HttpConnection connection=new HttpConnection();
+    	connection.get(url, listener);
+    	connection.run();
+    	Log.d("my",url);
+	}
 }

@@ -27,7 +27,7 @@ public class Constants {
 		
 		public static final String REDIRECT_URL = "http://isynchro.imatlas.com";
 		
-		public static final String API_ROOT = "https://open.t.qq.com/api"; 
+		public static final String API_ROOT = "http://open.t.qq.com/api"; 
 		
 		public static final String OAUTH_GET_ACCESS_TOKEN = "https://open.t.qq.com/cgi-bin/oauth2/authorize";
 		

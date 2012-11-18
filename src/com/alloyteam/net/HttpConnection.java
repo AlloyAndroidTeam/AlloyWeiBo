@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 /**
  * 异步http请求
@@ -56,7 +57,7 @@ public class HttpConnection implements Runnable {
 		ConnectionManager.getInstance().push(this);
 	}
 
-	public void get(String url) {
+	public void get(String url, HttpConnectionListener listener) {
 		create(GET, url, null, listener);
 	}
 
@@ -109,7 +110,7 @@ public class HttpConnection implements Runnable {
 					if (data != null) {
 						Bundle bundle = (Bundle) data;
 						String result = bundle.getString("callbackkey");
-						boolean success = result == "fail";
+						boolean success = result != "fail";
 						listener.onResponse(success, success ? result : null);
 					}
 				}
@@ -130,7 +131,14 @@ public class HttpConnection implements Runnable {
 			switch (method) {
 			case GET:
 				httpResponse = httpClient.execute(new HttpGet(url));
-				break;
+				if (isHttpSuccessExecuted(httpResponse)) {
+					String result = EntityUtils.toString(httpResponse
+							.getEntity());
+					Log.d("my",result);
+					this.sendMessage(result);
+				} else {
+					break;
+				}
 			case POST:
 				HttpPost httpPost = new HttpPost(url);
 //				List<NameValuePair> params = new ArrayList<NameValuePair>();

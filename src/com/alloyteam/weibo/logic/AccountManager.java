@@ -111,6 +111,26 @@ public class AccountManager {
 	 * 
 	 * 
 	 */
+	public static Account getDefaultAccount() {
+		DBHelper dbHelper = DBHelper.getInstance();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+				null, // Columns to return
+				null, // SQL WHERE
+				null, // Selection Args
+				null, // SQL GROUP BY
+				null, // SQL HAVING
+				null // SQL ORDER BY
+				);
+		if (cursor.moveToFirst()) {
+			Account account = new Account();
+			parseCursorToAccount(account, cursor);
+			return account;
+		}
+		else {
+			return null;
+		}
+	}
 	
 	/**
 	 * 获取当前已经授权的帐号列表
@@ -141,7 +161,6 @@ public class AccountManager {
 			cursor.close();
 		}
 		return list;
-
 	}
 
 	/****************************** 私有函数 ***************************/
