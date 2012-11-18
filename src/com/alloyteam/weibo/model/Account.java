@@ -95,7 +95,7 @@ public class Account {
 	 * oauth_consumer_key=APP_KEY&access_token=ACCESSTOKEN&openid=OPENID&clientip=CLIENTIP&oauth_version=2.a&scope=all
 	 */
 	public void getHomeLine(final int pageflag, final int pagetime, final int reqnum, final int type, final int contenttype, final String format, final HttpConnection.HttpConnectionListener listener){
-		if(isInvalid()){
+		/*if(isInvalid()){
 			refresh(new RefreshCallback(){
 				public void onRefreshCallback(){
 					getHomeLine(pageflag,pagetime,reqnum,type,contenttype,format,listener);
@@ -103,7 +103,7 @@ public class Account {
 			});
 			Log.d("my","invalid");
 			return;
-		}
+		}*/
     	String url = Constants.Tencent.HOME_TIMELINE +
     			"?oauth_consumer_key="+Constants.Tencent.APP_KEY+"&access_token="+accessToken+"&openid="+openId+"&clientip=127.0.0.1&oauth_version=2.a&scope=all";
     	url+="&pageflag="+pageflag+"&pagetime="+pagetime+"&reqnum="+reqnum+"&type="+type+"contenttype="+contenttype+"&format="+format+"&t="+System.currentTimeMillis();
