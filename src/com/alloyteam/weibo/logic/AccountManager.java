@@ -123,13 +123,16 @@ public class AccountManager {
 				null // SQL ORDER BY
 				);
 		if (cursor.moveToFirst()) {
-			Account account = new Account();
-			parseCursorToAccount(account, cursor);
-			return account;
+			do {
+				Account account = new Account();
+				parseCursorToAccount(account, cursor);
+
+				//if(account.isDefault){
+					return account;
+				//}
+			} while (cursor.moveToNext());
 		}
-		else {
-			return null;
-		}
+		return null;
 	}
 	
 	/**

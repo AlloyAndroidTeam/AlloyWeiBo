@@ -6,10 +6,15 @@ package com.alloyteam.weibo.model;
 
 import java.util.Date;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.os.Bundle;
 import android.util.Log;
 
 import com.alloyteam.net.HttpConnection;
 import com.alloyteam.weibo.logic.Constants;
+import com.alloyteam.weibo.logic.Utility;
 
 /**
  * @author azraellong
@@ -89,7 +94,16 @@ public class Account {
 	 * contenttype 内容过滤
 	 * oauth_consumer_key=APP_KEY&access_token=ACCESSTOKEN&openid=OPENID&clientip=CLIENTIP&oauth_version=2.a&scope=all
 	 */
-	public void getHomeLine(int pageflag, int pagetime, int reqnum, int type, int contenttype, String format, HttpConnection.HttpConnectionListener listener){
+	public void getHomeLine(final int pageflag, final int pagetime, final int reqnum, final int type, final int contenttype, final String format, final HttpConnection.HttpConnectionListener listener){
+		if(isInvalid()){
+			refresh(new RefreshCallback(){
+				public void onRefreshCallback(){
+					getHomeLine(pageflag,pagetime,reqnum,type,contenttype,format,listener);
+				}
+			});
+			Log.d("my","invalid");
+			return;
+		}
     	String url = Constants.Tencent.HOME_TIMELINE +
     			"?oauth_consumer_key="+Constants.Tencent.APP_KEY+"&access_token="+accessToken+"&openid="+openId+"&clientip=127.0.0.1&oauth_version=2.a&scope=all";
     	url+="&pageflag="+pageflag+"&pagetime="+pagetime+"&reqnum="+reqnum+"&type="+type+"contenttype="+contenttype+"&format="+format+"&t="+System.currentTimeMillis();
@@ -98,4 +112,45 @@ public class Account {
     	connection.run();
     	Log.d("my",url);
 	}
+	
+	public void refresh(final RefreshCallback callback){
+		String url="https://open.t.qq.com/cgi-bin/oauth2/access_token?client_id="+Constants.Tencent.APP_KEY+"&grant_type=refresh_token&refresh_token="+refreshToken;
+		HttpConnection.HttpConnectionListener listener = new HttpConnection.HttpConnectionListener(){
+			public void onResponse(boolean isSuccess, String result){
+				if(isSuccess){
+					//access_token=ACCESS_TOKEN&expires_in=60&refresh_token=REFRESH_TOKEN&name=NAME;
+					Bundle values = Utility.parseString(result, "#");
+					Log.d("my",result);
+			    	accessToken = values.getString("access_token");
+			    	refreshToken = values.getString("refresh_token");
+			    	nick = values.getString("name");
+			    	Log.d("my","expire:"+values.getString("expires_in"));
+			    	invalidTime = new Date(System.currentTimeMillis()+Integer.parseInt(values.getString("expires_in")));
+			    	invalidTime.setSeconds(values.getInt("expires_in"));
+			    	callback.onRefreshCallback();
+				}
+			}
+		};
+    	HttpConnection connection=new HttpConnection();
+    	connection.get(url, listener);
+    	connection.run();
+    	Log.d("my",url);
+	}
+	/**
+	 * 判断是否过期
+	 */
+	public boolean isInvalid(){
+		long time=System.currentTimeMillis();
+		Log.d("my",String.valueOf(time));
+		Log.d("my", String.valueOf(invalidTime.getTime()));
+		if(time>invalidTime.getTime()){
+			return true;
+		}
+		return false;
+	}
+	
+	public static interface RefreshCallback{
+		public void onRefreshCallback();	
+	}
+	
 }
