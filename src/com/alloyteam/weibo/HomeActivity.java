@@ -9,20 +9,23 @@ import org.json.JSONObject;
 
 import com.alloyteam.net.HttpConnection;
 import com.alloyteam.weibo.model.Weibo;
-import com.alloyteam.weibo.util.HttpThread;
+import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.logic.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -34,6 +37,9 @@ import android.widget.ListView;
 public class HomeActivity extends Activity {
 	public static final String TAG = "HomeActivity";
 	public ListView mylist;
+	public ImageView bigImageView;
+	public ImageLoader imageLoader;
+	public boolean isMove=false;
 
 	private Handler mainHandler = new Handler() {
 		@Override
@@ -56,6 +62,9 @@ public class HomeActivity extends Activity {
 				// Intent i = new
 				// Intent(HomeActivity.this,AccountManager.class);
 				// startActivity(i);
+				break;
+			case R.id.bigImage:
+				bigImageView.setVisibility(View.GONE);
 				break;
 			case R.id.btn_post:
 				i = new Intent(HomeActivity.this, PostActivity.class);
@@ -88,8 +97,46 @@ public class HomeActivity extends Activity {
 		findViewById(R.id.btn_account_manager).setOnClickListener(listener);
 		findViewById(R.id.btn_group).setOnClickListener(listener);
 		findViewById(R.id.btn_post).setOnClickListener(listener);
-
+		bigImageView=(ImageView) findViewById(R.id.bigImage);
+		bigImageView.setOnClickListener(listener);
 		getHomeLine();
+		imageLoader=new ImageLoader(this);
+		bigImageView.setOnTouchListener(new View.OnTouchListener() {
+			float mx, my;
+
+	        public boolean onTouch(View arg0, MotionEvent event) {
+	        	//super.onTouchEvent(event);
+
+	            float curX, curY;
+
+	            switch (event.getAction()) {
+
+	                case MotionEvent.ACTION_DOWN:
+	                    mx = event.getX();
+	                    my = event.getY();
+	                    isMove=false;
+	                    break;
+	                case MotionEvent.ACTION_MOVE:
+	                    curX = event.getX();
+	                    curY = event.getY();
+	                    int moveX=(int)(mx - curX),moveY=(int)(my - curY);
+	                    bigImageView.scrollBy(moveX, moveY);
+	                    mx = curX;
+	                    my = curY;
+	                    if(Math.abs(moveX)+Math.abs(moveY)>10)isMove=true;
+	                    break;
+	                case MotionEvent.ACTION_UP:
+	                    curX = event.getX();
+	                    curY = event.getY();
+	                    bigImageView.scrollBy((int) (mx - curX), (int) (my - curY));
+	                    if(!isMove)bigImageView.setVisibility(View.GONE);
+	                    break;
+	            }
+
+	            return true;
+	        }
+	    });
+
 	}
 
 	public void getHomeLine() {
@@ -154,10 +201,6 @@ public class HomeActivity extends Activity {
 							TextView text = (TextView) context
 									.findViewById(R.id.tv_home_loading);
 							text.setVisibility(View.GONE);
-							// LayoutParams lp=(LayoutParams)
-							// mylist.getLayoutParams();
-							// lp.leftMargin=0;
-							// mylist.setLayoutParams(lp);
 						} catch (JSONException je) {
 							Log.d("json", "error");
 						}
@@ -173,11 +216,20 @@ public class HomeActivity extends Activity {
 		});
 	}
 
+	public void showImage(String url, Bitmap bm){
+		Intent intent = new Intent(this, ImageActivity.class);
+		/*bigImageView.setImageBitmap(bm);
+		bigImageView.scrollTo(0, 0);
+		bigImageView.setVisibility(View.VISIBLE);
+		imageLoader.displayImage(url+"/2000", bigImageView, null);*/
+		intent.putExtra("url", url);
+		startActivity(intent);
+	}
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		// check and update list(if need)
-
 	}
 
 	@Override

@@ -81,7 +81,7 @@ public class ViewCache {
 
         if (image == null) {
 
-        	image = (ImageView) baseView.findViewById(R.id.imageView2);
+        	image = (ImageView) baseView.findViewById(R.id.thumbImage);
 
         }
 

@@ -53,7 +53,7 @@ public class ImageLoader {
 		} else {
 			// 若没有的话则开启新线程加载图片
 			queuePhoto(url, imageView, callback);
-			imageView.setImageResource(stub_id);
+			//imageView.setImageResource(stub_id);
 		}
 	}
 
@@ -185,8 +185,9 @@ public class ImageLoader {
 				else{
 					photoToLoad.imageView.setImageBitmap(bitmap);
 				}
-			} else
-				photoToLoad.imageView.setImageResource(stub_id);
+			} else{
+				//photoToLoad.imageView.setImageResource(stub_id);
+			}
 		}
 	}
 

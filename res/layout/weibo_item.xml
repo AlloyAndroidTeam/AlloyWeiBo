@@ -53,14 +53,14 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="6dp"
         android1:text="@string/hello_world" />
-
+
     <ImageView
-        android1:id="@+id/imageView2"
+        android1:id="@+id/thumbImage"
         android1:layout_width="wrap_content"
         android1:layout_height="wrap_content"
         android1:layout_alignLeft="@+id/textView1"
         android1:layout_below="@+id/textView1"
         android1:layout_marginTop="14dp"
-        android1:src="@drawable/flower" />
+        android1:minWidth="100dp" />
 
 </RelativeLayout>

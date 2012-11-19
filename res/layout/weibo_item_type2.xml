@@ -92,15 +92,15 @@
             android:layout_below="@+id/textView4"
             android:text="TextView"
             android:textColor="#000" />
-
+
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/thumbImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/textView5"
             android:layout_below="@+id/textView5"
             android:layout_marginTop="5dp"
-            android:src="@drawable/flower" />
+            android:minWidth="100dp" />
 
     </RelativeLayout>
 
