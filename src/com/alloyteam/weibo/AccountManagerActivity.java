@@ -9,9 +9,11 @@ import com.alloyteam.weibo.model.Account;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +41,18 @@ public class AccountManagerActivity extends Activity {
 
 	String[] providers = new String[] { "新浪微博", "腾讯微博" };
 
+	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String uid = intent.getStringExtra("uid");
+			int type = intent.getIntExtra("type", 0);
+			Account account = AccountManager.getAccount(uid, type);
+			accountListAdatper.add(account);
+			Log.v(TAG, "onReceive: " + uid + " added.");
+		}
+	};
+	
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -80,41 +94,24 @@ public class AccountManagerActivity extends Activity {
 		ListView accountListView = (ListView) findViewById(R.id.accountList);
 		accountListView.setAdapter(accountListAdatper);
 
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
-	@Override 
-	protected void onNewIntent(Intent intent){
-		super.onNewIntent(intent);
-		String action = intent.getStringExtra("action");
-		Log.i(TAG,"onNewIntent "+action);
-		if (action!=null && action.equals("addAccount")) {
-			String uid = intent.getStringExtra("uid");
-			int type = intent.getIntExtra("type", 0);
-			Account account = AccountManager.getAccount(uid, type);
-			accountListAdatper.add(account);
-			Log.v(TAG, "onNewIntent: " + uid + " added.");
-		}
-	}
 	
-//	/*
-//	 * @deprecated {不需要这个方式}
-//	 */
-//	@Override
-//	protected void onActivityResult(int requestCode, int resultCode,
-//			Intent intent) {
-//		super.onActivityResult(requestCode, resultCode, intent);
-//		// Log.v(TAG, "onActivityResult: " + requestCode + ":" + resultCode);
-//
-//		String action = intent.getStringExtra("action");
-//		if (action.equals("addAccount")) {
-//			String uid = intent.getStringExtra("uid");
-//			int type = intent.getIntExtra("type", 0);
-//			Account account = AccountManager.getAccount(uid, type);
-//			accountListAdatper.add(account);
-//			Log.v(TAG, "onActivityResult: " + uid + " added.");
-//		}
-//
-//	}
+	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onStop()
+	 */
+	@Override
+	protected void onStop() {
+		super.onStop();
+		
+		this.unregisterReceiver(broadcastReceiver);
+	}
+
+
 
 	class AccountViewHolder {
 		Button deleteButton;
