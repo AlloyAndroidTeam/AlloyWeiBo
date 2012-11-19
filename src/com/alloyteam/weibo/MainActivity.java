@@ -6,9 +6,11 @@ import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -20,10 +22,13 @@ import android.widget.TabHost.TabSpec;
  */
 public class MainActivity extends TabActivity {
 
+	public static final String TAG = "MainActivity"; 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE); 
 		setContentView(R.layout.activity_main);
+		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.home_title);
 
 		setupTabHost();
 		
@@ -41,6 +46,10 @@ public class MainActivity extends TabActivity {
         return true;
     }
     
+    @Override
+    protected void onNewIntent(Intent intent){
+    	super.onNewIntent(intent);
+    }
 
 	private TabHost mTabHost;
 

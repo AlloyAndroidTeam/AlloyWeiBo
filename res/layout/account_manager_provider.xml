@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android1="http://schemas.android.com/apk/res/android"
+    xmlns:android2="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android1:id="@+id/providerDesc"
+        android1:layout_width="wrap_content"
+        android1:layout_height="wrap_content"
+        android1:layout_alignParentLeft="true"
+        android1:layout_alignParentTop="true"
+        android2:layout_alignBottom="@+id/providerSelect"
+        android1:text="TextView" />
+
+    <RadioButton
+        android2:id="@+id/providerSelect"
+        android2:layout_width="wrap_content"
+        android2:layout_height="wrap_content"
+        android:focusable="false" 
+        android2:layout_alignParentRight="true"
+        android2:layout_alignParentTop="true" />
+
+</RelativeLayout>

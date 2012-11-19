@@ -4,8 +4,9 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="8"
         android:targetSdkVersion="15" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -35,14 +36,14 @@
         <activity
             android:name="AccountManagerActivity"
             android:label="@string/account_manager"
-            android:launchMode="singleInstance" >
+            android:launchMode="singleTask"
+             >
 
             <!-- 被调用后，如果在栈中存在，则其在栈中顺序被提到最前，其它activity顺序依次后退 -->
         </activity>
         <activity
             android:name=".PostActivity"
-            android:label="@string/post"
-            android:launchMode="singleInstance" >
+            android:label="@string/post"  >
 
             <!-- 被调用后，如果在栈中存在，则其在栈中顺序被提到最前，其它activity顺序依次后退 -->
         </activity>
@@ -58,10 +59,6 @@
         <activity
             android:name=".AuthActivity"
             android:label="@string/title_activity_auth" >
-        </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login" >
         </activity>
     </application>
 

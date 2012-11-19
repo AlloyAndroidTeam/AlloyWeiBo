@@ -24,11 +24,8 @@ import com.alloyteam.weibo.model.Account;
  */
 public class ApiManager {
 
-	public static int SINA = 1;
 
-	public static int TENCENT = 2;
-
-
+	
 	/**
 	 * 调用微博 api
 	 * 

@@ -24,6 +24,8 @@ public class SplashActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
+		// 在这里初始化 dbhelper
+		DBHelper.init(getApplicationContext());
 		final Intent i = new Intent();
 		if(hasAccount()){
 			i.setClass(this, MainActivity.class);
@@ -45,8 +47,7 @@ public class SplashActivity extends Activity {
 	 * @return 是否有默认帐号
 	 */
 	private boolean hasAccount(){
-		DBHelper dbHelper = DBHelper.getInstance(SplashActivity.this);
-		ArrayList<Account> list = AccountManager.getAccounts(dbHelper);
+		ArrayList<Account> list = AccountManager.getAccounts();
 		if(list != null && list.size() > 0){
 			return true;
 		}

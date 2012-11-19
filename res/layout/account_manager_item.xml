@@ -2,28 +2,34 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-   >
-
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/accountProviderDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:text="腾讯微博" />
+
     <TextView
         android:id="@+id/descTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/button1"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:text="腾讯: azrael" />
-
+        android:layout_alignLeft="@+id/accountProviderDesc"
+        android:layout_below="@+id/accountProviderDesc"
+        android:text="azrael(xxx)" />
+
     <Button
-        android:id="@+id/deleteAccountBtn"
+        android:id="@+id/accountDelBtn"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="删除" />
+        android:layout_alignTop="@+id/accountProviderDesc"
+        android:layout_marginRight="14dp"
+        android:text="解除绑定" />
 
 </RelativeLayout>
