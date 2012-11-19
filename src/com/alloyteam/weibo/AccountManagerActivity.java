@@ -92,29 +92,29 @@ public class AccountManagerActivity extends Activity {
 			int type = intent.getIntExtra("type", 0);
 			Account account = AccountManager.getAccount(uid, type);
 			accountListAdatper.add(account);
-			Log.v(TAG, "onActivityResult: " + uid + " added.");
+			Log.v(TAG, "onNewIntent: " + uid + " added.");
 		}
 	}
 	
-	/*
-	 * @deprecated {不需要这个方式}
-	 */
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-			Intent intent) {
-		super.onActivityResult(requestCode, resultCode, intent);
-		// Log.v(TAG, "onActivityResult: " + requestCode + ":" + resultCode);
-
-		String action = intent.getStringExtra("action");
-		if (action.equals("addAccount")) {
-			String uid = intent.getStringExtra("uid");
-			int type = intent.getIntExtra("type", 0);
-			Account account = AccountManager.getAccount(uid, type);
-			accountListAdatper.add(account);
-			Log.v(TAG, "onActivityResult: " + uid + " added.");
-		}
-
-	}
+//	/*
+//	 * @deprecated {不需要这个方式}
+//	 */
+//	@Override
+//	protected void onActivityResult(int requestCode, int resultCode,
+//			Intent intent) {
+//		super.onActivityResult(requestCode, resultCode, intent);
+//		// Log.v(TAG, "onActivityResult: " + requestCode + ":" + resultCode);
+//
+//		String action = intent.getStringExtra("action");
+//		if (action.equals("addAccount")) {
+//			String uid = intent.getStringExtra("uid");
+//			int type = intent.getIntExtra("type", 0);
+//			Account account = AccountManager.getAccount(uid, type);
+//			accountListAdatper.add(account);
+//			Log.v(TAG, "onActivityResult: " + uid + " added.");
+//		}
+//
+//	}
 
 	class AccountViewHolder {
 		Button deleteButton;

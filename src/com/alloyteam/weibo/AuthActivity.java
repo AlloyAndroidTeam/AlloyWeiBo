@@ -114,8 +114,12 @@ public class AuthActivity extends Activity {
     	account.openKey = values.getString("openkey");
     	
     	account.authTime = new Date();
-    	account.invalidTime = new Date(System.currentTimeMillis()+ 640000000);
-    	//account.invalidTime.setSeconds(values.getInt("expires_in"));
+		account.invalidTime = new Date(account.authTime.getTime()
+				+ Integer.parseInt(values.getString("expires_in")) * 1000);
+    	Log.i(TAG, account.authTime.getTime() + " : " + values.getString("expires_in"));
+    	
+    	account.isDefault = AccountManager.getAccountCount() == 0;
+    	
     	
     	AccountManager.addAccount(account);
     	

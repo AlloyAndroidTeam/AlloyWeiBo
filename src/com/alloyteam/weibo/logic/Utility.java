@@ -21,10 +21,9 @@ public class Utility {
 	public static Bundle parseUrl(String url, String queryStart){
 		Bundle values = new Bundle();
 		int index = url.indexOf(queryStart);
-		if(index == -1){
-			//return values;
+		if(index != -1){
+			url = url.substring(index + 1);
 		}
-		url = url.substring(index + 1);
 		String [] arr = url.split("&");
 		for (String str : arr) {
 			String [] kv = str.split("=");
