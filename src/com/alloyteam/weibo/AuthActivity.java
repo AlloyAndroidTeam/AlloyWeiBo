@@ -94,11 +94,11 @@ public class AuthActivity extends Activity {
     	Activity context = AuthActivity.this;
 		//Intent intent = new Intent();
 		//context.setResult(accountType, intent);
-		Intent intent = new Intent(context,AccountManagerActivity.class);
+		Intent intent = new Intent();
     	
     	String uid =  values.getString("name");
     	if(AccountManager.exists(uid, accountType)){
-    		Toast.makeText(AuthActivity.this, "该帐号已绑定，请勿重复绑定", 1000).show();
+    		Toast.makeText(AuthActivity.this, "该帐号已绑定，请勿重复绑定", Toast.LENGTH_SHORT).show();
     		context.finish();
     		return;
     	}
@@ -114,15 +114,25 @@ public class AuthActivity extends Activity {
     	account.openKey = values.getString("openkey");
     	
     	account.authTime = new Date();
-    	account.invalidTime = new Date(System.currentTimeMillis()+ 640000000);
-    	//account.invalidTime.setSeconds(values.getInt("expires_in"));
+		account.invalidTime = new Date(account.authTime.getTime()
+				+ Integer.parseInt(values.getString("expires_in")) * 1000);
+    	Log.i(TAG, account.authTime.getTime() + " : " + values.getString("expires_in"));
+    	
+    	account.isDefault = AccountManager.getAccountCount() == 0;
     	
     	AccountManager.addAccount(account);
+    	
+    	
+    	
+    	intent.setAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
     	
 		intent.putExtra("action", "addAccount");
 		intent.putExtra("uid", account.uid);
 		intent.putExtra("type", account.type);
-		startActivity(intent);
+		
+		context.sendBroadcast(intent);
+		
+//		startActivity(intent);
 		context.finish();
     }
 }
