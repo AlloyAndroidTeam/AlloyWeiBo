@@ -110,7 +110,7 @@ public class HttpConnection implements Runnable {
 					if (data != null) {
 						Bundle bundle = (Bundle) data;
 						String result = bundle.getString("callbackkey");
-						boolean success = result != "fail";
+						boolean success = !result.equals("fail");
 						listener.onResponse(success, success ? result : null);
 					}
 				}

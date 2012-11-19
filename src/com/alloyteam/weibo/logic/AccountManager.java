@@ -27,6 +27,7 @@ public class AccountManager {
 	 */
 	public static void addAccount(Account account) {
 		Log.v(TAG, "addAccount: " + account);
+		
 		DBHelper dbHelper = DBHelper.getInstance();
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -107,11 +108,47 @@ public class AccountManager {
 		return result;
 	}
 
-	/** 获取默认帐号
-	 * 
-	 * 
+	/** 
+	 * 获取默认帐号
 	 */
 	public static Account getDefaultAccount() {
+		DBHelper dbHelper = DBHelper.getInstance();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+				null, // Columns to return
+				"isDefault=?", // SQL WHERE
+				new String[] { "1" }, // Selection Args
+				null, // SQL GROUP BY
+				null, // SQL HAVING
+				null // SQL ORDER BY
+				);
+		if (cursor.moveToFirst()) {
+			Account account = new Account();
+			parseCursorToAccount(account, cursor);
+			return account;
+		}else{
+			cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+				null, // Columns to return
+				"isDefault=?", // SQL WHERE
+				new String[] { "1" }, // Selection Args
+				null, // SQL GROUP BY
+				null, // SQL HAVING
+				null // SQL ORDER BY
+				);
+			if(cursor.moveToFirst()){
+				Account account = new Account();
+				parseCursorToAccount(account, cursor);
+				return account;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 返回绑定的帐号数目
+	 * @return
+	 */
+	public static int getAccountCount(){
 		DBHelper dbHelper = DBHelper.getInstance();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
@@ -122,17 +159,7 @@ public class AccountManager {
 				null, // SQL HAVING
 				null // SQL ORDER BY
 				);
-		if (cursor.moveToFirst()) {
-			do {
-				Account account = new Account();
-				parseCursorToAccount(account, cursor);
-
-				//if(account.isDefault){
-					return account;
-				//}
-			} while (cursor.moveToNext());
-		}
-		return null;
+		return cursor.getCount();
 	}
 	
 	/**
