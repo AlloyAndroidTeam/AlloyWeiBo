@@ -56,7 +56,7 @@ public class HomeActivity extends Activity {
 				//Intent i = new Intent(HomeActivity.this,AccountManager.class);
 				//startActivity(i);
 				break;
-			case R.id.btn_post:
+			case R.id.btn_post: 
 				i = new Intent(HomeActivity.this,PostActivity.class);
 				startActivity(i);
 				break;
@@ -86,6 +86,8 @@ public class HomeActivity extends Activity {
 		findViewById(R.id.btn_account_manager).setOnClickListener(listener);
 		findViewById(R.id.btn_group).setOnClickListener(listener);
 		findViewById(R.id.btn_post).setOnClickListener(listener);
+		
+		
 		
 		getHomeLine();
 	}

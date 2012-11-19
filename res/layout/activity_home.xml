@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:text="发送" />
+            android:text="发表" />
 
         <Button
             android:id="@+id/btn_group"
