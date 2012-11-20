@@ -156,14 +156,13 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 							JSONArray info = data.getJSONArray("info");
 							Log.d("json", "parse");
 							for (int i = 0; i < info.length(); ++i) {
+								JSONObject item = info.getJSONObject(i);
 								int status=item.getInt("status");
 								if(status!=0){
 									continue;
 								}
-								JSONObject item = info.getJSONObject(i);
 								String text = item.getString("text");
-								String name = item.getString("name");
-								int status=item.getInt("status");								
+								String name = item.getString("name");						
 								String avatarUrl = item.getString("head")
 										+ "/50";
 								int type = item.getInt("type");
