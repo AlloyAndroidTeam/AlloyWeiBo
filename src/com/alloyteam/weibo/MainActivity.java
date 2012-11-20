@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -20,7 +21,7 @@ import android.widget.TabHost.TabSpec;
  * @author pxz
  *
  */
-public class MainActivity extends TabActivity {
+public class MainActivity extends TabActivity  implements OnClickListener{
 
 	public static final String TAG = "MainActivity"; 
 	@Override
@@ -37,6 +38,8 @@ public class MainActivity extends TabActivity {
 		intent = new Intent(this, SettingActivity.class);
 		setupTab(new TextView(this), "设置",R.drawable.tab_bg_home,intent);
 		// TODO setup others
+		findViewById(R.id.btnHomeTitleAccount).setOnClickListener(this);
+		findViewById(R.id.btnHomeTitlePost).setOnClickListener(this);
 		
 	}
 
@@ -72,5 +75,22 @@ public class MainActivity extends TabActivity {
 		ImageView iv = (ImageView)view.findViewById(R.id.tab_item_icon);
 		iv.setImageResource(drawable);
 		return view;
+	}
+	/**
+	 * Yukin:响应click
+	 */
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		Intent i;
+		switch(v.getId()){
+    	case R.id.btnHomeTitlePost : //@发表
+    		i = new Intent(this, PostActivity.class);
+			startActivity(i);
+    		break;
+    	case R.id.btnHomeTitleAccount : //帐号
+    		i = new Intent(this, AccountManagerActivity.class);
+			startActivity(i); 
+    		break; 
+    	}
 	}
 }

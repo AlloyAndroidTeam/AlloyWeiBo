@@ -6,7 +6,7 @@
     android:orientation="horizontal" >
 
     <Button
-        android:id="@+id/btnAccount"
+        android:id="@+id/btnHomeTitleAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"

@@ -1,4 +1,3 @@
-bin
-gen
+/bin
 /gen
-/gen
+/.settings
