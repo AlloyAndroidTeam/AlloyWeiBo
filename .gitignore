@@ -1,9 +1,3 @@
-bin
-gen
-/gen
-<<<<<<< HEAD
+/bin
 /gen
 /.settings
-=======
-/gen
->>>>>>> 98064599bedfed720f8d9fb38e3428c883757f69
