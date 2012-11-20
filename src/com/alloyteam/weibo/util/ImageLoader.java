@@ -85,6 +85,8 @@ public class ImageLoader {
 			// CopyStream(is, os);
 			// os.close();
 			bitmap = decodeFile(is);
+			is.close();
+			conn.disconnect();
 			Log.d("my", "bitmap decode");
 			return bitmap;
 		} catch (Exception ex) {
@@ -119,14 +121,15 @@ public class ImageLoader {
 	  }
 	  return bytes;
 	 }
+	 
 	// decode这个图片并且按比例缩放以减少内存消耗，虚拟机对每张图片的缓存大小也是有限制的
-	private Bitmap decodeFile(InputStream f) {
+	private Bitmap decodeFile(InputStream f) throws IOException {
 
 		// decode image size
 		BitmapFactory.Options o = new BitmapFactory.Options();
-		//o.inJustDecodeBounds = true;
-		return BitmapFactory.decodeStream(f, null, o);
-		/*//BitmapFactory.
+		o.inJustDecodeBounds = true;
+		byte[] bt = getBytes(f);
+		BitmapFactory.decodeByteArray(bt, 0, bt.length, o);
 
 		// Find the correct scale value. It should be the power of 2.
 		final int REQUIRED_SIZE = 2048;
@@ -143,17 +146,8 @@ public class ImageLoader {
 		Log.d("my",String.valueOf(scale));
 		o.inJustDecodeBounds = false;
 		o.inSampleSize = scale;
-		try {
-			f.reset();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Bitmap bm=BitmapFactory.decodeStream(f);// o);
-		if(bm==null){
-			Log.d("my","null");
-		}
-		return bm;*/
+		Bitmap bm=BitmapFactory.decodeByteArray(bt, 0, bt.length, o);
+		return bm;
 	}
 
 	// Task for the queue
