@@ -143,7 +143,7 @@ public class HomeActivity extends Activity {
 
 	}
 
-	public void getHomeLine() {
+	public void getHomeLine() { 
 		mylist = (ListView) findViewById(R.id.lv_main_timeline);
 		mylist.setOnItemClickListener(timelineClickListener);
 		Account account = AccountManager.getDefaultAccount();
