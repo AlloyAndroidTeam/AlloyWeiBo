@@ -1,12 +1,52 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme" parent="android:Theme.Light">
-       	<item name="android:windowTitleSize">40dp</item>   
-        <item name="android:windowTitleBackgroundStyle">@style/homeTitleBackground</item> 
-   	</style>
-   	
-   	<style name="homeTitleBackground">   
-        <item name="android:background">#483</item>  
-    </style>   
+        <item name="android:windowTitleSize">40dp</item>
+        <item name="android:windowTitleBackgroundStyle">@style/homeTitleBackground</item>
+    </style>
+
+    <style name="homeTitleBackground">
+        <item name="android:background">#483</item>
+    </style>
+
+    <style name="AnimHead" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/head_in</item>
+        <item name="android:windowExitAnimation">@anim/head_out</item>
+    </style>
+
+    <style name="ImageScale" parent="android:Theme.Black.NoTitleBar">
+        <item name="android:windowAnimationStyle">@style/AnimHead</item>
+        <item name="android:windowNoTitle">true</item>
+        <!-- 无标题 -->
+        <item name="android:windowFullscreen">true</item>
+        <!-- 设置全屏显示 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- 边框 -->
+        <item name="android:windowIsFloating">false</item>
+        <!-- 是否浮现在activity之上 -->
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- 半透明 -->
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <!-- 模糊 -->
+    </style>
+
+    <style name="ImageloadingDialogStyle" parent="android:Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+ <!-- 无边框 -->
+        <item name="android:windowNoTitle">true</item>
+ <!-- 没有标题 -->
+        <item name="android:windowIsFloating">true</item>
+ <!-- 是否浮在activity之上 -->
+        <item name="android:windowIsTranslucent">true</item>
+ <!-- 背景是否半透明 -->
+        <item name="android:windowContentOverlay">@null</item>
+ <!-- 对话框是否有遮盖 -->
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+ <!-- 动画样式 -->
+        <item name="android:backgroundDimEnabled">true</item>
+ <!-- 背景是否模糊 -->
+    </style>
 
 </resources>

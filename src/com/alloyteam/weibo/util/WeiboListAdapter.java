@@ -5,10 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-
 import com.alloyteam.weibo.R;
 import com.alloyteam.weibo.model.Weibo;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -21,9 +21,11 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.alloyteam.weibo.HomeActivity;
 
 public class WeiboListAdapter extends BaseAdapter {
 	protected LayoutInflater mInflater;
@@ -31,12 +33,14 @@ public class WeiboListAdapter extends BaseAdapter {
 	private static final int mResource2 = R.layout.weibo_item_type2;// xml布局文件
 	List<Weibo> mItems;
 	ImageLoader imageLoader;
+	HomeActivity homeActivity;
 	
 	public WeiboListAdapter(Context context, List<Weibo> items) {
 		mItems = items;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		imageLoader=new ImageLoader(context);
+		homeActivity=((HomeActivity)context);
+		imageLoader=HomeActivity.imageLoader;//new ImageLoader(context);
 	}
 
 	@Override
@@ -129,6 +133,20 @@ public class WeiboListAdapter extends BaseAdapter {
             }
             return s;
     }
+	private OnClickListener listener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Intent i;
+			switch (v.getId()) {
+			case R.id.thumbImage:
+				Bitmap bm=v.getDrawingCache();
+				homeActivity.showImage((String)v.getTag(),bm);//+"/2000");
+				break;
+			default:
+				break;
+			}
+		}
+	};
 	public View getView(int position, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
 		View rowView = convertView;
@@ -174,6 +192,8 @@ public class WeiboListAdapter extends BaseAdapter {
 			else{
 				image.setVisibility(View.GONE);
 			}
+			image.setTag(weibo.mImage);
+			image.setOnClickListener(listener);
 		} else if (type == 2) {
 			TextView text2;
 			TextView name2;
@@ -227,6 +247,8 @@ public class WeiboListAdapter extends BaseAdapter {
 			else{
 				count.setVisibility(View.GONE);
 			}
+			image.setTag(weibo.mImage);
+			image.setOnClickListener(listener);
 		}
 		return rowView;
 	}

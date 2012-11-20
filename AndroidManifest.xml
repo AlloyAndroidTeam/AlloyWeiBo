@@ -60,6 +60,10 @@
             android:name=".AuthActivity"
             android:label="@string/title_activity_auth" >
         </activity>
+        <activity
+            android:name=".ImageActivity"
+            android:label="@string/title_activity_image" >
+        </activity>
     </application>
 
 </manifest>
