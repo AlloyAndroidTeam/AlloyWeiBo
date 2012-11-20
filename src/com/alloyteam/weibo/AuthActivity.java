@@ -94,7 +94,6 @@ public class AuthActivity extends Activity {
     	Activity context = AuthActivity.this;
 		//Intent intent = new Intent();
 		//context.setResult(accountType, intent);
-		Intent intent = new Intent();
     	
     	String uid =  values.getString("name");
     	if(AccountManager.exists(uid, accountType)){
@@ -122,7 +121,7 @@ public class AuthActivity extends Activity {
     	
     	AccountManager.addAccount(account);
     	
-    	
+    	Intent intent = new Intent();
     	
     	intent.setAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
     	

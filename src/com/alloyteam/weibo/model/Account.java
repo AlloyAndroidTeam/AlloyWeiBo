@@ -113,40 +113,40 @@ public class Account {
     	Log.d("my",url);
 	}
 	
-	public void refresh(final RefreshCallback callback){
-		String url="https://open.t.qq.com/cgi-bin/oauth2/access_token?client_id="+Constants.Tencent.APP_KEY+"&grant_type=refresh_token&refresh_token="+refreshToken;
-		HttpConnection.HttpConnectionListener listener = new HttpConnection.HttpConnectionListener(){
-			public void onResponse(boolean isSuccess, String result){
-				if(isSuccess){
-					//access_token=ACCESS_TOKEN&expires_in=60&refresh_token=REFRESH_TOKEN&name=NAME;
-					Bundle values = Utility.parseString(result, "#");
-					Log.d("my",result);
-			    	accessToken = values.getString("access_token");
-			    	refreshToken = values.getString("refresh_token");
-			    	nick = values.getString("name");
-			    	Log.d("my","expire:"+values.getString("expires_in"));
-			    	invalidTime = new Date(System.currentTimeMillis()+Integer.parseInt(values.getString("expires_in")));
-			    	invalidTime.setSeconds(values.getInt("expires_in"));
-			    	callback.onRefreshCallback();
-				}
-			}
-		};
-    	HttpConnection connection=new HttpConnection();
-    	connection.get(url, listener);
-    	connection.run();
-    	Log.d("my",url);
-	}
+//	public void refresh(final RefreshCallback callback){
+//		String url="https://open.t.qq.com/cgi-bin/oauth2/access_token?client_id="+Constants.Tencent.APP_KEY+"&grant_type=refresh_token&refresh_token="+refreshToken;
+//		HttpConnection.HttpConnectionListener listener = new HttpConnection.HttpConnectionListener(){
+//			public void onResponse(boolean isSuccess, String result){
+//				if(isSuccess){
+//					//access_token=ACCESS_TOKEN&expires_in=60&refresh_token=REFRESH_TOKEN&name=NAME;
+//					Bundle values = Utility.parseString(result, "#");
+//					Log.d("my",result);
+//			    	accessToken = values.getString("access_token");
+//			    	refreshToken = values.getString("refresh_token");
+//			    	nick = values.getString("name");
+//			    	Log.d("my","expire:"+values.getString("expires_in"));
+//			    	invalidTime = new Date(System.currentTimeMillis()+Integer.parseInt(values.getString("expires_in")));
+//			    	invalidTime.setSeconds(values.getInt("expires_in"));
+//			    	callback.onRefreshCallback();
+//				}
+//			}
+//		};
+//    	HttpConnection connection=new HttpConnection();
+//    	connection.get(url, listener);
+//    	connection.run();
+//    	Log.d("my",url);
+//	}
 	/**
 	 * 判断是否过期
 	 */
-	public boolean isInvalid(){
+	public boolean isValid(){
 		long time=System.currentTimeMillis();
 		Log.d("my",String.valueOf(time));
 		Log.d("my", String.valueOf(invalidTime.getTime()));
 		if(time>invalidTime.getTime()){
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	public static interface RefreshCallback{
