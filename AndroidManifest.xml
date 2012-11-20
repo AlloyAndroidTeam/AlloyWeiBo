@@ -43,8 +43,7 @@
         </activity>
         <activity
             android:name=".PostActivity"
-            android:label="@string/post"
-            android:launchMode="singleInstance" >
+            android:label="@string/post"  >
 
             <!-- 被调用后，如果在栈中存在，则其在栈中顺序被提到最前，其它activity顺序依次后退 -->
         </activity>
@@ -60,6 +59,10 @@
         <activity
             android:name=".AuthActivity"
             android:label="@string/title_activity_auth" >
+        </activity>
+        <activity
+            android:name=".ImageActivity"
+            android:label="@string/title_activity_image" >
         </activity>
     </application>
 

@@ -8,8 +8,14 @@
     <string name="time_line">时间线</string>
     <string name="post">发送</string>
     <string name="title_activity_auth">帐号授权</string>
+    <string name="title_activity_image">查看图片</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="add_account">+添加帐号</string>
     <string name="ensure_text">确定</string>
+    <string name="btn_back">返回</string>
+    <string name="btn_save">保存</string>
+    <string name="btn_add_pic">插图</string>
+    <string name="btn_add_friend">\@好友</string>
+    <string name="btn_add_topic">话题</string>
 
 </resources>
