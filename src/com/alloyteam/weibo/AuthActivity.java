@@ -13,7 +13,6 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.Constants;
@@ -87,6 +86,8 @@ public class AuthActivity extends Activity {
 		Activity context = AuthActivity.this;
 		String uid = values.getString("name");
 		
+		Account old = AccountManager.getAccount(uid, accountType);
+		
 		Account account = new Account();
 		account.type = accountType;
 		account.uid = uid;
@@ -102,13 +103,16 @@ public class AuthActivity extends Activity {
 		Log.i(TAG,
 				account.authTime.getTime() + " : "
 						+ values.getString("expires_in"));
-
-		account.isDefault = AccountManager.getAccountCount() == 0;
+		if(old != null){
+			account.isDefault = old.isDefault;
+		}else{
+			account.isDefault = AccountManager.getAccountCount() == 0;
+		}
 		
 		Intent intent = new Intent();
 		intent.putExtra("uid", account.uid);
 		intent.putExtra("type", account.type);
-		if (AccountManager.exists(uid, accountType)) {
+		if (old != null) {
 //			Toast.makeText(AuthActivity.this, "该帐号已绑定，请勿重复绑定",
 //					Toast.LENGTH_SHORT).show();
 			AccountManager.updateAccount(account);
