@@ -14,7 +14,7 @@
         android:text="帐号" />
 
     <Button
-        android:id="@+id/btnEdit"
+        android:id="@+id/btnHomeTitlePost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
