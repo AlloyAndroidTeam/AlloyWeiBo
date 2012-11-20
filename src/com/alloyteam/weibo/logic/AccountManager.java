@@ -129,8 +129,8 @@ public class AccountManager {
 		}else{
 			cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
 				null, // Columns to return
-				"isDefault=?", // SQL WHERE
-				new String[] { "1" }, // Selection Args
+				null, // SQL WHERE
+				null, // Selection Args
 				null, // SQL GROUP BY
 				null, // SQL HAVING
 				null // SQL ORDER BY
@@ -185,6 +185,7 @@ public class AccountManager {
 				parseCursorToAccount(account, cursor);
 
 				list.add(account);
+				Log.v(TAG, "getAccounts: " + account);
 			} while (cursor.moveToNext());
 		}
 		if (cursor != null && !cursor.isClosed()) {

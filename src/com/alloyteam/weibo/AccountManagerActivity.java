@@ -2,11 +2,6 @@ package com.alloyteam.weibo;
 
 import java.util.ArrayList;
 
-import com.alloyteam.weibo.logic.AccountManager;
-import com.alloyteam.weibo.logic.Constants;
-import com.alloyteam.weibo.logic.DBHelper;
-import com.alloyteam.weibo.model.Account;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -20,14 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RadioButton;
-
 import android.widget.TextView;
+
+import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.Constants;
+import com.alloyteam.weibo.model.Account;
 
 /**
  * @author pxz
@@ -42,7 +37,7 @@ public class AccountManagerActivity extends Activity {
 	String[] providers = new String[] { "新浪微博", "腾讯微博" };
 
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String uid = intent.getStringExtra("uid");
@@ -52,7 +47,7 @@ public class AccountManagerActivity extends Activity {
 			Log.v(TAG, "onReceive: " + uid + " added.");
 		}
 	};
-	
+
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -70,18 +65,21 @@ public class AccountManagerActivity extends Activity {
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setTitle("选择帐号类型");
-				builder.setItems(providers, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int index) {
-						Log.v(TAG, index + " click");
-						Activity context = AccountManagerActivity.this;
-						int type = index + 1;
-						Intent intent = new Intent(context, AuthActivity.class);
-						intent.putExtra("type", type);
-						context.startActivity(intent);
-				    }
-				});
-				builder.setNegativeButton("取消",  null);
+				builder.setItems(providers,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int index) {
+								Log.v(TAG, index + " click");
+								Activity context = AccountManagerActivity.this;
+								int type = index + 1;
+								Intent intent = new Intent(context,
+										AuthActivity.class);
+								intent.putExtra("type", type);
+								context.startActivity(intent);
+							}
+						});
+				builder.setNegativeButton("取消", null);
 				AlertDialog dialog = builder.create();
 				dialog.setCanceledOnTouchOutside(false);
 				dialog.show();
@@ -99,19 +97,18 @@ public class AccountManagerActivity extends Activity {
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
-	
-	
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onStop()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onDestroy()
 	 */
 	@Override
-	protected void onStop() {
-		super.onStop();
-		
-		//this.unregisterReceiver(broadcastReceiver);
+	protected void onDestroy() {
+		super.onDestroy();
+		if (broadcastReceiver != null) {
+			this.unregisterReceiver(broadcastReceiver);
+		}
 	}
-
-
 
 	class AccountViewHolder {
 		Button deleteButton;
@@ -150,8 +147,10 @@ public class AccountManagerActivity extends Activity {
 
 				holder.description = (TextView) convertView
 						.findViewById(R.id.descTextView);
-				holder.deleteButton = (Button) convertView.findViewById(R.id.accountDelBtn);
-				holder.provider = (TextView) convertView.findViewById(R.id.accountProviderDesc);
+				holder.deleteButton = (Button) convertView
+						.findViewById(R.id.accountDelBtn);
+				holder.provider = (TextView) convertView
+						.findViewById(R.id.accountProviderDesc);
 
 				convertView.setTag(holder);
 

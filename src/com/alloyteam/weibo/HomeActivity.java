@@ -1,5 +1,6 @@
 package com.alloyteam.weibo;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,9 @@ import com.alloyteam.weibo.util.WeiboListAdapter;
 
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.ApiManager;
+import com.alloyteam.weibo.logic.Constants;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -146,15 +150,35 @@ public class HomeActivity extends Activity {
 		final Activity context = this;
 		if (account == null)
 			return;
-		account.getHomeLine(0, 0, 10, 0, 0, "json",
-				new HttpConnection.HttpConnectionListener() {
-					public void onResponse(boolean success, String result) {
-						if (!success)
-							return;
+
+		// final int pageflag, final int pagetime, final int reqnum, final int
+		// type, final int contenttype, final String format
+
+		Bundle params = new Bundle();
+		params.putInt("pageflag", 0);
+		params.putInt("pagetime", 0);
+		params.putInt("reqnum", 10);
+		params.putInt("type", 0);
+		params.putInt("contenttype", 0);
+		params.putString("format", "json");
+		params.putLong("t", System.currentTimeMillis());
+
+		ApiManager.requestAsync(account, Constants.Tencent.HOME_TIMELINE,
+				params, "GET", new ApiManager.IApiListener() {
+
+					@Override
+					public void onJSONException(JSONException exception) {
+					}
+
+					public void onFailure(String msg) {
+
+					}
+
+					@Override
+					public void onComplete(JSONObject result) {
+						List<Weibo> list = new ArrayList<Weibo>();
 						try {
-							List<Weibo> list = new ArrayList<Weibo>();
-							JSONObject obj = new JSONObject(result);
-							JSONObject data = obj.getJSONObject("data");
+							JSONObject data = result.getJSONObject("data");
 							JSONArray info = data.getJSONArray("info");
 							Log.d("json", "parse");
 							for (int i = 0; i < info.length(); ++i) {
@@ -195,25 +219,22 @@ public class HomeActivity extends Activity {
 								}
 								list.add(weibo);
 							}
+							Log.i("azrael", "list");
 							WeiboListAdapter ila = new WeiboListAdapter(
 									context, list);
 							mylist.setAdapter(ila);
 							TextView text = (TextView) context
 									.findViewById(R.id.tv_home_loading);
 							text.setVisibility(View.GONE);
+							// LayoutParams lp=(LayoutParams)
+							// mylist.getLayoutParams();
+							// lp.leftMargin=0;
+							// mylist.setLayoutParams(lp);
 						} catch (JSONException je) {
 							Log.d("json", "error");
 						}
 					}
 				});
-		mylist.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View item, int position,
-					long id) {
-				//进入详情页
-			}
-		});
 	}
 
 	public void showImage(String url, Bitmap bm){
