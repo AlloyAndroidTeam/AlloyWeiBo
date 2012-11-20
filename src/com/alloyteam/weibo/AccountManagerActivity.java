@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,7 +38,7 @@ public class AccountManagerActivity extends Activity {
 	AccountListAdatper accountListAdatper;
 
 	String[] providers = new String[] { "新浪微博", "腾讯微博" };
-	
+
 	int currentDefaultAccountPosition = -1;
 
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -45,10 +46,21 @@ public class AccountManagerActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String uid = intent.getStringExtra("uid");
+			Log.v(TAG, "onReceive: " + uid + " added.");
 			int type = intent.getIntExtra("type", 0);
 			Account account = AccountManager.getAccount(uid, type);
-			accountListAdatper.add(account);
-			Log.v(TAG, "onReceive: " + uid + " added.");
+			String action = intent.getAction();
+//			intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+//			intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+			if("com.alloyteam.weibo.NEW_ACCOUNT_ADD".equals(action)){
+				accountListAdatper.add(account);
+			}else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
+				//TODO 未测试
+				int position = accountListAdatper.getPositionByAccount(account);
+				Account old = accountListAdatper.getItem(position);
+				accountListAdatper.remove(old);
+				accountListAdatper.insert(account, position);
+			}
 		}
 	};
 
@@ -94,11 +106,12 @@ public class AccountManagerActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View arg1, int position,
 				long arg3) {
-			if(currentDefaultAccountPosition == position){
+			if (currentDefaultAccountPosition == position) {
 				return;
 			}
-			if(currentDefaultAccountPosition != -1){
-				Account current = accountListAdatper.getItem(currentDefaultAccountPosition);
+			if (currentDefaultAccountPosition != -1) {
+				Account current = accountListAdatper
+						.getItem(currentDefaultAccountPosition);
 				current.isDefault = false;
 				AccountManager.updateAccount(current);
 			}
@@ -127,6 +140,7 @@ public class AccountManagerActivity extends Activity {
 
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
@@ -169,7 +183,17 @@ public class AccountManagerActivity extends Activity {
 
 			this.accounts = objects;
 		}
-
+		
+		public int getPositionByAccount(Account o){
+			Account a;
+			for (int i = 0, length = accounts.size(); i < length; i++) {
+				a = accounts.get(i);
+				if(a.equals(o)){
+					return i;
+				}
+			}
+			return -1;
+		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
@@ -232,6 +256,14 @@ public class AccountManagerActivity extends Activity {
 											AccountManager
 													.removeAccount(account);
 											accountListAdatper.remove(account);
+											if(account.isDefault){
+												Account newDefault = accountListAdatper.getItem(0);
+												if(newDefault != null){
+													newDefault.isDefault = true;
+													AccountManager.updateAccount(newDefault);
+													accountListAdatper.notifyDataSetChanged();
+												}
+											}
 										}
 
 									}).show();

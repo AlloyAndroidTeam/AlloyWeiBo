@@ -3,10 +3,12 @@ package com.alloyteam.weibo;
 import java.util.ArrayList;
 
 import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.DBHelper;
 import com.alloyteam.weibo.model.*;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,7 +27,10 @@ public class SplashActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
 		// 在这里初始化 dbhelper
-		DBHelper.init(getApplicationContext());
+		Context context = getApplicationContext();
+		DBHelper.init(context);
+		ApiManager.init(context);
+		
 		final Intent i = new Intent();
 		if(hasAccount()){
 			i.setClass(this, MainActivity.class);

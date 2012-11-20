@@ -5,14 +5,20 @@
 package com.alloyteam.weibo.logic;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Toast;
 
+import com.alloyteam.weibo.AuthActivity;
 import com.alloyteam.weibo.model.Account;
 
 /**
@@ -31,8 +37,17 @@ public class ApiManager {
 
 	}
 
+	private static Context apiContext;
+
+	public static void init(Context context) {
+		apiContext = context;
+	}
+
+	// private static ArrayList<RequestObject> requestQueue;
+
 	/**
 	 * 同步调用微博 api
+	 * 
 	 * @param account
 	 * @param url
 	 * @param params
@@ -67,6 +82,7 @@ public class ApiManager {
 
 	/**
 	 * 异步调用微博 api
+	 * 
 	 * @param account
 	 * @param url
 	 * @param params
@@ -76,13 +92,30 @@ public class ApiManager {
 	public static void requestAsync(final Account account, final String url,
 			final Bundle params, final String method,
 			final IApiListener listener) {
-		final Handler handler = new Handler() {
+		
+		if (!account.isValid() /*|| true*/) {
+			// if (requestQueue == null) {
+			// requestQueue = new ArrayList<RequestObject>();
+			// }
+			// RequestObject requestObject = new RequestObject();
+			// requestObject.account = account;
+			// requestObject.url = url;
+			// requestObject.params = params;
+			// requestObject.method = method;
+			// requestObject.listener = listener;
+			// requestQueue.add(requestObject);
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see android.os.Handler#handleMessage(android.os.Message)
-			 */
+			Intent intent = new Intent(apiContext, AuthActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.putExtra("uid", account.uid);
+			intent.putExtra("type", account.type);
+			Toast.makeText(apiContext, "该帐号(" + account.uid + ")绑定已失效，请重新绑定",
+					Toast.LENGTH_SHORT).show();
+			apiContext.startActivity(intent);
+			return;
+		}
+
+		final Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				try {
@@ -131,6 +164,7 @@ public class ApiManager {
 
 	/**
 	 * 填充授权信息
+	 * 
 	 * @param account
 	 * @param bundle
 	 * @return
@@ -147,5 +181,15 @@ public class ApiManager {
 		bundle.putString("openid", account.openId);
 		return bundle;
 	}
+
+	// private static class RequestObject {
+	// Account account;
+	// String url;
+	//
+	// Bundle params;
+	// String method;
+	//
+	// IApiListener listener;
+	// }
 
 }
