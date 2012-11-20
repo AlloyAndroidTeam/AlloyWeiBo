@@ -38,7 +38,7 @@ public class HomeActivity extends Activity {
 	public static final String TAG = "HomeActivity";
 	public ListView mylist;
 	public ImageView bigImageView;
-	public ImageLoader imageLoader;
+	static public ImageLoader imageLoader;
 	public boolean isMove=false;
 
 	private Handler mainHandler = new Handler() {

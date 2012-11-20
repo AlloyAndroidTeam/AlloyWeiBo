@@ -40,7 +40,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		homeActivity=((HomeActivity)context);
-		imageLoader=homeActivity.imageLoader;//new ImageLoader(context);
+		imageLoader=HomeActivity.imageLoader;//new ImageLoader(context);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.alloyteam.weibo.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -44,16 +46,15 @@ public class ImageLoader {
 
 		Bitmap bitmap = memoryCache.get(url);
 		if (bitmap != null) {
-			if(callback!=null){
+			if (callback != null) {
 				imageView.setImageBitmap(callback.imageLoaded(bitmap, url));
-			}
-			else{
+			} else {
 				imageView.setImageBitmap(bitmap);
 			}
 		} else {
 			// 若没有的话则开启新线程加载图片
 			queuePhoto(url, imageView, callback);
-			//imageView.setImageResource(stub_id);
+			// imageView.setImageResource(stub_id);
 		}
 	}
 
@@ -91,27 +92,68 @@ public class ImageLoader {
 			return null;
 		}
 	}
-
+	/**
+	  * 将网络图片，转换为 btye 类型
+	  * @param is
+	  * @return
+	  * @throws IOException
+	  */
+	 private static byte[] getBytes(InputStream is) throws IOException {           
+	  ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	  int imgSize = 1024*4;
+	  byte[] b = null;  
+	  byte[] bytes = null;
+	  try {
+	   b= new byte[imgSize];
+	   int len = 0;           
+	   while ((len = is.read(b, 0, imgSize)) != -1)            
+	   {            
+	    baos.write(b, 0, len);            
+	    baos.flush();           
+	   }           
+	   bytes = baos.toByteArray();           
+	   baos.close();
+	   is.close();
+	  } catch (Exception e) {
+	   //Log.i(TAG, "将网络图片，转换为 btye 类型 方法异常"+e.toString());
+	  }
+	  return bytes;
+	 }
 	// decode这个图片并且按比例缩放以减少内存消耗，虚拟机对每张图片的缓存大小也是有限制的
 	private Bitmap decodeFile(InputStream f) {
 
 		// decode image size
 		BitmapFactory.Options o = new BitmapFactory.Options();
-		// o.inJustDecodeBounds = true;
+		//o.inJustDecodeBounds = true;
 		return BitmapFactory.decodeStream(f, null, o);
+		/*//BitmapFactory.
 
 		// Find the correct scale value. It should be the power of 2.
-		/*
-		 * final int REQUIRED_SIZE = 70; int width_tmp = o.outWidth, height_tmp
-		 * = o.outHeight; int scale = 1; while (true) { if (width_tmp / 2 <
-		 * REQUIRED_SIZE || height_tmp / 2 < REQUIRED_SIZE) break; width_tmp /=
-		 * 2; height_tmp /= 2; scale *= 2; }
-		 * 
-		 * // decode with inSampleSize BitmapFactory.Options o2 = new
-		 * BitmapFactory.Options(); o2.inSampleSize = scale; return
-		 * BitmapFactory.decodeStream(f, null, o2);
-		 */
-
+		final int REQUIRED_SIZE = 2048;
+		int width_tmp = o.outWidth, height_tmp = o.outHeight;
+		int scale = 1;
+		while (true) {
+			if (width_tmp / 2 < REQUIRED_SIZE && height_tmp / 2 < REQUIRED_SIZE)
+				break;
+			width_tmp /= 2;
+			height_tmp /= 2;
+			scale *= 2;
+		}
+		//BitmapFactory.Options o2 = new BitmapFactory.Options();
+		Log.d("my",String.valueOf(scale));
+		o.inJustDecodeBounds = false;
+		o.inSampleSize = scale;
+		try {
+			f.reset();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Bitmap bm=BitmapFactory.decodeStream(f);// o);
+		if(bm==null){
+			Log.d("my","null");
+		}
+		return bm;*/
 	}
 
 	// Task for the queue
@@ -143,7 +185,7 @@ public class ImageLoader {
 			memoryCache.put(photoToLoad.url, bmp);
 			if (imageViewReused(photoToLoad))
 				return;
-			BitmapDisplayer bd = new BitmapDisplayer(bmp,photoToLoad);			
+			BitmapDisplayer bd = new BitmapDisplayer(bmp, photoToLoad);
 			// 更新的操作放在UI线程中
 			Activity a = (Activity) photoToLoad.imageView.getContext();
 			a.runOnUiThread(bd);
@@ -179,14 +221,14 @@ public class ImageLoader {
 				return;
 			Log.d("my", "set");
 			if (bitmap != null) {
-				if(photoToLoad.callback!=null){
-					photoToLoad.imageView.setImageBitmap(photoToLoad.callback.imageLoaded(bitmap, photoToLoad.url));
-				}
-				else{
+				if (photoToLoad.callback != null) {
+					photoToLoad.imageView.setImageBitmap(photoToLoad.callback
+							.imageLoaded(bitmap, photoToLoad.url));
+				} else {
 					photoToLoad.imageView.setImageBitmap(bitmap);
 				}
-			} else{
-				//photoToLoad.imageView.setImageResource(stub_id);
+			} else {
+				// photoToLoad.imageView.setImageResource(stub_id);
 			}
 		}
 	}

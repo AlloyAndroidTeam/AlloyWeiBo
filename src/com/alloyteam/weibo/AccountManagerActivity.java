@@ -108,7 +108,7 @@ public class AccountManagerActivity extends Activity {
 	protected void onStop() {
 		super.onStop();
 		
-		this.unregisterReceiver(broadcastReceiver);
+		//this.unregisterReceiver(broadcastReceiver);
 	}
 
 
