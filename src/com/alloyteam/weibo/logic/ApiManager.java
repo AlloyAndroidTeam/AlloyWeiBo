@@ -32,11 +32,14 @@ public class ApiManager {
 	}
 
 	/**
-	 * 调用微博 api
-	 * 
+	 * 同步调用微博 api
+	 * @param account
+	 * @param url
+	 * @param params
+	 * @param method
+	 * @return
 	 * @throws JSONException
 	 * @throws IOException
-	 * 
 	 */
 	public static JSONObject request(Account account, String url,
 			Bundle params, String method) throws JSONException, IOException {
@@ -62,6 +65,14 @@ public class ApiManager {
 		return jsonObject;
 	}
 
+	/**
+	 * 异步调用微博 api
+	 * @param account
+	 * @param url
+	 * @param params
+	 * @param method
+	 * @param listener
+	 */
 	public static void requestAsync(final Account account, final String url,
 			final Bundle params, final String method,
 			final IApiListener listener) {
@@ -118,6 +129,12 @@ public class ApiManager {
 
 	}
 
+	/**
+	 * 填充授权信息
+	 * @param account
+	 * @param bundle
+	 * @return
+	 */
 	private static Bundle fillParams(Account account, Bundle bundle) {
 		if (bundle == null) {
 			bundle = new Bundle();

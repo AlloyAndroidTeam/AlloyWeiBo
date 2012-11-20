@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -35,6 +37,8 @@ public class AccountManagerActivity extends Activity {
 	AccountListAdatper accountListAdatper;
 
 	String[] providers = new String[] { "新浪微博", "腾讯微博" };
+	
+	int currentDefaultAccountPosition = -1;
 
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -48,49 +52,78 @@ public class AccountManagerActivity extends Activity {
 		}
 	};
 
+	OnClickListener onAddBtnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Activity context = AccountManagerActivity.this;
+			ListView listView = new ListView(context);
+			listView.setAdapter(new ArrayAdapter<String>(context,
+					R.layout.account_manager_provider, R.id.providerDesc,
+					providers));
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+			builder.setTitle("选择帐号类型");
+			builder.setItems(providers, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int index) {
+					Log.v(TAG, index + " click");
+					Activity context = AccountManagerActivity.this;
+					int type = index + 1;
+					Intent intent = new Intent(context, AuthActivity.class);
+					intent.putExtra("type", type);
+					context.startActivity(intent);
+				}
+			});
+			builder.setNegativeButton("取消", null);
+			AlertDialog dialog = builder.create();
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.show();
+
+		}
+	};
+
+	OnItemClickListener onAccListItemClickListener = new OnItemClickListener() {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * android.widget.AdapterView.OnItemClickListener#onItemClick(android
+		 * .widget.AdapterView, android.view.View, int, long)
+		 */
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View arg1, int position,
+				long arg3) {
+			if(currentDefaultAccountPosition == position){
+				return;
+			}
+			if(currentDefaultAccountPosition != -1){
+				Account current = accountListAdatper.getItem(currentDefaultAccountPosition);
+				current.isDefault = false;
+				AccountManager.updateAccount(current);
+			}
+			Account account = accountListAdatper.getItem(position);
+			account.isDefault = true;
+			AccountManager.updateAccount(account);
+			accountListAdatper.notifyDataSetChanged();
+		}
+
+	};
+
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_account_manager);
 
 		Button addButton = (Button) findViewById(R.id.addNewAccount);
-		addButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Activity context = AccountManagerActivity.this;
-				ListView listView = new ListView(context);
-				listView.setAdapter(new ArrayAdapter<String>(context,
-						R.layout.account_manager_provider, R.id.providerDesc,
-						providers));
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle("选择帐号类型");
-				builder.setItems(providers,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int index) {
-								Log.v(TAG, index + " click");
-								Activity context = AccountManagerActivity.this;
-								int type = index + 1;
-								Intent intent = new Intent(context,
-										AuthActivity.class);
-								intent.putExtra("type", type);
-								context.startActivity(intent);
-							}
-						});
-				builder.setNegativeButton("取消", null);
-				AlertDialog dialog = builder.create();
-				dialog.setCanceledOnTouchOutside(false);
-				dialog.show();
-
-			}
-		});
+		addButton.setOnClickListener(onAddBtnClickListener);
 
 		ArrayList<Account> accounts = AccountManager.getAccounts();
 		accountListAdatper = new AccountListAdatper(this, 0, accounts);
 		ListView accountListView = (ListView) findViewById(R.id.accountList);
 		accountListView.setAdapter(accountListAdatper);
+
+		accountListView.setOnItemClickListener(onAccListItemClickListener);
 
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
@@ -114,6 +147,7 @@ public class AccountManagerActivity extends Activity {
 		Button deleteButton;
 		TextView description;
 		TextView provider;
+		TextView defaultSelect;
 	}
 
 	class AccountListAdatper extends ArrayAdapter<Account> {
@@ -136,6 +170,7 @@ public class AccountManagerActivity extends Activity {
 			this.accounts = objects;
 		}
 
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			AccountViewHolder holder;
@@ -151,6 +186,8 @@ public class AccountManagerActivity extends Activity {
 						.findViewById(R.id.accountDelBtn);
 				holder.provider = (TextView) convertView
 						.findViewById(R.id.accountProviderDesc);
+				holder.defaultSelect = (TextView) convertView
+						.findViewById(R.id.defaultSelectTxt);
 
 				convertView.setTag(holder);
 
@@ -166,6 +203,12 @@ public class AccountManagerActivity extends Activity {
 			} else if (account.type == Constants.SINA) {
 				desc += "新浪微博";
 			}
+			if (account.isDefault) {
+				currentDefaultAccountPosition = position;
+				holder.defaultSelect.setVisibility(View.VISIBLE);
+			} else {
+				holder.defaultSelect.setVisibility(View.GONE);
+			}
 			holder.provider.setText(desc);
 			desc = account.uid + "(" + account.nick + ")";
 			holder.description.setText(desc);
@@ -174,8 +217,12 @@ public class AccountManagerActivity extends Activity {
 
 				@Override
 				public void onClick(View v) {
+					String message = "您确定要解除绑定吗?";
+					if (account.isDefault) {
+						message = "该帐号是默认帐号，" + message;
+					}
 					new AlertDialog.Builder(AccountManagerActivity.this)
-							.setMessage("您确定要解除绑定吗?")
+							.setMessage(message)
 							.setPositiveButton(R.string.ensure_text,
 									new AlertDialog.OnClickListener() {
 										@Override
