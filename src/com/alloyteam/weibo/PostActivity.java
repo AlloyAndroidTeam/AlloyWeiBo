@@ -5,20 +5,25 @@ package com.alloyteam.weibo;
  
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+ 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alloyteam.net.HttpConnection;
 import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.ApiManager;
+import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.model.Account;
-import com.alloyteam.weibo.model.Weibo;
-import com.alloyteam.weibo.util.WeiboListAdapter;
+import com.alloyteam.weibo.model.Weibo; 
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.AlertDialog; 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -55,6 +60,11 @@ public class PostActivity extends Activity implements OnClickListener{
 	private ImageView photoThumb;
 	private TextView tvWordCount;
 	//private PopFriend popFriend;
+	private AlertDialog tipsDlg;
+	
+	
+	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
+	private Runnable runner;
 	
 	private ListView listView;
 	@Override
@@ -271,9 +281,7 @@ public class PostActivity extends Activity implements OnClickListener{
     		 return;
     	 }
     	 
-    	 Account account=AccountManager.getDefaultAccount(); 
-        
-         account.add("json", content, "127.0.0.1", new HttpConnection.HttpConnectionListener() {		
+    	add("json", content, "127.0.0.1", new HttpConnection.HttpConnectionListener() {		
  			public void onResponse(boolean success, String result) {
  				Log.d("save",result);
  				if(!success)return;
@@ -291,4 +299,150 @@ public class PostActivity extends Activity implements OnClickListener{
  			}
          });	
     }
+    
+    
+    
+    /**
+	 * 发送微博，文字
+	 */
+	public void add(String format, String content,
+			String clientip, final HttpConnection.HttpConnectionListener listener) throws Exception {
+		 
+		
+		 Account account = AccountManager.getDefaultAccount();
+    	 
+         Bundle params = new Bundle(); 
+         params.putString("format", format);
+         params.putString("content", content);     
+         params.putString("longitude", "");
+         params.putString("syncflag", "1"); 
+         
+         final Context _context = this;
+     	 ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
+     							params, "POST", new ApiManager.IApiListener() {
+
+					@Override
+					public void onJSONException(JSONException exception) {
+						Log.d("add", "onJSONException");
+					}
+
+					public void onFailure(String msg) {
+						Log.d("add", "onFailure");
+					}
+
+					@Override
+					public void onComplete(JSONObject result) {
+						Log.d("add", "onComplete"+result.toString()); 
+						try {							 
+							String errcode = result.getString("errcode");
+							if (errcode.equals("0")){
+								
+								//tips("发送成功.");
+								Intent intent = new Intent();						    	
+						    	intent.setAction("com.alloyteam.weibo.WEIBO_ADDED"); 					
+								_context.sendBroadcast(intent);								 
+								finish();
+							}else{								
+								tips("发送失败，请重试！");
+							} 
+							 
+						} catch (JSONException je) {
+							Log.d("json", "error");
+						}
+					}
+				});
+
+    	 
+	}
+	
+	/**
+	 * 发表一条带图片的微博
+	 * 
+	 * @param oAuth
+	 * @param format 返回数据的格式 是（json或xml）
+	 * @param content  微博内容
+	 * @param clientip 用户IP(以分析用户所在地)
+	 * @param jing 经度（可以填空）
+	 * @param wei 纬度（可以填空）
+	 * @param picpath 可以是本地图片路径 或 网络地址
+	 * @param syncflag  微博同步到空间分享标记（可选，0-同步，1-不同步，默认为0）  
+	 * @return
+	 * @throws Exception
+     * @see <a href="http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E5%8F%91%E8%A1%A8%E4%B8%80%E6%9D%A1%E5%B8%A6%E5%9B%BE%E7%89%87%E7%9A%84%E5%BE%AE%E5%8D%9A">腾讯微博开放平台上关于此条API的文档1-本地图片</a>
+     * @see <a href="http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E7%94%A8%E5%9B%BE%E7%89%87URL%E5%8F%91%E8%A1%A8%E5%B8%A6%E5%9B%BE%E7%89%87%E7%9A%84%E5%BE%AE%E5%8D%9A">腾讯微博开放平台上关于此条API的文档2-网络图片</a>
+	 */
+	public void addPic(String format, String content,
+			String clientip, String jing, String wei, String picpath,String syncflag,
+			 final HttpConnection.HttpConnectionListener listener)
+			throws Exception {
+		Account account = AccountManager.getDefaultAccount();
+    	 
+        Bundle params = new Bundle(); 
+        params.putString("format", format);
+        params.putString("content", content);         
+        params.putString("clientip", clientip);
+        params.putString("longitude", "");
+        params.putString("syncflag", "1");
+        params.putString("oauth_consumer_key", Constants.Tencent.T_ADD); 
+        params.putString("oauth_version", "2.a");
+        params.putString("scope", "all"); 
+        
+    	ApiManager.requestAsync(account, Constants.Tencent.HOME_TIMELINE,
+    							params, "POST", new ApiManager.IApiListener() {
+
+					@Override
+					public void onJSONException(JSONException exception) {
+					}
+
+					public void onFailure(String msg) {
+
+					}
+
+					@Override
+					public void onComplete(JSONObject result) {
+						List<Weibo> list = new ArrayList<Weibo>();
+						try {
+							JSONObject data = result.getJSONObject("data");
+							JSONArray info = data.getJSONArray("info");
+							Log.d("json", "parse");
+							 
+						} catch (JSONException je) {
+							Log.d("json", "error");
+						}
+					}
+				});
+
+	};
+	/**
+	 * 提示
+	 */
+	private void tips(String msg){
+		if (tipsDlg == null){
+			AlertDialog.Builder builder = new AlertDialog.Builder(this); 
+			//tipsDlg = new AlertDialog.Builder(this);	
+			builder. setTitle("提示").setIcon(R.drawable.ic_launcher);
+			tipsDlg = builder.create();
+		}
+		tipsDlg.setMessage(msg);
+		tipsDlg.show();
+		autoClose(2000);
+	}
+	/**
+	 * 延时关闭 
+	 */
+	public void autoClose(long duration){  
+        //创建自动关闭任务
+		if (runner == null){
+	        runner = new Runnable() {  
+	            @Override  
+	            public void run() {  
+	            	if (tipsDlg != null){	            		 
+	            		tipsDlg.dismiss();
+	            	}
+	            }  
+	        };  
+		}
+        //新建调度任务  
+        executor.schedule(runner, duration, TimeUnit.MILLISECONDS);            
+    }  
 }

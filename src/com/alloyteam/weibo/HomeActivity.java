@@ -1,6 +1,5 @@
 package com.alloyteam.weibo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.alloyteam.net.HttpConnection;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
 import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.PullDownView.OnPullDownListener;
 import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
@@ -25,12 +24,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -38,13 +35,20 @@ import android.widget.ListView;
  * @author pxz
  * 
  */
-public class HomeActivity extends Activity {
+public class HomeActivity extends Activity implements OnPullDownListener, OnItemClickListener{
 	public static final String TAG = "HomeActivity";
 	public ListView mylist;
 	public ImageView bigImageView;
 	static public ImageLoader imageLoader;
 	public boolean isMove=false;
+	private PullDownView mPullDownView;
+	private static final int WHAT_DID_LOAD_DATA = 0;
+	private static final int WHAT_DID_REFRESH = 1;
+	private static final int WHAT_DID_MORE = 2;
+	private WeiboListAdapter mAdapter;
+	private List<Weibo> list;
 
+	
 	private Handler mainHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -103,51 +107,21 @@ public class HomeActivity extends Activity {
 		findViewById(R.id.btn_post).setOnClickListener(listener);
 		bigImageView=(ImageView) findViewById(R.id.bigImage);
 		bigImageView.setOnClickListener(listener);
-		getHomeLine();
 		imageLoader=new ImageLoader(this);
-		bigImageView.setOnTouchListener(new View.OnTouchListener() {
-			float mx, my;
-
-	        public boolean onTouch(View arg0, MotionEvent event) {
-	        	//super.onTouchEvent(event);
-
-	            float curX, curY;
-
-	            switch (event.getAction()) {
-
-	                case MotionEvent.ACTION_DOWN:
-	                    mx = event.getX();
-	                    my = event.getY();
-	                    isMove=false;
-	                    break;
-	                case MotionEvent.ACTION_MOVE:
-	                    curX = event.getX();
-	                    curY = event.getY();
-	                    int moveX=(int)(mx - curX),moveY=(int)(my - curY);
-	                    bigImageView.scrollBy(moveX, moveY);
-	                    mx = curX;
-	                    my = curY;
-	                    if(Math.abs(moveX)+Math.abs(moveY)>10)isMove=true;
-	                    break;
-	                case MotionEvent.ACTION_UP:
-	                    curX = event.getX();
-	                    curY = event.getY();
-	                    bigImageView.scrollBy((int) (mx - curX), (int) (my - curY));
-	                    if(!isMove)bigImageView.setVisibility(View.GONE);
-	                    break;
-	            }
-
-	            return true;
-	        }
-	    });
-
+		getHomeLine();
 	}
 
 	public void getHomeLine() {
-		mylist = (ListView) findViewById(R.id.lv_main_timeline);
-		mylist.setOnItemClickListener(timelineClickListener);
+		mPullDownView = (PullDownView) findViewById(R.id.pull_down_view);
+		mPullDownView.setOnPullDownListener(this);
+		list = new ArrayList<Weibo>();
+		mylist = mPullDownView.getListView();
+		mAdapter = new WeiboListAdapter(
+				this, list);
+		mylist.setAdapter(mAdapter);
+		mylist.setOnItemClickListener(this);
+		mPullDownView.enableAutoFetchMore(true, 1);
 		Account account = AccountManager.getDefaultAccount();
-		final Activity context = this;
 		if (account == null)
 			return;
 
@@ -176,15 +150,19 @@ public class HomeActivity extends Activity {
 
 					@Override
 					public void onComplete(JSONObject result) {
-						List<Weibo> list = new ArrayList<Weibo>();
+						Log.d("my","complete");
 						try {
 							JSONObject data = result.getJSONObject("data");
 							JSONArray info = data.getJSONArray("info");
 							Log.d("json", "parse");
 							for (int i = 0; i < info.length(); ++i) {
 								JSONObject item = info.getJSONObject(i);
+								int status=item.getInt("status");
+								if(status!=0){
+									continue;
+								}
 								String text = item.getString("text");
-								String name = item.getString("name");
+								String name = item.getString("name");						
 								String avatarUrl = item.getString("head")
 										+ "/50";
 								int type = item.getInt("type");
@@ -218,18 +196,9 @@ public class HomeActivity extends Activity {
 									}
 								}
 								list.add(weibo);
-							}
-							Log.i("azrael", "list");
-							WeiboListAdapter ila = new WeiboListAdapter(
-									context, list);
-							mylist.setAdapter(ila);
-							TextView text = (TextView) context
-									.findViewById(R.id.tv_home_loading);
-							text.setVisibility(View.GONE);
-							// LayoutParams lp=(LayoutParams)
-							// mylist.getLayoutParams();
-							// lp.leftMargin=0;
-							// mylist.setLayoutParams(lp);
+							}					
+							mAdapter.notifyDataSetChanged();
+							mPullDownView.notifyDidLoad();
 						} catch (JSONException je) {
 							Log.d("json", "error");
 						}
@@ -239,10 +208,6 @@ public class HomeActivity extends Activity {
 
 	public void showImage(String url, Bitmap bm){
 		Intent intent = new Intent(this, ImageActivity.class);
-		/*bigImageView.setImageBitmap(bm);
-		bigImageView.scrollTo(0, 0);
-		bigImageView.setVisibility(View.VISIBLE);
-		imageLoader.displayImage(url+"/2000", bigImageView, null);*/
 		intent.putExtra("url", url);
 		startActivity(intent);
 	}
@@ -258,4 +223,104 @@ public class HomeActivity extends Activity {
 		super.onPause();
 		Log.i(TAG, "onPause");
 	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void loadData(){
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				List<String> strings = new ArrayList<String>();
+
+				Message msg = mUIHandler.obtainMessage(WHAT_DID_LOAD_DATA);
+				msg.obj = strings;
+				msg.sendToTarget();
+			}
+		}).start();
+	}
+
+
+	@Override
+	public void onRefresh() {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}				
+				Message msg = mUIHandler.obtainMessage(WHAT_DID_REFRESH);
+				msg.obj = "After refresh " + System.currentTimeMillis();
+				msg.sendToTarget();
+			}
+		}).start();
+	}
+	
+	@Override
+	public void onMore() {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}				
+				Message msg = mUIHandler.obtainMessage(WHAT_DID_MORE);
+				msg.obj = "After more " + System.currentTimeMillis();
+				msg.sendToTarget();
+			}
+		}).start();
+	}
+	
+	private Handler mUIHandler = new Handler(){
+
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case WHAT_DID_LOAD_DATA:{
+					if(msg.obj != null){
+						List<String> strings = (List<String>) msg.obj;
+						if(!strings.isEmpty()){
+							mAdapter.notifyDataSetChanged();
+						}
+					}
+					// 诉它数据加载完毕;
+					mPullDownView.notifyDidLoad();
+					break;
+				}
+				case WHAT_DID_REFRESH :{
+					String body = (String) msg.obj;
+					mAdapter.notifyDataSetChanged();
+					// 告诉它更新完毕
+					mPullDownView.notifyDidRefresh();
+					break;
+				}
+				
+				case WHAT_DID_MORE:{
+					String body = (String) msg.obj;
+					mAdapter.notifyDataSetChanged();
+					// 告诉它获取更多完毕
+					mPullDownView.notifyDidMore();
+					break;
+				}
+			}
+			
+		}
+		
+	};
 }
