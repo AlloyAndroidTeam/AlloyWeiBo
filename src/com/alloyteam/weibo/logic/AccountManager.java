@@ -27,7 +27,7 @@ public class AccountManager {
 	 */
 	public static void addAccount(Account account) {
 		Log.v(TAG, "addAccount: " + account);
-		
+
 		DBHelper dbHelper = DBHelper.getInstance();
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -59,6 +59,24 @@ public class AccountManager {
 		Log.v(TAG, "removeAccount: " + account);
 	}
 
+	public static void updateAccount(Account account) {
+		if (exists(account.uid, account.type)) {
+			SQLiteDatabase db = DBHelper.getInstance().getWritableDatabase();
+			ContentValues values = new ContentValues();
+			values.put("nick", account.nick);
+
+			values.put("openId", account.openId);
+			values.put("openKey", account.openKey);
+			values.put("accessToken", account.accessToken);
+			values.put("refreshToken", account.refreshToken);
+			values.put("isDefault", account.isDefault ? 1 : 0);
+			values.put("invalidTime", account.invalidTime.getTime());
+			values.put("authTime", account.authTime.getTime());
+			db.update(DBHelper.ACCOUNT_TABLE_NAME, values, "uid=? and type=?",
+					new String[] { account.uid, account.type + "" });
+		}
+	}
+
 	/**
 	 * 根据 account.uid 读取 account
 	 * 
@@ -73,7 +91,8 @@ public class AccountManager {
 				new String[] { uid, type + "" }, // Selection Args
 				null, // SQL GROUP BY
 				null, // SQL HAVING
-				null // SQL ORDER BY
+				null, // SQL ORDER BY
+				"1" // limit
 				);
 		Account account = null;
 		if (cursor.moveToFirst()) {
@@ -96,7 +115,8 @@ public class AccountManager {
 				new String[] { uid, type + "" }, // Selection Args
 				null, // SQL GROUP BY
 				null, // SQL HAVING
-				null // SQL ORDER BY
+				null, // SQL ORDER BY
+				"1" // limit
 				);
 		boolean result = false;
 		if (cursor.moveToFirst()) {
@@ -108,7 +128,7 @@ public class AccountManager {
 		return result;
 	}
 
-	/** 
+	/**
 	 * 获取默认帐号
 	 */
 	public static Account getDefaultAccount() {
@@ -120,35 +140,60 @@ public class AccountManager {
 				new String[] { "1" }, // Selection Args
 				null, // SQL GROUP BY
 				null, // SQL HAVING
-				null // SQL ORDER BY
+				null, // SQL ORDER BY
+				"1" // limit
 				);
 		if (cursor.moveToFirst()) {
 			Account account = new Account();
 			parseCursorToAccount(account, cursor);
+			Log.v(TAG, "getDefaultAccount - default: " + account);
 			return account;
-		}else{
+		} else {
 			cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
-				null, // Columns to return
-				null, // SQL WHERE
-				null, // Selection Args
-				null, // SQL GROUP BY
-				null, // SQL HAVING
-				null // SQL ORDER BY
-				);
-			if(cursor.moveToFirst()){
+					null, // Columns to return
+					null, // SQL WHERE
+					null, // Selection Args
+					null, // SQL GROUP BY
+					null, // SQL HAVING
+					null, // SQL ORDER BY
+					"1" // limit
+					);
+			if (cursor.moveToFirst()) {
 				Account account = new Account();
 				parseCursorToAccount(account, cursor);
+				Log.v(TAG, "getDefaultAccount - first: " + account);
 				return account;
 			}
 		}
 		return null;
 	}
-	
+
+//	public static Account getFirstAccount() {
+//		DBHelper dbHelper = DBHelper.getInstance();
+//		SQLiteDatabase db = dbHelper.getReadableDatabase();
+//		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+//				null, // Columns to return
+//				null, // SQL WHERE
+//				null, // Selection Args
+//				null, // SQL GROUP BY
+//				null, // SQL HAVING
+//				null, // SQL ORDER BY,
+//				"1" // limit
+//				);
+//		if (cursor.moveToFirst()) {
+//			Account account = new Account();
+//			parseCursorToAccount(account, cursor);
+//			return account;
+//		}
+//		return null;
+//	}
+
 	/**
 	 * 返回绑定的帐号数目
+	 * 
 	 * @return
 	 */
-	public static int getAccountCount(){
+	public static int getAccountCount() {
 		DBHelper dbHelper = DBHelper.getInstance();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
@@ -161,7 +206,7 @@ public class AccountManager {
 				);
 		return cursor.getCount();
 	}
-	
+
 	/**
 	 * 获取当前已经授权的帐号列表
 	 * 

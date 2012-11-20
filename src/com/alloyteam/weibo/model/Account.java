@@ -82,6 +82,12 @@ public class Account {
 	 */
 	public boolean isDefault;
 
+	/* 判断两个帐号是否是同一个, 只判断了 uid, 和 type
+	 */
+	public boolean equals(Account o) {
+		return this.uid.equals(o.uid) && this.type == o.type;
+	}
+	
 	@Override
 	public String toString() {
 		return "Account [uid=" + uid + ", nick=" + nick + ", avator=" + avator
