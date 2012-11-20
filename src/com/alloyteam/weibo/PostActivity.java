@@ -3,6 +3,19 @@
  */
 package com.alloyteam.weibo;
  
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.alloyteam.net.HttpConnection;
+import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.model.Weibo;
+import com.alloyteam.weibo.util.WeiboListAdapter;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -34,6 +47,7 @@ import android.widget.TextView;
 public class PostActivity extends Activity implements OnClickListener{
 	private EditText tvMain;  
 	private Button btnBack;
+	private Button btnSave;
 	private Button btnAddPic;
 	private Button btnAddFriend;
 	private Button btnAddTopic;
@@ -72,11 +86,14 @@ public class PostActivity extends Activity implements OnClickListener{
         tvWordCount = (TextView)findViewById(R.id.tvPostCount);
         bindWordCount();
         
-        btnBack = (Button)findViewById(R.id.btnPostBack);        
+        btnBack = (Button)findViewById(R.id.btnPostBack);   
+        btnSave = (Button)findViewById(R.id.btnPostSave);  
         btnAddPic = (Button)findViewById(R.id.btnPostAddPic);
     	btnAddFriend = (Button)findViewById(R.id.btnPostAddFriend);
     	btnAddTopic = (Button)findViewById(R.id.btnPostAddTopic);
+    	
     	btnBack.setOnClickListener(this);
+    	btnSave.setOnClickListener(this);
     	btnAddPic.setOnClickListener(this);
     	btnAddFriend.setOnClickListener(this);
     	btnAddTopic.setOnClickListener(this);    	
@@ -106,9 +123,18 @@ public class PostActivity extends Activity implements OnClickListener{
    		 
     		break;
     	case R.id.btnPostBack : //返回
-    		finish(); 
-    		break;	
+    		finish();
     		
+    		break;	
+    	case R.id.btnPostSave : //保存
+      		 try {
+				save();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				Log.v("btnPostSave","保存失败");
+				e.printStackTrace();
+			}
+    		break;	
     	}
 	}
 	/*
@@ -235,4 +261,34 @@ public class PostActivity extends Activity implements OnClickListener{
   
         }  
     }  
+    /**
+     * 发布
+     * @throws Exception 
+     */
+    private void save() throws Exception{    	 
+    	 String content = tvMain.getText().toString();
+    	 if (content.length() > 140){
+    		 return;
+    	 }
+    	 
+    	 Account account=AccountManager.getDefaultAccount(); 
+        
+         account.add("json", content, "127.0.0.1", new HttpConnection.HttpConnectionListener() {		
+ 			public void onResponse(boolean success, String result) {
+ 				Log.d("save",result);
+ 				if(!success)return;
+ 				try{
+ 					List<Weibo> list=new ArrayList<Weibo>();
+ 					JSONObject obj=new JSONObject(result);
+ 		        	JSONObject data =  obj.getJSONObject("data");
+ 		        	JSONArray info = data.getJSONArray("info");
+ 		        	Log.d("json","parse"); 		        	 
+ 		        }
+ 				catch (JSONException je)  
+ 	            {  
+ 	                Log.d("json","error");
+ 	            }
+ 			}
+         });	
+    }
 }
