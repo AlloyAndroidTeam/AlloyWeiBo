@@ -1,5 +1,6 @@
 package com.alloyteam.weibo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -41,28 +42,20 @@ public class MainActivity extends TabActivity implements OnClickListener {
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			String uid = intent.getStringExtra("uid");
-			int type = intent.getIntExtra("type", 0);
-			Log.v(TAG, "onReceive: " + uid + " added.");
+//			String uid = intent.getStringExtra("uid");
+//			int type = intent.getIntExtra("type", 0);
+//			Log.v(TAG, "onReceive: " + uid + " added.");
 			String action = intent.getAction();
 			if ("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)) {
-				Account account = AccountManager.getAccount(uid, type);
-				accountSwitchBtn.setText(getAccountDescption(account));
-			} else if ("com.alloyteam.weibo.ACCOUNT_REMOVE".equals(action)) {
 				Account account = AccountManager.getDefaultAccount();
-				if (account == null) {
-					accountSwitchBtn.setText("绑定帐号");
-					accountSwitchBtn.setTag(1);
-				} else {
+				if(account != null){
 					accountSwitchBtn.setText(getAccountDescption(account));
 					accountSwitchBtn.setTag(0);
+				}else{
+					accountSwitchBtn.setText("绑定帐号");
+					accountSwitchBtn.setTag(1);
 				}
-			} else if ("com.alloyteam.weibo.NEW_ACCOUNT_ADD".equals(action)) {
-				Account account = AccountManager.getAccount(uid, type);
-				if(account.isDefault){
-					accountSwitchBtn.setText(getAccountDescption(account));
-				}
-			}
+			} 
 
 		}
 	};
@@ -88,13 +81,15 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		Account defaultAccount = AccountManager.getDefaultAccount();
 		if (defaultAccount != null) {
 			accountSwitchBtn.setText(getAccountDescption(defaultAccount));
+			accountSwitchBtn.setTag(0);
 		} else {
 			accountSwitchBtn.setText("绑定帐号");
+			accountSwitchBtn.setTag(1);
 		}
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
-		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_REMOVE");
-		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+//		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_REMOVE");
+//		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
@@ -150,6 +145,10 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		case R.id.btnHomeTitleAccount: // 帐号
 			// i = new Intent(this, AccountManagerActivity.class);
 			// startActivity(i);
+			ArrayList<Account> accounts = AccountManager.getAccounts();
+			if(accounts.size() == 1){
+				break;
+			}
 			Object tag = accountSwitchBtn.getTag();
 			if (tag.equals(1)) {
 				i = new Intent(this, AccountManagerActivity.class);
@@ -157,7 +156,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 				break;
 			}
 			final AccountArrayAdapter adapter = new AccountArrayAdapter(this,
-					0, AccountManager.getAccounts());
+					0, accounts);
 			AlertDialog dialog = new AlertDialog.Builder(this).setAdapter(
 					adapter, new AlertDialog.OnClickListener() {
 						@Override
