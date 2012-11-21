@@ -50,9 +50,9 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			String uid = intent.getStringExtra("uid");
 			int type = intent.getIntExtra("type", 0);
 			Log.v(TAG, "onReceive: " + uid + " added.");
-			Account account = AccountManager.getAccount(uid, type);
 			String action = intent.getAction();
-			if ("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)) {
+			if ("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)) {
+				Account account = AccountManager.getAccount(uid, type);
 				accountSwitchBtn.setText(getAccountDescption(account));
 			}
 
@@ -82,8 +82,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			accountSwitchBtn.setText(getAccountDescption(defaultAccount));
 		}
 		IntentFilter intentFilter = new IntentFilter();
-//		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
-		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
@@ -149,11 +148,6 @@ public class MainActivity extends TabActivity implements OnClickListener {
 							Account account = adapter.getItem(which);
 							if (account != null) {
 								AccountManager.switchDefaultAccount(account);
-								Intent intent = new Intent();
-								intent.putExtra("uid", account.uid);
-								intent.putExtra("type", account.type);
-								intent.setAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
-								MainActivity.this.sendBroadcast(intent);
 							}
 						}
 					}).create();

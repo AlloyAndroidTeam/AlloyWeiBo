@@ -246,8 +246,7 @@ public class AccountManagerActivity extends Activity {
 										public void onClick(
 												DialogInterface dialog,
 												int which) {
-											AccountManager
-													.removeAccount(account);
+											AccountManager.removeAccount(account);
 											accountListAdatper.remove(account);
 											if(account.isDefault){
 												Account newDefault = accountListAdatper.getItem(0);

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -24,6 +26,20 @@ public class AccountManager {
 
 	private static Account currentDefaultAccount;
 	
+	private static Context amContext;
+	
+	public static void init(Context context){
+		amContext = context;
+	}
+	
+	private static void broadcastAccountAction(String action, Account account){
+		Intent intent = new Intent();
+		intent.putExtra("id", account.id);
+		intent.putExtra("uid", account.uid);
+		intent.putExtra("type", account.type);
+		intent.setAction(action);
+		amContext.sendBroadcast(intent);
+	}
 	
 	/**
 	 * 添加帐号
@@ -49,6 +65,8 @@ public class AccountManager {
 		long result = db.insert(DBHelper.ACCOUNT_TABLE_NAME, null, values);
 		account.id = (int) result;
 		Log.v(TAG, "addAccount result: " + result);
+		
+		broadcastAccountAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD", account);
 	}
 
 	/**
@@ -63,6 +81,7 @@ public class AccountManager {
 		db.delete(DBHelper.ACCOUNT_TABLE_NAME, "uid=? and type=?",
 				new String[] { account.uid, account.type + "" });
 		Log.v(TAG, "removeAccount: " + account);
+		broadcastAccountAction("com.alloyteam.weibo.ACCOUNT_REMOVE", account);
 	}
 
 	public static void updateAccount(Account account) {
@@ -83,6 +102,7 @@ public class AccountManager {
 			values.put("authTime", account.authTime.getTime());
 			db.update(DBHelper.ACCOUNT_TABLE_NAME, values, "uid=? and type=?",
 					new String[] { account.uid, account.type + "" });
+			broadcastAccountAction("com.alloyteam.weibo.ACCOUNT_UPDATE", account);
 		}
 	}
 
@@ -187,6 +207,7 @@ public class AccountManager {
 		newDefault.isDefault = true;
 		currentDefaultAccount = newDefault;
 		updateAccount(newDefault);
+		broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE", newDefault);
 	}
 
 
