@@ -25,28 +25,30 @@ public class AccountManager {
 	static final String TAG = "AccountManager";
 
 	private static Account currentDefaultAccount;
-	
+
 	private static Context amContext;
-	
-	public static void init(Context context){
+
+	public static void init(Context context) {
 		amContext = context;
 	}
-	
-	private static void broadcastAccountAction(String action, Account account){
+
+	private static void broadcastAccountAction(String action, Account account) {
 		Intent intent = new Intent();
-		intent.putExtra("id", account.id);
-		intent.putExtra("uid", account.uid);
-		intent.putExtra("type", account.type);
+		if (account != null) {
+			intent.putExtra("id", account.id);
+			intent.putExtra("uid", account.uid);
+			intent.putExtra("type", account.type);
+		}
 		intent.setAction(action);
 		amContext.sendBroadcast(intent);
 	}
-	
+
 	/**
 	 * 添加帐号
 	 */
 	public static void addAccount(Account account) {
 		Log.v(TAG, "addAccount: " + account);
-
+		
 		DBHelper dbHelper = DBHelper.getInstance();
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -65,30 +67,66 @@ public class AccountManager {
 		long result = db.insert(DBHelper.ACCOUNT_TABLE_NAME, null, values);
 		account.id = (int) result;
 		Log.v(TAG, "addAccount result: " + result);
-		
+
 		broadcastAccountAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD", account);
+		
+		if (account.isDefault){
+			if(currentDefaultAccount == null || !currentDefaultAccount.equals(account)){
+				currentDefaultAccount = account;
+				broadcastAccountAction(
+						"com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE", account);
+			}
+		}
 	}
 
 	/**
 	 * 删除帐号
 	 */
 	public static void removeAccount(Account account) {
-		if(currentDefaultAccount != null && currentDefaultAccount.equals(account)){
-			currentDefaultAccount = null;
+		Account old = getAccount(account.uid, account.type);
+		if (old != null) {
+			
+			// if(currentDefaultAccount != null &&
+			// currentDefaultAccount.equals(account)){
+			// currentDefaultAccount = null;
+			// broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE",
+			// null);
+			// }
+
+			DBHelper dbHelper = DBHelper.getInstance();
+			SQLiteDatabase db = dbHelper.getWritableDatabase();
+			db.delete(DBHelper.ACCOUNT_TABLE_NAME, "uid=? and type=?",
+					new String[] { account.uid, account.type + "" });
+			Log.v(TAG, "removeAccount: " + account);
+			broadcastAccountAction("com.alloyteam.weibo.ACCOUNT_REMOVE",
+					account);
+			
+			if (old.isDefault) {
+				Account newDefault = getFirstAccount();
+				currentDefaultAccount = newDefault;
+				broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE",
+							newDefault);
+			}
 		}
-		DBHelper dbHelper = DBHelper.getInstance();
-		SQLiteDatabase db = dbHelper.getWritableDatabase();
-		db.delete(DBHelper.ACCOUNT_TABLE_NAME, "uid=? and type=?",
-				new String[] { account.uid, account.type + "" });
-		Log.v(TAG, "removeAccount: " + account);
-		broadcastAccountAction("com.alloyteam.weibo.ACCOUNT_REMOVE", account);
+
 	}
 
 	public static void updateAccount(Account account) {
-		if(currentDefaultAccount != null && currentDefaultAccount.equals(account)){
-			currentDefaultAccount = account;
-		}
-		if (exists(account.uid, account.type)) {
+		Account old = getAccount(account.uid, account.type);
+		if (old != null) {
+			if (account.isDefault) {
+				currentDefaultAccount = account;
+			}
+			
+			// if(currentDefaultAccount != null &&
+			// currentDefaultAccount.equals(account)){
+			// if(account.isDefault != currentDefaultAccount.isDefault){
+			// broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE",
+			// account);
+			// }
+			// currentDefaultAccount = account;
+			// }
+			//
 			SQLiteDatabase db = DBHelper.getInstance().getWritableDatabase();
 			ContentValues values = new ContentValues();
 			values.put("nick", account.nick);
@@ -102,7 +140,13 @@ public class AccountManager {
 			values.put("authTime", account.authTime.getTime());
 			db.update(DBHelper.ACCOUNT_TABLE_NAME, values, "uid=? and type=?",
 					new String[] { account.uid, account.type + "" });
-			broadcastAccountAction("com.alloyteam.weibo.ACCOUNT_UPDATE", account);
+			broadcastAccountAction("com.alloyteam.weibo.ACCOUNT_UPDATE",
+					account);
+			
+			if (!old.isDefault && account.isDefault) {
+				broadcastAccountAction(
+						"com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE", account);
+			}
 		}
 	}
 
@@ -122,7 +166,7 @@ public class AccountManager {
 				null, // SQL HAVING
 				null, // SQL ORDER BY
 				"1" // limit
-				);
+		);
 		Account account = null;
 		if (cursor.moveToFirst()) {
 			account = new Account();
@@ -146,7 +190,7 @@ public class AccountManager {
 				null, // SQL HAVING
 				null, // SQL ORDER BY
 				"1" // limit
-				);
+		);
 		boolean result = false;
 		if (cursor.moveToFirst()) {
 			result = true;
@@ -161,7 +205,7 @@ public class AccountManager {
 	 * 获取默认帐号
 	 */
 	public static Account getDefaultAccount() {
-		if(currentDefaultAccount == null){
+		if (currentDefaultAccount == null) {
 			DBHelper dbHelper = DBHelper.getInstance();
 			SQLiteDatabase db = dbHelper.getReadableDatabase();
 			Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
@@ -172,12 +216,12 @@ public class AccountManager {
 					null, // SQL HAVING
 					null, // SQL ORDER BY
 					"1" // limit
-					);
+			);
 			if (cursor.moveToFirst()) {
 				Account account = new Account();
 				parseCursorToAccount(account, cursor);
 				Log.v(TAG, "getDefaultAccount - default: " + account);
-				currentDefaultAccount =  account;
+				currentDefaultAccount = account;
 			} else {
 				cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
 						null, // Columns to return
@@ -187,7 +231,7 @@ public class AccountManager {
 						null, // SQL HAVING
 						null, // SQL ORDER BY
 						"1" // limit
-						);
+				);
 				if (cursor.moveToFirst()) {
 					Account account = new Account();
 					parseCursorToAccount(account, cursor);
@@ -198,18 +242,48 @@ public class AccountManager {
 		}
 		return currentDefaultAccount;
 	}
-	
-	public static void switchDefaultAccount(Account newDefault){
-		if(currentDefaultAccount != null){
+
+	/**
+	 * 切换默认帐号
+	 * 
+	 * @param newDefault
+	 */
+	public static void switchDefaultAccount(Account newDefault) {
+		if (currentDefaultAccount != null) {
 			currentDefaultAccount.isDefault = false;
 			updateAccount(currentDefaultAccount);
 		}
 		newDefault.isDefault = true;
 		currentDefaultAccount = newDefault;
 		updateAccount(newDefault);
-		broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE", newDefault);
+		// updateAccount 会广播 change
+		// broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE",
+		// newDefault);
 	}
 
+	/**
+	 * 获取第一个帐号
+	 */
+	public static Account getFirstAccount() {
+		DBHelper dbHelper = DBHelper.getInstance();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+				null, // Columns to return
+				null, // SQL WHERE
+				null, // Selection Args
+				null, // SQL GROUP BY
+				null, // SQL HAVING
+				null, // SQL ORDER BY
+				"1" // limit
+		);
+		if (cursor.moveToFirst()) {
+			Account account = new Account();
+			parseCursorToAccount(account, cursor);
+			Log.v(TAG, "getFirstAccount: " + account);
+			return account;
+		}
+		return null;
+	}
 
 	/**
 	 * 返回绑定的帐号数目
@@ -253,7 +327,7 @@ public class AccountManager {
 				parseCursorToAccount(account, cursor);
 
 				list.add(account);
-//				Log.v(TAG, "getAccounts: " + account);
+				// Log.v(TAG, "getAccounts: " + account);
 			} while (cursor.moveToNext());
 		}
 		if (cursor != null && !cursor.isClosed()) {

@@ -44,19 +44,34 @@ public class AccountManagerActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String uid = intent.getStringExtra("uid");
-			Log.v(TAG, "onReceive: " + uid + " added.");
 			int type = intent.getIntExtra("type", 0);
-			Account account = AccountManager.getAccount(uid, type);
 			String action = intent.getAction();
-//			intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
-//			intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+
 			if("com.alloyteam.weibo.NEW_ACCOUNT_ADD".equals(action)){
+				Log.v(TAG, "onReceive: " + uid + " added.");
+				Account account = AccountManager.getAccount(uid, type);
 				accountListAdatper.add(account);
 			}else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
 				//TODO 未测试
+				Account account = AccountManager.getAccount(uid, type);
 				int position = accountListAdatper.getPositionByAccount(account);
 				accountListAdatper.accounts.set(position, account);
 				accountListAdatper.notifyDataSetChanged();
+			}else if("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)){
+				Account newDefault = AccountManager.getDefaultAccount();
+				if(newDefault != null){
+					int position = accountListAdatper.getPositionByAccount(newDefault);
+					if(position > -1){
+						accountListAdatper.accounts.set(position, newDefault);
+						accountListAdatper.notifyDataSetChanged();
+					}
+				}
+				
+//				if(newDefault != null){
+//					newDefault.isDefault = true;
+//					AccountManager.switchDefaultAccount(newDefault);
+//					accountListAdatper.notifyDataSetChanged();
+//				}
 			}
 		}
 	};
@@ -115,7 +130,7 @@ public class AccountManagerActivity extends Activity {
 			Account account = accountListAdatper.getItem(position);
 			account.isDefault = true;
 			AccountManager.switchDefaultAccount(account);
-			accountListAdatper.notifyDataSetChanged();
+//			accountListAdatper.notifyDataSetChanged();
 		}
 
 	};
@@ -138,6 +153,7 @@ public class AccountManagerActivity extends Activity {
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
@@ -248,17 +264,17 @@ public class AccountManagerActivity extends Activity {
 												int which) {
 											AccountManager.removeAccount(account);
 											accountListAdatper.remove(account);
-											if(account.isDefault){
-												if(accountListAdatper.getCount() == 0){
-													return;
-												}
-												Account newDefault = accountListAdatper.getItem(0);
-												if(newDefault != null){
-													newDefault.isDefault = true;
-													AccountManager.switchDefaultAccount(newDefault);
-													accountListAdatper.notifyDataSetChanged();
-												}
-											}
+//											if(account.isDefault){
+//												if(accountListAdatper.getCount() == 0){
+//													return;
+//												}
+//												Account newDefault = accountListAdatper.getItem(0);
+//												if(newDefault != null){
+//													newDefault.isDefault = true;
+//													AccountManager.switchDefaultAccount(newDefault);
+//													accountListAdatper.notifyDataSetChanged();
+//												}
+//											}
 										}
 
 									}).show();
