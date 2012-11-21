@@ -152,10 +152,27 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 
 					@Override
 					public void onJSONException(JSONException exception) {
+						if(pageflag==WHAT_DID_LOAD_DATA){
+							mPullDownView.notifyDidLoad();
+						}
+						else if(pageflag==WHAT_DID_MORE){
+							mPullDownView.notifyDidMore();
+						}
+						else{				
+							mPullDownView.notifyDidRefresh();
+						}
 					}
 
 					public void onFailure(String msg) {
-
+						if(pageflag==WHAT_DID_LOAD_DATA){
+							mPullDownView.notifyDidLoad();
+						}
+						else if(pageflag==WHAT_DID_MORE){
+							mPullDownView.notifyDidMore();
+						}
+						else{				
+							mPullDownView.notifyDidRefresh();
+						}	
 					}
 
 					@Override
