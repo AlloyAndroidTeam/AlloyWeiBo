@@ -37,6 +37,8 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -69,7 +71,7 @@ public class PostActivity extends Activity implements OnClickListener{
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
 	private Runnable runner;
 	
-	private ListView listView;
+	private PopFriend popFrined;
 	
 	
 	@Override
@@ -79,20 +81,14 @@ public class PostActivity extends Activity implements OnClickListener{
 		//自定义标题栏 
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.activity_post);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.post_title); 
+        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.post_title);        
         
-        
-        
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
-        				    WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);         
         
         /*
         Bundle bundle = getIntent().getExtras();
-        Long id = bundle.getLong("id"); 
-          
-        titlebarTxt.setText("编辑:" + id.toString()); 
-       
-        
+        Long id = bundle.getLong("id");           
+        titlebarTxt.setText("编辑:" + id.toString());         
         tvWordCount = (TextView)findViewById(R.id.editWordCount);
         */
         
@@ -113,6 +109,7 @@ public class PostActivity extends Activity implements OnClickListener{
     	btnAddFriend.setOnClickListener(this);
     	btnAddTopic.setOnClickListener(this);    	
         
+    	tvMain.setFocusable(true);
 		 
 	}
 	@Override
@@ -121,17 +118,16 @@ public class PostActivity extends Activity implements OnClickListener{
 		Log.v("onClick","" + v.getId());
 		switch(v.getId()){
     	case R.id.btnPostAddFriend : //@好友
-    		 
+    		//showFriend(v); 
     		break;
     	case R.id.btnPostAddPic : //插入图片
    		 	insertPhoto();
     		break;
     	case R.id.btnPostAddTopic : //插入主题
-   		 
+    		addTopic();
     		break;
     	case R.id.btnPostBack : //返回
-    		finish();
-    		
+    		finish();    		
     		break;	
     	case R.id.btnPostSave : //保存
       		 try {
@@ -493,4 +489,40 @@ public class PostActivity extends Activity implements OnClickListener{
         //新建调度任务  
         executor.schedule(runner, duration, TimeUnit.MILLISECONDS);            
     }  
+	
+	
+	/**
+	 * #话题
+	 */
+	private void addTopic(){
+		int index = tvMain.getSelectionStart();//获取光标所在位置
+		 
+		String text="#请在这里输入话题#";
+		 
+		Editable edit = tvMain.getEditableText();//获取EditText的文字		
+		if (index < 0 || index >= edit.length() ){
+			edit.append(text);	
+		}else{
+			edit.insert(index,text);//光标所在位置插入文字			
+		}
+		tvMain.setSelection(index+1, index + text.length() - 1);		
+	}
+	
+	/**
+	 * @好友
+	 */	 
+	private void showFriend(View v){
+		popFrined = new PopFriend(this);				
+		LayoutInflater inflater = LayoutInflater.from(this);
+		//popFrined.setHeight(height)
+		popFrined.showAtLocation(v, Gravity.BOTTOM, 50, 40);
+		//popFrined.showAsDropDown(btnAddFriend, 0, (- popFrined.getHeight() - 30));
+		
+	}
+	 
+	
+	
+	
+	
+	
 }
