@@ -18,7 +18,10 @@ import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,6 +54,25 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	private long downTimeStamp=0;
 	private Account account;
 	
+	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			/*String uid = intent.getStringExtra("uid");
+			Log.v(TAG, "onReceive: " + uid + " added.");
+			int type = intent.getIntExtra("type", 0);
+			Account account = AccountManager.getAccount(uid, type);*/
+			String action = intent.getAction();
+			if("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)){
+				Log.d("my","account change");
+				initHomeLine();
+			}
+			else if("com.alloyteam.weibo.WEIBO_ADDED".equals(action)){
+				onRefresh();
+			}
+		}
+	};
+
 	private Handler mainHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -58,59 +80,17 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			super.handleMessage(msg);
 		}
 	};
-	private OnClickListener listener = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			Intent i;
-			switch (v.getId()) {
-//			case R.id.btn_account_manager:
-//				i = new Intent(HomeActivity.this, AccountManagerActivity.class);
-//				startActivity(i);
-//				break;
-//			case R.id.btn_group:
-				// TODO 微博分组暂不处理
-				// Intent i = new
-				// Intent(HomeActivity.this,AccountManager.class);
-				// startActivity(i);
-//				break;
-			case R.id.bigImage:
-				bigImageView.setVisibility(View.GONE);
-				break;
-//			case R.id.btn_post:
-//				i = new Intent(HomeActivity.this, PostActivity.class);
-//				startActivity(i);
-//				break;
-			case View.NO_ID:// fall through
-			default:
-			}
-		}
-	};
-
-	private OnItemClickListener timelineClickListener = new OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) {
-			// TODO
-			// get extra info and transfer to TwittDetailActivity
-			// Intent i = new
-			// Intent(HomeActivity.this,TwittDetailActivity.class);
-			// long twittId = balabala();
-			// i.putExtra(TWITT_ID, twittId)
-			// startActivity(i);
-		}
-	};
-
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_home);
-//		findViewById(R.id.btn_account_manager).setOnClickListener(listener);
-//		findViewById(R.id.btn_group).setOnClickListener(listener);
-//		findViewById(R.id.btn_post).setOnClickListener(listener);
-		bigImageView=(ImageView) findViewById(R.id.bigImage);
-		bigImageView.setOnClickListener(listener);
 		imageLoader=new ImageLoader(this);
 		initHomeLine();
+		IntentFilter intentFilter = new IntentFilter();
+		//intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
+		intentFilter.addAction("com.alloyteam.weibo.WEIBO_ADDED");		
+		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
 	public void initHomeLine() {
@@ -271,6 +251,14 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				});
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (broadcastReceiver != null) {
+			this.unregisterReceiver(broadcastReceiver);
+		}
+	}
+
 	public void showImage(String url, Bitmap bm){
 		Intent intent = new Intent(this, ImageActivity.class);
 		intent.putExtra("url", url);
@@ -293,7 +281,9 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		// TODO Auto-generated method stub
-		
+		Intent intent = new Intent(this, DetailActivity.class);
+		intent.putExtra("position", position);
+		startActivity(intent);		
 	}
 
 	@Override

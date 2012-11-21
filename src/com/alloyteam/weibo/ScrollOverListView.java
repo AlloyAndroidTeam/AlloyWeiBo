@@ -1,11 +1,15 @@
 package com.alloyteam.weibo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
-
+import android.widget.AdapterView.OnItemClickListener;
+import android.view.View.OnClickListener;
 
 /**
  * <p>一个可以监听ListView是否滚动到最顶部或最底部的自定义控件</p>
@@ -13,32 +17,46 @@ import android.widget.ListView;
  * 如果加以改进，可以实现监听scroll滚动的具体位置等
  */
 
-public class ScrollOverListView extends ListView {
+public class ScrollOverListView extends ListView implements OnItemClickListener,OnClickListener {
 
 	private int mLastY;
 	private int mTopPosition;
 	private int mBottomPosition;
+	private Context mContext;
 
 	public ScrollOverListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		mContext=context;
 		init();
 	}
 
 	public ScrollOverListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		mContext=context;
 		init();
 	}
 
 	public ScrollOverListView(Context context) {
 		super(context);
+		mContext=context;
 		init();
 	}
 
 	private void init(){
 		mTopPosition = 0;
 		mBottomPosition = 0;
+		this.setOnItemClickListener(this);
 	}
 	
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(mContext, DetailActivity.class);
+		intent.putExtra("position", position);
+		mContext.startActivity(intent);		
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		final int action = ev.getAction();
@@ -238,6 +256,14 @@ public class ScrollOverListView extends ListView {
 		 */
 		boolean onMotionUp(MotionEvent ev);
 		
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(mContext, DetailActivity.class);
+		Log.d("my","click");
+		mContext.startActivity(intent);		
 	}
 
 

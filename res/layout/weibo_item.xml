@@ -5,10 +5,8 @@
     android:layout_height="match_parent"
     android:paddingBottom="10dp"
     android:paddingRight="10dp"
-    android:state_focused="true"
     android:state_pressed="true"
-    android1:background="@layout/selector"
-    android1:clickable="true" >
+    android:background="@layout/selector" >
 
      <ImageView
          android:id="@+id/imageView1"
