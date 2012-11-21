@@ -17,6 +17,9 @@ public class SettingActivity extends Activity {
 	protected void onCreate(Bundle bundle){
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_setting);
+		
+		
+		
 	}
 
 	@Override
