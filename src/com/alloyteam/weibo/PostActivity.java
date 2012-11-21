@@ -4,7 +4,9 @@
 package com.alloyteam.weibo;
  
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +28,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -61,12 +64,14 @@ public class PostActivity extends Activity implements OnClickListener{
 	private TextView tvWordCount;
 	//private PopFriend popFriend;
 	private AlertDialog tipsDlg;
-	
+	private String picFilePath;
 	
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
 	private Runnable runner;
 	
 	private ListView listView;
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
@@ -108,14 +113,6 @@ public class PostActivity extends Activity implements OnClickListener{
     	btnAddFriend.setOnClickListener(this);
     	btnAddTopic.setOnClickListener(this);    	
         
-        /*
-        btnBack.setOnClickListener(new OnClickListener(){
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				finish();
-			}        	
-        }); 
-		*/
 		 
 	}
 	@Override
@@ -250,6 +247,8 @@ public class PostActivity extends Activity implements OnClickListener{
                         if (image != null) {  
                         	photoThumb.setImageBitmap(image);  
                         }  
+                        //picPath
+                        picFilePath = getPicPath(mImageCaptureUri);
                     } catch (Exception e) {  
                         e.printStackTrace();  
                     }  
@@ -262,6 +261,7 @@ public class PostActivity extends Activity implements OnClickListener{
                         	photoThumb.setImageBitmap(image);  
                         }  
                     }  
+                    Log.v("onActivityResult", "from Bundle extras");
                 }  
   
             }  
@@ -270,43 +270,151 @@ public class PostActivity extends Activity implements OnClickListener{
             break;  
   
         }  
-    }  
+    } 
+    private String getPicPath(Uri originalUri){
+    	//Uri originalUri = data.getData();        //获得图片的uri          
+        //这里开始的第二部分，获取图片的路径：   
+        String[] proj = {MediaStore.Images.Media.DATA};          
+        Cursor cursor = managedQuery(originalUri, proj, null, null, null);   
+        //按我个人理解 这个是获得用户选择的图片的索引值   
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);             
+        cursor.moveToFirst();  
+        //最后根据索引值获取图片路径  
+        String path = cursor.getString(column_index);  	
+    	return path;
+    }
     /**
      * 发布
      * @throws Exception 
      */
     private void save() throws Exception{    	 
     	 String content = tvMain.getText().toString();
-    	 if (content.length() > 140){
+    	 if (content == null || content.length() == 0 || content.length() > 140){
     		 return;
     	 }
-    	 
-    	add("json", content, "127.0.0.1", new HttpConnection.HttpConnectionListener() {		
- 			public void onResponse(boolean success, String result) {
- 				Log.d("save",result);
- 				if(!success)return;
- 				try{
- 					List<Weibo> list=new ArrayList<Weibo>();
- 					JSONObject obj=new JSONObject(result);
- 		        	JSONObject data =  obj.getJSONObject("data");
- 		        	JSONArray info = data.getJSONArray("info");
- 		        	Log.d("json","parse"); 		        	 
- 		        }
- 				catch (JSONException je)  
- 	            {  
- 	                Log.d("json","error");
- 	            }
- 			}
-         });	
+    	 final Context _context = this;
+    	 ApiManager.IApiListener listener =  new ApiManager.IApiListener() {
+
+				@Override
+				public void onJSONException(JSONException exception) {
+					Log.d("add", "onJSONException");
+				}
+
+				public void onFailure(String msg) {
+					Log.d("add", "onFailure");
+				}
+
+				@Override
+				public void onComplete(JSONObject result) {
+					Log.d("add", "onComplete"+result.toString()); 
+					try {							 
+						String errcode = result.getString("errcode");
+						String ret = result.getString("ret");
+						if (errcode.equals("0")){												
+							//tips("发送成功.");
+							Intent intent = new Intent();						    	
+					    	intent.setAction("com.alloyteam.weibo.WEIBO_ADDED"); 					
+							_context.sendBroadcast(intent);								 
+							finish();
+						}else{								
+							checkErrcode(Integer.parseInt(ret), Integer.parseInt(errcode));//tips("发送失败，请重试！");
+						} 
+						 
+					} catch (JSONException je) {
+						Log.d("json", "error");
+					}
+				}
+			};
+		 if (picFilePath != null){
+			 addPic("json", content, "127.0.0.1", listener);
+		 }else{
+			 add("json", content, "127.0.0.1", listener);
+		 }
     }
     
-    
+    /**
+     * 检查返回的错误
+     */
+    private void checkErrcode(int ret, int errcode){
+    	String txt = "发送失败，请重试！";
+    	  
+		 switch(errcode){
+	 		case 1:
+	 			txt = "必须为用户侧真实ip";
+	 			break;
+	 		case 2:
+	 			txt = "微博内容超出长度限制";
+	 			break;
+// 		 		case 3:
+// 		 			txt = "经度值错误";
+// 		 			break;
+// 		 		case 4:
+// 		 			txt = "纬度值错误";
+// 		 			break;
+	 		case 3:
+	 			txt = "格式错误、用户无效";
+	 			break;	
+	 		
+	 		case 4:
+	 			txt = "有过多脏话";
+	 			break;
+	 		case 5:
+	 			txt = "禁止访问，如城市，uin黑名单限制等";
+	 			break;
+	 		case 9:
+	 			if (ret == 1){
+	 				txt = "图片大小超出限制或为0";
+	 			}else{
+	 				txt = "包含垃圾信息";
+	 			}
+	 			break;
+	 		case 10:
+	 			if (ret == 1){
+	 				txt = "图片格式错误，目前仅支持gif、jpeg、jpg、png、bmp及ico格式";
+	 			}else{
+	 				txt = "发表太快";
+	 			}
+	 			
+	 			break;
+	 		case 12:
+	 			txt = "源消息审核中";
+	 			break;	
+	 		case 13:
+	 			txt = "重复发表";
+	 			break;
+	 		case 14:
+	 			txt = "未实名认证";
+	 			break;
+	 		case 16:
+	 			txt = "服务器内部错误导致发表失败";
+	 			break;
+	 		case 15: 
+	 			
+	 		case 1001:
+	 			txt = "公共uin黑名单限制";
+	 			break;
+	 		case 1002:
+	 			txt = "公共IP黑名单限制";
+	 			break;
+	 		case 1003:
+	 			txt = "微博黑名单限制";
+	 			break;
+	 		case 1004:
+	 			txt = "单UIN访问微博过快";
+	 			break;	
+	 		case 1472:
+	 			txt = "服务器内部错误导致发表失败";
+	 			break;
+ 		 }
+    	  
+    	 tips(txt);
+    }
     
     /**
 	 * 发送微博，文字
 	 */
 	public void add(String format, String content,
-			String clientip, final HttpConnection.HttpConnectionListener listener) throws Exception {
+			String clientip, final ApiManager.IApiListener listener) throws Exception {
 		 
 		
 		 Account account = AccountManager.getDefaultAccount();
@@ -317,42 +425,9 @@ public class PostActivity extends Activity implements OnClickListener{
          params.putString("longitude", "");
          params.putString("syncflag", "1"); 
          
-         final Context _context = this;
-     	 ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-     							params, "POST", new ApiManager.IApiListener() {
-
-					@Override
-					public void onJSONException(JSONException exception) {
-						Log.d("add", "onJSONException");
-					}
-
-					public void onFailure(String msg) {
-						Log.d("add", "onFailure");
-					}
-
-					@Override
-					public void onComplete(JSONObject result) {
-						Log.d("add", "onComplete"+result.toString()); 
-						try {							 
-							String errcode = result.getString("errcode");
-							if (errcode.equals("0")){
-								
-								//tips("发送成功.");
-								Intent intent = new Intent();						    	
-						    	intent.setAction("com.alloyteam.weibo.WEIBO_ADDED"); 					
-								_context.sendBroadcast(intent);								 
-								finish();
-							}else{								
-								tips("发送失败，请重试！");
-							} 
-							 
-						} catch (JSONException je) {
-							Log.d("json", "error");
-						}
-					}
-				});
-
-    	 
+         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
+					params, "POST", listener);
+         
 	}
 	
 	/**
@@ -372,8 +447,7 @@ public class PostActivity extends Activity implements OnClickListener{
      * @see <a href="http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E7%94%A8%E5%9B%BE%E7%89%87URL%E5%8F%91%E8%A1%A8%E5%B8%A6%E5%9B%BE%E7%89%87%E7%9A%84%E5%BE%AE%E5%8D%9A">腾讯微博开放平台上关于此条API的文档2-网络图片</a>
 	 */
 	public void addPic(String format, String content,
-			String clientip, String jing, String wei, String picpath,String syncflag,
-			 final HttpConnection.HttpConnectionListener listener)
+			String clientip,  final ApiManager.IApiListener listener)
 			throws Exception {
 		Account account = AccountManager.getDefaultAccount();
     	 
@@ -383,35 +457,9 @@ public class PostActivity extends Activity implements OnClickListener{
         params.putString("clientip", clientip);
         params.putString("longitude", "");
         params.putString("syncflag", "1");
-        params.putString("oauth_consumer_key", Constants.Tencent.T_ADD); 
-        params.putString("oauth_version", "2.a");
-        params.putString("scope", "all"); 
+        params.putString("compatibleflag", "0"); 
+        ApiManager.postAsync(account, Constants.Tencent.T_ADD_PIC, params, picFilePath, listener);
         
-    	ApiManager.requestAsync(account, Constants.Tencent.HOME_TIMELINE,
-    							params, "POST", new ApiManager.IApiListener() {
-
-					@Override
-					public void onJSONException(JSONException exception) {
-					}
-
-					public void onFailure(String msg) {
-
-					}
-
-					@Override
-					public void onComplete(JSONObject result) {
-						List<Weibo> list = new ArrayList<Weibo>();
-						try {
-							JSONObject data = result.getJSONObject("data");
-							JSONArray info = data.getJSONArray("info");
-							Log.d("json", "parse");
-							 
-						} catch (JSONException je) {
-							Log.d("json", "error");
-						}
-					}
-				});
-
 	};
 	/**
 	 * 提示

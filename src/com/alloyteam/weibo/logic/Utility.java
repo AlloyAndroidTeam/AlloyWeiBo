@@ -4,25 +4,37 @@
  */
 package com.alloyteam.weibo.logic;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+ 
 
 import android.os.Bundle;
 import android.util.Log;
@@ -116,18 +128,21 @@ public class Utility {
 				url = url + "?";
 			url = url + encodedParam;
 			Log.i("http request", "get: " + url);
-			request = new HttpGet(url);
+			request = new HttpGet(url);		
+			
 		} else if (method.equals("POST")) {
+			
 			HttpPost post = new HttpPost(url);
 			ArrayList<NameValuePair> data = toPostData(params);
 			post.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
 			request = post;
+			
 		}
-
 		HttpResponse response = httpClient.execute(request);
 		if (isHttpSuccessExecuted(response)) {
 			result = EntityUtils.toString(response.getEntity());
 		}
+		
 		return result;
 	}
 
@@ -145,5 +160,61 @@ public class Utility {
 		int statusCode = response.getStatusLine().getStatusCode();
 		return (statusCode > 199) && (statusCode < 400);
 	}
-
+	
+	 
+	 /**
+     * Post方法传送文件和消息
+     * 使用：httpmime-4.1.3.jar库文件
+     * @param url  连接的URL
+     * @param queryString 请求参数串
+     * @param files 上传的文件列表
+     * @return 服务器返回的信息
+     * @throws Exception
+     */
+    public static String postWithFile(String url, Bundle params, String filePath) throws Exception {    	
+    	  Log.v("httpPostWithFile", "httpPostWithFile");
+          HttpClient httpClient= new DefaultHttpClient();
+          HttpPost httpPost= new HttpPost(url);          
+          MultipartEntity mulentity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+          
+          ArrayList<NameValuePair> data = toPostData(params); 
+          
+          StringBody stringBody;
+          FormBodyPart fbp;
+          
+          for(NameValuePair queryParam:data){
+	        stringBody = new StringBody(queryParam.getValue(),Charset.forName("UTF-8"));
+	        fbp= new FormBodyPart(queryParam.getName(), stringBody); 
+	        mulentity.addPart(fbp); 
+	      }
+          
+          FileBody fileBody;
+          File targetFile; 
+          
+          //添加图片表单数据         
+          if (filePath != null && filePath.length() > 0){
+	          targetFile= new File(filePath);          
+	          fileBody = new FileBody(targetFile,"application/octet-stream"); 
+	          fbp= new FormBodyPart("pic", fileBody);
+	          mulentity.addPart(fbp);  
+          }
+          httpPost.setEntity(mulentity); 
+          String responseData = null;
+          try {
+             HttpResponse response= httpClient.execute(httpPost);
+             //Log.i(tag, "httpPostWithFile [2] StatusLine = "+response.getStatusLine());
+             if(response.getStatusLine().getStatusCode()== HttpStatus.SC_OK){ 
+            	 responseData = EntityUtils.toString(response.getEntity());
+             }else{
+            	 Log.i("HttpResponse", "error = "+ response.getStatusLine().getStatusCode());
+             }
+	             
+	       } catch (Exception e) {
+	             e.printStackTrace();
+	       }finally{
+	           httpPost.abort();
+	        }
+           //Log.v("responseData", responseData);
+           return responseData;
+    }
 }
