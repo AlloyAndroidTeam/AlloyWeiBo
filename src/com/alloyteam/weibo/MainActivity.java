@@ -2,12 +2,6 @@ package com.alloyteam.weibo;
 
 import java.util.List;
 
-import com.alloyteam.weibo.logic.AccountManager;
-import com.alloyteam.weibo.logic.Constants;
-import com.alloyteam.weibo.model.Account;
-
-import android.os.Bundle;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -15,24 +9,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.SimpleAdapter;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
+
+import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.Constants;
+import com.alloyteam.weibo.model.Account;
 
 /**
  * @author pxz
@@ -54,6 +48,20 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			if ("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)) {
 				Account account = AccountManager.getAccount(uid, type);
 				accountSwitchBtn.setText(getAccountDescption(account));
+			} else if ("com.alloyteam.weibo.ACCOUNT_REMOVE".equals(action)) {
+				Account account = AccountManager.getDefaultAccount();
+				if (account == null) {
+					accountSwitchBtn.setText("绑定帐号");
+					accountSwitchBtn.setTag(1);
+				} else {
+					accountSwitchBtn.setText(getAccountDescption(account));
+					accountSwitchBtn.setTag(0);
+				}
+			} else if ("com.alloyteam.weibo.NEW_ACCOUNT_ADD".equals(action)) {
+				Account account = AccountManager.getAccount(uid, type);
+				if(account.isDefault){
+					accountSwitchBtn.setText(getAccountDescption(account));
+				}
 			}
 
 		}
@@ -80,9 +88,13 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		Account defaultAccount = AccountManager.getDefaultAccount();
 		if (defaultAccount != null) {
 			accountSwitchBtn.setText(getAccountDescption(defaultAccount));
+		} else {
+			accountSwitchBtn.setText("绑定帐号");
 		}
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
+		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_REMOVE");
+		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
@@ -138,7 +150,12 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		case R.id.btnHomeTitleAccount: // 帐号
 			// i = new Intent(this, AccountManagerActivity.class);
 			// startActivity(i);
-
+			Object tag = accountSwitchBtn.getTag();
+			if (tag.equals(1)) {
+				i = new Intent(this, AccountManagerActivity.class);
+				startActivity(i);
+				break;
+			}
 			final AccountArrayAdapter adapter = new AccountArrayAdapter(this,
 					0, AccountManager.getAccounts());
 			AlertDialog dialog = new AlertDialog.Builder(this).setAdapter(
@@ -190,7 +207,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			TextView textView = (TextView) convertView
 					.findViewById(R.id.currentAccountText);
 			Account account = this.getItem(position);
-			convertView.setTag("asdf");
+
 			textView.setText(getAccountDescption(account));
 			return convertView;
 		}
@@ -204,5 +221,16 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		// text += " 当前帐号";
 		// }
 		return text;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.ActivityGroup#onDestroy()
+	 */
+	@Override
+	protected void onDestroy() {
+		this.unregisterReceiver(broadcastReceiver);
+		super.onDestroy();
 	}
 }
