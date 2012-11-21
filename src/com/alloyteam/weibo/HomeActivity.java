@@ -85,20 +85,31 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		public void onClick(View v) {
 			Intent i;
 			switch (v.getId()) {
-			case R.id.btn_account_manager:
-				i = new Intent(HomeActivity.this, AccountManagerActivity.class);
-				startActivity(i);
-				break;
-			case R.id.btn_group:
+//			case R.id.btn_account_manager:
+//				i = new Intent(HomeActivity.this, AccountManagerActivity.class);
+//				startActivity(i);
+//				break;
+//			case R.id.btn_group:
 				// TODO 微博分组暂不处理
 				// Intent i = new
 				// Intent(HomeActivity.this,AccountManager.class);
 				// startActivity(i);
+<<<<<<< HEAD
 				break;
 			case R.id.btn_post:
 				i = new Intent(HomeActivity.this, PostActivity.class);
 				startActivity(i);
 				break;
+=======
+//				break;
+			case R.id.bigImage:
+				bigImageView.setVisibility(View.GONE);
+				break;
+//			case R.id.btn_post:
+//				i = new Intent(HomeActivity.this, PostActivity.class);
+//				startActivity(i);
+//				break;
+>>>>>>> c3ba4a78067a1a9a5cd8b845aeae3bc864da8adc
 			case View.NO_ID:// fall through
 			default:
 			}
@@ -109,9 +120,17 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_home);
+<<<<<<< HEAD
 		findViewById(R.id.btn_account_manager).setOnClickListener(listener);
 		findViewById(R.id.btn_group).setOnClickListener(listener);
 		findViewById(R.id.btn_post).setOnClickListener(listener);
+=======
+//		findViewById(R.id.btn_account_manager).setOnClickListener(listener);
+//		findViewById(R.id.btn_group).setOnClickListener(listener);
+//		findViewById(R.id.btn_post).setOnClickListener(listener);
+		bigImageView=(ImageView) findViewById(R.id.bigImage);
+		bigImageView.setOnClickListener(listener);
+>>>>>>> c3ba4a78067a1a9a5cd8b845aeae3bc864da8adc
 		imageLoader=new ImageLoader(this);
 		initHomeLine();
 		IntentFilter intentFilter = new IntentFilter();

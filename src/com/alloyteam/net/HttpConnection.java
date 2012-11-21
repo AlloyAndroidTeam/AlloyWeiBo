@@ -3,8 +3,8 @@
  * @date 2012-11-13
  */
 package com.alloyteam.net;
-
-import java.util.ArrayList;
+ 
+import java.util.ArrayList; 
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -186,5 +186,8 @@ public class HttpConnection implements Runnable {
 		int statusCode = response.getStatusLine().getStatusCode();
 		return (statusCode > 199) && (statusCode < 400);
 	}
+	
+	
+	 
 
 }

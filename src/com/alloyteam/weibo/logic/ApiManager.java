@@ -5,7 +5,9 @@
 package com.alloyteam.weibo.logic;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,6 +16,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.alloyteam.weibo.AuthActivity;
@@ -24,7 +27,9 @@ import com.alloyteam.weibo.model.Account;
  * 
  */
 public class ApiManager {
-
+	
+	public static String TAG = "ApiManager";
+	
 	public interface IApiListener {
 
 		public void onComplete(JSONObject result);
@@ -116,9 +121,10 @@ public class ApiManager {
 		final Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
+				String result = "no data";
 				try {
 					Bundle data = msg.getData();
-					String result = data.getString("result");
+					result = data.getString("result");
 					boolean success = !result.equals("fail");
 					if (success) {
 						JSONObject jsonObject = new JSONObject(result);
@@ -135,6 +141,7 @@ public class ApiManager {
 					if (listener != null) {
 						listener.onJSONException(e);
 					}
+					Log.d(TAG, result);
 					e.printStackTrace();
 				}
 			}
@@ -179,15 +186,68 @@ public class ApiManager {
 		bundle.putString("openid", account.openId);
 		return bundle;
 	}
+	
+	
+	/**
+	 * post带文件
+	 */
+	public static void postAsync(final Account account, final String url,
+			final Bundle params, final String filePath,
+			final IApiListener listener) {
+		
+		final Handler handler = new Handler() {
 
-	// private static class RequestObject {
-	// Account account;
-	// String url;
-	//
-	// Bundle params;
-	// String method;
-	//
-	// IApiListener listener;
-	// }
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see android.os.Handler#handleMessage(android.os.Message)
+			 */
+			@Override
+			public void handleMessage(Message msg) {
+				try {
+					Bundle data = msg.getData();
+					String result = data.getString("result");
+					boolean success = !result.equals("fail");
+					if (success) {
+						JSONObject jsonObject = new JSONObject(result);
+						if (listener != null) {
+							listener.onComplete(jsonObject);
+						}
+					} else {
+						if (listener != null) {
+							listener.onFailure("http error");
+						}
+					}
 
+				} catch (JSONException e) {
+					if (listener != null) {
+						listener.onJSONException(e);
+					}
+					e.printStackTrace();
+				}
+			}
+
+		};
+		new Thread() {
+			@Override
+			public void run() {
+				Bundle dataParams = fillParams(account, params);
+				String result = "fail";
+				
+				try {
+					result = Utility.postWithFile(url, dataParams,  filePath);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				Message message = Message.obtain(handler, 1);
+				Bundle data = new Bundle();
+				data.putString("result", result);
+				message.setData(data);
+				handler.sendMessage(message);
+			}
+		}.start();
+
+	}
 }
