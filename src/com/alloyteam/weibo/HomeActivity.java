@@ -237,12 +237,12 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 								else if(pageflag==WHAT_DID_MORE){
 									mPullDownView.notifyDidMore();								
 									list.addAll(tmpList);
-									downTimeStamp=tmpUpStamp;
+									downTimeStamp=tmpDownStamp;
 								}
 								else{				
 									mPullDownView.notifyDidRefresh();
 									list.addAll(0, tmpList);
-									upTimeStamp=tmpDownStamp;
+									upTimeStamp=tmpUpStamp;
 								}
 								mAdapter.notifyDataSetChanged();
 							}
