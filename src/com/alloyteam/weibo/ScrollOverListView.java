@@ -17,7 +17,7 @@ import android.view.View.OnClickListener;
  * 如果加以改进，可以实现监听scroll滚动的具体位置等
  */
 
-public class ScrollOverListView extends ListView implements OnItemClickListener,OnClickListener {
+public class ScrollOverListView extends ListView implements OnItemClickListener {
 
 	private int mLastY;
 	private int mTopPosition;
@@ -51,10 +51,7 @@ public class ScrollOverListView extends ListView implements OnItemClickListener,
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		// TODO Auto-generated method stub
-		Intent intent = new Intent(mContext, DetailActivity.class);
-		intent.putExtra("position", position);
-		mContext.startActivity(intent);		
+		mOnScrollOverListener.onItemClick(parent,view,position,id);
 	}
 
 	@Override
@@ -161,6 +158,13 @@ public class ScrollOverListView extends ListView implements OnItemClickListener,
 		public boolean onMotionUp(MotionEvent ev) {
 			return false;
 		}
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view,
+				int position, long id) {
+			// TODO Auto-generated method stub
+			return;
+		}
 		
 	};
 	
@@ -256,15 +260,9 @@ public class ScrollOverListView extends ListView implements OnItemClickListener,
 		 */
 		boolean onMotionUp(MotionEvent ev);
 		
+		void onItemClick(AdapterView<?> parent, View view, int position,
+				long id);
+		
 	}
-
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		Intent intent = new Intent(mContext, DetailActivity.class);
-		Log.d("my","click");
-		mContext.startActivity(intent);		
-	}
-
 
 }
