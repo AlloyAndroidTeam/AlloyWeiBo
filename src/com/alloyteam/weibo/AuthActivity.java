@@ -111,19 +111,19 @@ public class AuthActivity extends Activity {
 			account.isDefault = AccountManager.getAccountCount() == 0;
 		}
 		
-		Intent intent = new Intent();
-		intent.putExtra("uid", account.uid);
-		intent.putExtra("type", account.type);
+//		Intent intent = new Intent();
+//		intent.putExtra("uid", account.uid);
+//		intent.putExtra("type", account.type);
 		if (old != null) {
 //			Toast.makeText(AuthActivity.this, "该帐号已绑定，请勿重复绑定",
 //					Toast.LENGTH_SHORT).show();
 			AccountManager.updateAccount(account);
-			intent.setAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+//			intent.setAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
 		}else {
 			AccountManager.addAccount(account);
-			intent.setAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+//			intent.setAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		}
-		context.sendBroadcast(intent);
+//		context.sendBroadcast(intent);
 		context.finish();
 	}
 }

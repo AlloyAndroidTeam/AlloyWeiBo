@@ -31,6 +31,7 @@ public class SplashActivity extends Activity {
 		// 在这里初始化 dbhelper
 		Context context = getApplicationContext();
 		DBHelper.init(context);
+		AccountManager.init(context);
 		ApiManager.init(context);
 		
 		final Intent i = new Intent();
