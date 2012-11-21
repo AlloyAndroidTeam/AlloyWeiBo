@@ -433,7 +433,7 @@ public class PullDownView extends LinearLayout implements OnScrollOverListener{
 	@Override
 	public boolean onMotionMove(MotionEvent ev, int delta) {
 		//当头部文件回推消失的时候，不允许滚动
-		if(mIsPullUpDone) return true;
+		if(mIsPullUpDone) return false;
 		
 		// 如果开始按下到滑动距离不超过误差值，则不滑动
 		final int absMotionY = (int) Math.abs(ev.getRawY() - mMotionDownLastY);
