@@ -64,6 +64,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			Account account = AccountManager.getAccount(uid, type);*/
 			String action = intent.getAction();
 			if("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)){
+				initHomeLine();
 			}
 			else if("com.alloyteam.weibo.WEIBO_ADDED".equals(action)){
 				onRefresh();
