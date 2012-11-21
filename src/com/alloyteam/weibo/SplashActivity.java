@@ -31,6 +31,7 @@ public class SplashActivity extends Activity {
 		// 在这里初始化 dbhelper
 		Context context = getApplicationContext();
 		DBHelper.init(context);
+		AccountManager.init(context);
 		ApiManager.init(context);
 		
 		final Intent i = new Intent();
@@ -54,11 +55,8 @@ public class SplashActivity extends Activity {
 	 * @return 是否有默认帐号
 	 */
 	private boolean hasAccount(){
-		ArrayList<Account> list = AccountManager.getAccounts();
-		if(list != null && list.size() > 0){
-			return true;
-		}
-		return false;
+		int count = AccountManager.getAccountCount();
+		return count > 0;
 	}
 
 }

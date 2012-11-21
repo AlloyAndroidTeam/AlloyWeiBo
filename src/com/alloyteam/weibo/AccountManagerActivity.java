@@ -36,7 +36,6 @@ public class AccountManagerActivity extends Activity {
 
 	AccountListAdatper accountListAdatper;
 
-	String[] providers = new String[] { "新浪微博", "腾讯微博" };
 
 	int currentDefaultAccountPosition = -1;
 
@@ -45,20 +44,34 @@ public class AccountManagerActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String uid = intent.getStringExtra("uid");
-			Log.v(TAG, "onReceive: " + uid + " added.");
 			int type = intent.getIntExtra("type", 0);
-			Account account = AccountManager.getAccount(uid, type);
 			String action = intent.getAction();
-//			intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
-//			intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+
 			if("com.alloyteam.weibo.NEW_ACCOUNT_ADD".equals(action)){
+				Log.v(TAG, "onReceive: " + uid + " added.");
+				Account account = AccountManager.getAccount(uid, type);
 				accountListAdatper.add(account);
 			}else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
 				//TODO 未测试
+				Account account = AccountManager.getAccount(uid, type);
 				int position = accountListAdatper.getPositionByAccount(account);
-				Account old = accountListAdatper.getItem(position);
-				accountListAdatper.remove(old);
-				accountListAdatper.insert(account, position);
+				accountListAdatper.accounts.set(position, account);
+				accountListAdatper.notifyDataSetChanged();
+			}else if("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)){
+				Account newDefault = AccountManager.getDefaultAccount();
+				if(newDefault != null){
+					int position = accountListAdatper.getPositionByAccount(newDefault);
+					if(position > -1){
+						accountListAdatper.accounts.set(position, newDefault);
+						accountListAdatper.notifyDataSetChanged();
+					}
+				}
+				
+//				if(newDefault != null){
+//					newDefault.isDefault = true;
+//					AccountManager.switchDefaultAccount(newDefault);
+//					accountListAdatper.notifyDataSetChanged();
+//				}
 			}
 		}
 	};
@@ -67,17 +80,18 @@ public class AccountManagerActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Activity context = AccountManagerActivity.this;
-			ListView listView = new ListView(context);
-			listView.setAdapter(new ArrayAdapter<String>(context,
-					R.layout.account_manager_provider, R.id.providerDesc,
-					providers));
+			String [] providers = Constants.getProviders();
+//			ListView listView = new ListView(context);
+//			listView.setAdapter(new ArrayAdapter<String>(context,
+//					R.layout.account_manager_provider, R.id.providerDesc,
+//					providers));
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			builder.setTitle("选择帐号类型");
 			builder.setItems(providers, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int index) {
-					Log.v(TAG, index + " click");
+//					Log.v(TAG, index + " click");
 					Activity context = AccountManagerActivity.this;
 					int type = index + 1;
 					Intent intent = new Intent(context, AuthActivity.class);
@@ -85,7 +99,7 @@ public class AccountManagerActivity extends Activity {
 					context.startActivity(intent);
 				}
 			});
-			builder.setNegativeButton("取消", null);
+//			builder.setNegativeButton("取消", null);
 			AlertDialog dialog = builder.create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.show();
@@ -112,12 +126,11 @@ public class AccountManagerActivity extends Activity {
 				Account current = accountListAdatper
 						.getItem(currentDefaultAccountPosition);
 				current.isDefault = false;
-				AccountManager.updateAccount(current);
 			}
 			Account account = accountListAdatper.getItem(position);
 			account.isDefault = true;
-			AccountManager.updateAccount(account);
-			accountListAdatper.notifyDataSetChanged();
+			AccountManager.switchDefaultAccount(account);
+//			accountListAdatper.notifyDataSetChanged();
 		}
 
 	};
@@ -140,6 +153,7 @@ public class AccountManagerActivity extends Activity {
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
@@ -220,12 +234,8 @@ public class AccountManagerActivity extends Activity {
 			}
 
 			final Account account = this.getItem(position);
-			String desc = "";
-			if (account.type == Constants.TENCENT) {
-				desc += "腾讯微博";
-			} else if (account.type == Constants.SINA) {
-				desc += "新浪微博";
-			}
+			String desc = Constants.getProvider(account.type);
+
 			if (account.isDefault) {
 				currentDefaultAccountPosition = position;
 				holder.defaultSelect.setVisibility(View.VISIBLE);
@@ -252,17 +262,19 @@ public class AccountManagerActivity extends Activity {
 										public void onClick(
 												DialogInterface dialog,
 												int which) {
-											AccountManager
-													.removeAccount(account);
+											AccountManager.removeAccount(account);
 											accountListAdatper.remove(account);
-											if(account.isDefault){
-												Account newDefault = accountListAdatper.getItem(0);
-												if(newDefault != null){
-													newDefault.isDefault = true;
-													AccountManager.updateAccount(newDefault);
-													accountListAdatper.notifyDataSetChanged();
-												}
-											}
+//											if(account.isDefault){
+//												if(accountListAdatper.getCount() == 0){
+//													return;
+//												}
+//												Account newDefault = accountListAdatper.getItem(0);
+//												if(newDefault != null){
+//													newDefault.isDefault = true;
+//													AccountManager.switchDefaultAccount(newDefault);
+//													accountListAdatper.notifyDataSetChanged();
+//												}
+//											}
 										}
 
 									}).show();

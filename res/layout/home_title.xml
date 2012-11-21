@@ -6,27 +6,23 @@
     android:orientation="horizontal" >
 
     <Button
-        android:id="@+id/btnHomeTitleAccount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:text="帐号切换" />
-
-    <Button
         android:id="@+id/btnHomeTitlePost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:text="发表" />
-
-    <TextView
-        android:id="@+id/tvTitle"
+
+    <Button
+        android:id="@+id/btnHomeTitleAccount"
+        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnHomeTitlePost"
+        android:layout_alignBottom="@+id/btnHomeTitlePost"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="标题栏" />
+        android:drawableRight="@drawable/arrow_down"
+        android:text="帐号切换" />
 
 </RelativeLayout>
