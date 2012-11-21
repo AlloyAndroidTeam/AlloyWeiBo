@@ -207,7 +207,7 @@ public class ApiManager {
 				try {
 					Bundle data = msg.getData();
 					String result = data.getString("result");
-					boolean success = !result.equals("fail");
+					boolean success = !"fail".equals(result);
 					if (success) {
 						JSONObject jsonObject = new JSONObject(result);
 						if (listener != null) {

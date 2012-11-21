@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,20 +43,20 @@ public class MainActivity extends TabActivity implements OnClickListener {
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-//			String uid = intent.getStringExtra("uid");
-//			int type = intent.getIntExtra("type", 0);
-//			Log.v(TAG, "onReceive: " + uid + " added.");
+			// String uid = intent.getStringExtra("uid");
+			// int type = intent.getIntExtra("type", 0);
+			// Log.v(TAG, "onReceive: " + uid + " added.");
 			String action = intent.getAction();
 			if ("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)) {
 				Account account = AccountManager.getDefaultAccount();
-				if(account != null){
+				if (account != null) {
 					accountSwitchBtn.setText(getAccountDescption(account));
 					accountSwitchBtn.setTag(0);
-				}else{
+				} else {
 					accountSwitchBtn.setText("绑定帐号");
 					accountSwitchBtn.setTag(1);
 				}
-			} 
+			}
 
 		}
 	};
@@ -88,8 +89,8 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		}
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
-//		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_REMOVE");
-//		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+		// intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_REMOVE");
+		// intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
 
@@ -146,7 +147,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			// i = new Intent(this, AccountManagerActivity.class);
 			// startActivity(i);
 			ArrayList<Account> accounts = AccountManager.getAccounts();
-			if(accounts.size() == 1){
+			if (accounts.size() == 1) {
 				break;
 			}
 			Object tag = accountSwitchBtn.getTag();
@@ -206,8 +207,12 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			TextView textView = (TextView) convertView
 					.findViewById(R.id.currentAccountText);
 			Account account = this.getItem(position);
+			String text = getAccountDescption(account);
+			if (account.isDefault) {
+				text += " ∨";
+			}
+			textView.setText(text);
 
-			textView.setText(getAccountDescption(account));
 			return convertView;
 		}
 
@@ -216,9 +221,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 	private String getAccountDescption(Account account) {
 		String text = account.uid + "(" + Constants.getProvider(account.type)
 				+ ")";
-		// if(account.isDefault){
-		// text += " 当前帐号";
-		// }
+
 		return text;
 	}
 
