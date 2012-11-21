@@ -26,6 +26,8 @@ public class ImageActivity extends Activity {
 	int displayWidth;
 	int displayHeight;
 	float startX,startY;
+	boolean isDown=false;
+	Activity context=this;
 	public ImageLoader.ImageCallback callback=new ImageLoader.ImageCallback(){
 		public Bitmap imageLoaded(Bitmap bm, String url){
 			dialog.dismiss();
@@ -45,9 +47,9 @@ public class ImageActivity extends Activity {
 	        LayoutParams para;  
 	        para = image.getLayoutParams();
 	        para.width=displayWidth;
-	        para.height=scaleHeight;
+	        para.height=Math.max(scaleHeight,displayHeight);
 	        image.setLayoutParams(para);
-	        if(scale>1){
+	        //if(scale>1){
 	        	final int maxOffsetY=scaleHeight-displayHeight;
 	        	Log.d("my",""+maxOffsetY);
 	    		image.setOnTouchListener(new View.OnTouchListener() {
@@ -63,18 +65,24 @@ public class ImageActivity extends Activity {
 	    	                case MotionEvent.ACTION_DOWN:
 	    	                	startX = mx = event.getX();
 	    	                    startY = my = event.getY();
+	    	                    isDown=true;
 	    	                    break;
 	    	                case MotionEvent.ACTION_MOVE:
 	    	                    curX = event.getX();
 	    	                    curY = event.getY();
 	    	                    moveX=(int)(mx - curX);
 	    	                    moveY=(int)(my - curY);
-	    	                    Log.d("my",""+moveY);
+	    	                    mx = curX;
+	    	                    my = curY;
+	    	                	if(!isDown){
+	    	                		isDown=true;
+	    	                		startX=mx;
+	    	                		startY=my;
+	    	                		break;
+	    	                	}
 	    	                    if(image.getScrollY()+moveY<=maxOffsetY&&image.getScrollY()+moveY>=0){
 	    	                    	image.scrollBy(0, moveY);
 	    	                    }	    	                    
-	    	                    mx = curX;
-	    	                    my = curY;
 	    	                    break;
 	    	                case MotionEvent.ACTION_UP:
 	    	                    curX = event.getX();
@@ -87,13 +95,14 @@ public class ImageActivity extends Activity {
 	    	                    if(Math.abs(curX-startX)+Math.abs(curY-startY)<10){
 	    	                    	finish();
 	    	                    }
+	    	                    isDown=false;
 	    	                    break;
 	    	            }
 
 	    	            return true;
 	    	        }
 	    	    });
-	        }
+	        //}
 			return bm;//Bitmap.createBitmap(bm, 0, 0, bmpWidth, bmpHeight, mx, true);
 		}
 	};
