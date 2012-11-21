@@ -43,11 +43,13 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	public boolean isMove=false;
 	private PullDownView mPullDownView;
 	private static final int WHAT_DID_LOAD_DATA = 0;
-	private static final int WHAT_DID_REFRESH = 1;
-	private static final int WHAT_DID_MORE = 2;
+	private static final int WHAT_DID_REFRESH = 2;
+	private static final int WHAT_DID_MORE = 1;
 	private WeiboListAdapter mAdapter;
 	private List<Weibo> list;
-
+	private long upTimeStamp=0;
+	private long downTimeStamp=0;
+	private Account account;
 	
 	private Handler mainHandler = new Handler() {
 		@Override
@@ -108,10 +110,10 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		bigImageView=(ImageView) findViewById(R.id.bigImage);
 		bigImageView.setOnClickListener(listener);
 		imageLoader=new ImageLoader(this);
-		getHomeLine();
+		initHomeLine();
 	}
 
-	public void getHomeLine() {
+	public void initHomeLine() {
 		mPullDownView = (PullDownView) findViewById(R.id.pull_down_view);
 		mPullDownView.setOnPullDownListener(this);
 		list = new ArrayList<Weibo>();
@@ -121,16 +123,24 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		mylist.setAdapter(mAdapter);
 		mylist.setOnItemClickListener(this);
 		mPullDownView.enableAutoFetchMore(true, 1);
-		Account account = AccountManager.getDefaultAccount();
+		account = AccountManager.getDefaultAccount();
 		if (account == null)
 			return;
-
-		// final int pageflag, final int pagetime, final int reqnum, final int
-		// type, final int contenttype, final String format
-
+		loadData(WHAT_DID_LOAD_DATA);
+	}
+	
+	public void loadData(final int pageflag){
 		Bundle params = new Bundle();
-		params.putInt("pageflag", 0);
-		params.putInt("pagetime", 0);
+		params.putInt("pageflag", pageflag);
+		if(pageflag==WHAT_DID_REFRESH){
+			params.putLong("pagetime", upTimeStamp);
+		}
+		else if(pageflag==WHAT_DID_MORE){
+			params.putLong("pagetime", downTimeStamp);
+		}
+		else{
+			params.putLong("pagetime", 0);
+		}
 		params.putInt("reqnum", 10);
 		params.putInt("type", 0);
 		params.putInt("contenttype", 0);
@@ -151,50 +161,92 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 					@Override
 					public void onComplete(JSONObject result) {
 						Log.d("my","complete");
+						Log.d("json",result.toString());
 						try {
-							JSONObject data = result.getJSONObject("data");
-							JSONArray info = data.getJSONArray("info");
-							Log.d("json", "parse");
-							for (int i = 0; i < info.length(); ++i) {
-								JSONObject item = info.getJSONObject(i);
-								String text = item.getString("text");
-								String name = item.getString("name");
-								String avatarUrl = item.getString("head")
-										+ "/50";
-								int type = item.getInt("type");
-								Weibo weibo = new Weibo(name, text, avatarUrl);
-								long timestamp = item.getLong("timestamp");
-								weibo.type = type;
-								weibo.timestamp = timestamp;
-								if (type == 2) {
-									JSONObject source = item
-											.getJSONObject("source");
-									String text2 = source.getString("text");
-									String name2 = source.getString("name");
-									String avatarUrl2 = source
-											.getString("head") + "/50";
-									weibo.mText2 = text2;
-									weibo.mAvatarUrl2 = avatarUrl2;
-									weibo.mName2 = name2;
-									if (source.get("image") != JSONObject.NULL) {
-										Log.d("my", "image");
-										JSONArray images = source
-												.getJSONArray("image");
-										weibo.mImage = images.getString(0);
+							List<Weibo> tmpList=new ArrayList<Weibo>();
+							if (result.get("data") == JSONObject.NULL){
+								if(pageflag==WHAT_DID_LOAD_DATA){
+									mPullDownView.notifyDidLoad();
+								}
+								else if(pageflag==WHAT_DID_MORE){
+									mPullDownView.notifyDidMore();
+								}
+								else{				
+									mPullDownView.notifyDidRefresh();
+								}								
+							}
+							else{
+								JSONObject data = result.getJSONObject("data");
+								JSONArray info = data.getJSONArray("info");
+								Log.d("json", "parse");
+								long tmpDownStamp=0,tmpUpStamp=0;
+								for (int i = 0; i < info.length(); ++i) {
+									JSONObject item = info.getJSONObject(i);
+									int status=item.getInt("status");
+									if(status!=0){
+										continue;
 									}
-									weibo.count = item.getInt("count");
-								} else {
-									if (item.get("image") != JSONObject.NULL) {
-										Log.d("my", "image");
-										JSONArray images = item
-												.getJSONArray("image");
-										weibo.mImage = images.getString(0);
+									String text = item.getString("text");
+									String name = item.getString("name");						
+									String avatarUrl = item.getString("head")
+											+ "/50";
+									int type = item.getInt("type");
+									Weibo weibo = new Weibo(name, text, avatarUrl);
+									long timestamp = item.getLong("timestamp");
+									weibo.type = type;
+									weibo.timestamp = timestamp;
+									if (type == 2) {
+										JSONObject source = item
+												.getJSONObject("source");
+										String text2 = source.getString("text");
+										String name2 = source.getString("name");
+										String avatarUrl2 = source
+												.getString("head") + "/50";
+										weibo.mText2 = text2;
+										weibo.mAvatarUrl2 = avatarUrl2;
+										weibo.mName2 = name2;
+										if (source.get("image") != JSONObject.NULL) {
+											Log.d("my", "image");
+											JSONArray images = source
+													.getJSONArray("image");
+											weibo.mImage = images.getString(0);
+										}
+										weibo.count = item.getInt("count");
+									} else {
+										if (item.get("image") != JSONObject.NULL) {
+											Log.d("my", "image");
+											JSONArray images = item
+													.getJSONArray("image");
+											weibo.mImage = images.getString(0);
+										}
+									}
+									tmpList.add(weibo);
+									if(i==0){
+										tmpUpStamp=timestamp;
+									}
+									if(i==info.length()-1){
+										tmpDownStamp=timestamp;
 									}
 								}
-								list.add(weibo);
-							}					
-							mAdapter.notifyDataSetChanged();
-							mPullDownView.notifyDidLoad();
+								if(pageflag==WHAT_DID_LOAD_DATA){
+									mPullDownView.notifyDidLoad();
+									list.addAll(tmpList);
+									upTimeStamp=tmpUpStamp;
+									downTimeStamp=tmpDownStamp;
+								}
+								else if(pageflag==WHAT_DID_MORE){
+									mPullDownView.notifyDidMore();								
+									list.addAll(tmpList);
+									downTimeStamp=tmpDownStamp;
+								}
+								else{				
+									mPullDownView.notifyDidRefresh();
+									list.addAll(0, tmpList);
+									upTimeStamp=tmpUpStamp;
+								}
+								mAdapter.notifyDataSetChanged();
+							}
+							
 						} catch (JSONException je) {
 							Log.d("json", "error");
 						}
@@ -227,96 +279,14 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		
 	}
 
-	private void loadData(){
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				List<String> strings = new ArrayList<String>();
-
-				Message msg = mUIHandler.obtainMessage(WHAT_DID_LOAD_DATA);
-				msg.obj = strings;
-				msg.sendToTarget();
-			}
-		}).start();
-	}
-
-
 	@Override
 	public void onRefresh() {
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}				
-				Message msg = mUIHandler.obtainMessage(WHAT_DID_REFRESH);
-				msg.obj = "After refresh " + System.currentTimeMillis();
-				msg.sendToTarget();
-			}
-		}).start();
+		loadData(WHAT_DID_REFRESH);
 	}
 	
 	@Override
 	public void onMore() {
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}				
-				Message msg = mUIHandler.obtainMessage(WHAT_DID_MORE);
-				msg.obj = "After more " + System.currentTimeMillis();
-				msg.sendToTarget();
-			}
-		}).start();
+		loadData(WHAT_DID_MORE);
 	}
 	
-	private Handler mUIHandler = new Handler(){
-
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-				case WHAT_DID_LOAD_DATA:{
-					if(msg.obj != null){
-						List<String> strings = (List<String>) msg.obj;
-						if(!strings.isEmpty()){
-							mAdapter.notifyDataSetChanged();
-						}
-					}
-					// 诉它数据加载完毕;
-					mPullDownView.notifyDidLoad();
-					break;
-				}
-				case WHAT_DID_REFRESH :{
-					String body = (String) msg.obj;
-					mAdapter.notifyDataSetChanged();
-					// 告诉它更新完毕
-					mPullDownView.notifyDidRefresh();
-					break;
-				}
-				
-				case WHAT_DID_MORE:{
-					String body = (String) msg.obj;
-					mAdapter.notifyDataSetChanged();
-					// 告诉它获取更多完毕
-					mPullDownView.notifyDidMore();
-					break;
-				}
-			}
-			
-		}
-		
-	};
 }

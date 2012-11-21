@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:text="帐号" />
+        android:text="帐号切换" />
 
     <Button
         android:id="@+id/btnHomeTitlePost"
