@@ -52,8 +52,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			Log.v(TAG, "onReceive: " + uid + " added.");
 			Account account = AccountManager.getAccount(uid, type);
 			String action = intent.getAction();
-			if ("com.alloyteam.weibo.NEW_ACCOUNT_ADD".equals(action)
-					|| "com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)) {
+			if ("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)) {
 				accountSwitchBtn.setText(getAccountDescption(account));
 			}
 
@@ -83,7 +82,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			accountSwitchBtn.setText(getAccountDescption(defaultAccount));
 		}
 		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+//		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
