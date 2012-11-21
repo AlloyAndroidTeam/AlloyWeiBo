@@ -1,10 +1,13 @@
 package com.alloyteam.weibo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 
 /**
@@ -13,14 +16,16 @@ import android.widget.ListView;
  * 如果加以改进，可以实现监听scroll滚动的具体位置等
  */
 
-public class ScrollOverListView extends ListView {
+public class ScrollOverListView extends ListView implements OnItemClickListener {
 
 	private int mLastY;
 	private int mTopPosition;
 	private int mBottomPosition;
+	private Context mContext;
 
 	public ScrollOverListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		mContext=context;
 		init();
 	}
 
@@ -37,8 +42,18 @@ public class ScrollOverListView extends ListView {
 	private void init(){
 		mTopPosition = 0;
 		mBottomPosition = 0;
+		this.setOnItemClickListener(this);
 	}
 	
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(mContext, DetailActivity.class);
+		intent.putExtra("position", position);
+		mContext.startActivity(intent);		
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		final int action = ev.getAction();
