@@ -22,6 +22,9 @@ public class AccountManager {
 
 	static final String TAG = "AccountManager";
 
+	private static Account currentDefaultAccount;
+	
+	
 	/**
 	 * 添加帐号
 	 */
@@ -52,6 +55,9 @@ public class AccountManager {
 	 * 删除帐号
 	 */
 	public static void removeAccount(Account account) {
+		if(currentDefaultAccount != null && currentDefaultAccount.equals(account)){
+			currentDefaultAccount = null;
+		}
 		DBHelper dbHelper = DBHelper.getInstance();
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		db.delete(DBHelper.ACCOUNT_TABLE_NAME, "uid=? and type=?",
@@ -60,6 +66,9 @@ public class AccountManager {
 	}
 
 	public static void updateAccount(Account account) {
+		if(currentDefaultAccount != null && currentDefaultAccount.equals(account)){
+			currentDefaultAccount = account;
+		}
 		if (exists(account.uid, account.type)) {
 			SQLiteDatabase db = DBHelper.getInstance().getWritableDatabase();
 			ContentValues values = new ContentValues();
@@ -132,27 +141,13 @@ public class AccountManager {
 	 * 获取默认帐号
 	 */
 	public static Account getDefaultAccount() {
-		DBHelper dbHelper = DBHelper.getInstance();
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
-				null, // Columns to return
-				"isDefault=?", // SQL WHERE
-				new String[] { "1" }, // Selection Args
-				null, // SQL GROUP BY
-				null, // SQL HAVING
-				null, // SQL ORDER BY
-				"1" // limit
-				);
-		if (cursor.moveToFirst()) {
-			Account account = new Account();
-			parseCursorToAccount(account, cursor);
-			Log.v(TAG, "getDefaultAccount - default: " + account);
-			return account;
-		} else {
-			cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+		if(currentDefaultAccount == null){
+			DBHelper dbHelper = DBHelper.getInstance();
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
 					null, // Columns to return
-					null, // SQL WHERE
-					null, // Selection Args
+					"isDefault=?", // SQL WHERE
+					new String[] { "1" }, // Selection Args
 					null, // SQL GROUP BY
 					null, // SQL HAVING
 					null, // SQL ORDER BY
@@ -161,32 +156,39 @@ public class AccountManager {
 			if (cursor.moveToFirst()) {
 				Account account = new Account();
 				parseCursorToAccount(account, cursor);
-				Log.v(TAG, "getDefaultAccount - first: " + account);
-				return account;
+				Log.v(TAG, "getDefaultAccount - default: " + account);
+				currentDefaultAccount =  account;
+			} else {
+				cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+						null, // Columns to return
+						null, // SQL WHERE
+						null, // Selection Args
+						null, // SQL GROUP BY
+						null, // SQL HAVING
+						null, // SQL ORDER BY
+						"1" // limit
+						);
+				if (cursor.moveToFirst()) {
+					Account account = new Account();
+					parseCursorToAccount(account, cursor);
+					Log.v(TAG, "getDefaultAccount - first: " + account);
+					currentDefaultAccount = account;
+				}
 			}
 		}
-		return null;
+		return currentDefaultAccount;
+	}
+	
+	public static void switchDefaultAccount(Account newDefault){
+		if(currentDefaultAccount != null){
+			currentDefaultAccount.isDefault = false;
+			updateAccount(currentDefaultAccount);
+		}
+		newDefault.isDefault = true;
+		currentDefaultAccount = newDefault;
+		updateAccount(newDefault);
 	}
 
-//	public static Account getFirstAccount() {
-//		DBHelper dbHelper = DBHelper.getInstance();
-//		SQLiteDatabase db = dbHelper.getReadableDatabase();
-//		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
-//				null, // Columns to return
-//				null, // SQL WHERE
-//				null, // Selection Args
-//				null, // SQL GROUP BY
-//				null, // SQL HAVING
-//				null, // SQL ORDER BY,
-//				"1" // limit
-//				);
-//		if (cursor.moveToFirst()) {
-//			Account account = new Account();
-//			parseCursorToAccount(account, cursor);
-//			return account;
-//		}
-//		return null;
-//	}
 
 	/**
 	 * 返回绑定的帐号数目
@@ -230,7 +232,7 @@ public class AccountManager {
 				parseCursorToAccount(account, cursor);
 
 				list.add(account);
-				Log.v(TAG, "getAccounts: " + account);
+//				Log.v(TAG, "getAccounts: " + account);
 			} while (cursor.moveToNext());
 		}
 		if (cursor != null && !cursor.isClosed()) {

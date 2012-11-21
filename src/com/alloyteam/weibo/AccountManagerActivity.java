@@ -36,7 +36,6 @@ public class AccountManagerActivity extends Activity {
 
 	AccountListAdatper accountListAdatper;
 
-	String[] providers = new String[] { "新浪微博", "腾讯微博" };
 
 	int currentDefaultAccountPosition = -1;
 
@@ -56,9 +55,8 @@ public class AccountManagerActivity extends Activity {
 			}else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
 				//TODO 未测试
 				int position = accountListAdatper.getPositionByAccount(account);
-				Account old = accountListAdatper.getItem(position);
-				accountListAdatper.remove(old);
-				accountListAdatper.insert(account, position);
+				accountListAdatper.accounts.set(position, account);
+				accountListAdatper.notifyDataSetChanged();
 			}
 		}
 	};
@@ -67,17 +65,18 @@ public class AccountManagerActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Activity context = AccountManagerActivity.this;
-			ListView listView = new ListView(context);
-			listView.setAdapter(new ArrayAdapter<String>(context,
-					R.layout.account_manager_provider, R.id.providerDesc,
-					providers));
+			String [] providers = Constants.getProviders();
+//			ListView listView = new ListView(context);
+//			listView.setAdapter(new ArrayAdapter<String>(context,
+//					R.layout.account_manager_provider, R.id.providerDesc,
+//					providers));
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			builder.setTitle("选择帐号类型");
 			builder.setItems(providers, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int index) {
-					Log.v(TAG, index + " click");
+//					Log.v(TAG, index + " click");
 					Activity context = AccountManagerActivity.this;
 					int type = index + 1;
 					Intent intent = new Intent(context, AuthActivity.class);
@@ -85,7 +84,7 @@ public class AccountManagerActivity extends Activity {
 					context.startActivity(intent);
 				}
 			});
-			builder.setNegativeButton("取消", null);
+//			builder.setNegativeButton("取消", null);
 			AlertDialog dialog = builder.create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.show();
@@ -112,11 +111,10 @@ public class AccountManagerActivity extends Activity {
 				Account current = accountListAdatper
 						.getItem(currentDefaultAccountPosition);
 				current.isDefault = false;
-				AccountManager.updateAccount(current);
 			}
 			Account account = accountListAdatper.getItem(position);
 			account.isDefault = true;
-			AccountManager.updateAccount(account);
+			AccountManager.switchDefaultAccount(account);
 			accountListAdatper.notifyDataSetChanged();
 		}
 
@@ -220,12 +218,8 @@ public class AccountManagerActivity extends Activity {
 			}
 
 			final Account account = this.getItem(position);
-			String desc = "";
-			if (account.type == Constants.TENCENT) {
-				desc += "腾讯微博";
-			} else if (account.type == Constants.SINA) {
-				desc += "新浪微博";
-			}
+			String desc = Constants.getProvider(account.type);
+
 			if (account.isDefault) {
 				currentDefaultAccountPosition = position;
 				holder.defaultSelect.setVisibility(View.VISIBLE);
@@ -259,7 +253,7 @@ public class AccountManagerActivity extends Activity {
 												Account newDefault = accountListAdatper.getItem(0);
 												if(newDefault != null){
 													newDefault.isDefault = true;
-													AccountManager.updateAccount(newDefault);
+													AccountManager.switchDefaultAccount(newDefault);
 													accountListAdatper.notifyDataSetChanged();
 												}
 											}
