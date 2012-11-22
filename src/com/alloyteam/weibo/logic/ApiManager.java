@@ -176,12 +176,14 @@ public class ApiManager {
 		if (bundle == null) {
 			bundle = new Bundle();
 		}
-		bundle.putString("oauth_version", "2.a");
-		bundle.putString("scope", "all");
-		bundle.putString("clientip", "127.0.0.1");
-		bundle.putString("oauth_consumer_key", Constants.Tencent.APP_KEY);
 		bundle.putString("access_token", account.accessToken);
-		bundle.putString("openid", account.openId);
+		if(account.type == Constants.TENCENT){
+			bundle.putString("oauth_version", "2.a");
+			bundle.putString("scope", "all");
+			bundle.putString("clientip", "127.0.0.1");
+			bundle.putString("oauth_consumer_key", Constants.Tencent.APP_KEY);
+			bundle.putString("openid", account.openId);
+		}
 		return bundle;
 	}
 	
