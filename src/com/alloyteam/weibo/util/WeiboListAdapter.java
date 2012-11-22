@@ -146,19 +146,17 @@ public class WeiboListAdapter extends BaseAdapter {
 			time = viewCache.getTime();
 			image = viewCache.getImage();
 			String avatarUrl = weibo.avatarUrl+"/50";
-			avatar.setTag(avatarUrl);
 			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			name.setText(weibo.name);
 			time.setText(Utility.formatDate(weibo.timestamp * 1000));
 			imageLoader.displayImage(avatarUrl, avatar, callback);
-			if(weibo.imageUrl!=null){
+			if(!weibo.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
 				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
 			}
 			else{
 				image.setVisibility(View.GONE);
 			}
-			image.setTag(weibo.imageUrl);
 			image.setOnClickListener(listener);
 		} else if (type == 2) {
 			TextView text2;
@@ -184,7 +182,6 @@ public class WeiboListAdapter extends BaseAdapter {
 			name = viewCache.getName();
 			time = viewCache.getTime();
 			String avatarUrl = weibo.avatarUrl+"/50";
-			avatar.setTag(avatarUrl);
 			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			name.setText(weibo.name);
 			time.setText(Utility.formatDate(weibo.timestamp * 1000));
@@ -193,13 +190,12 @@ public class WeiboListAdapter extends BaseAdapter {
 			avatar2 = viewCache.getAvatar2();
 			name2 = viewCache.getName2();
 			String avatarUrl2 = weibo.avatarUrl2+"/50";
-			avatar2.setTag(avatarUrl2);
 			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text2)));
 			name2.setText(weibo.name2);
 			imageLoader.displayImage(avatarUrl2, avatar2, callback); 
 			image=viewCache.getImage();
 			count=viewCache.getCount();
-			if(weibo.imageUrl!=null){
+			if(!weibo.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
 				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
 			}
@@ -213,7 +209,6 @@ public class WeiboListAdapter extends BaseAdapter {
 			else{
 				count.setVisibility(View.GONE);
 			}
-			image.setTag(weibo.imageUrl);
 			image.setOnClickListener(listener);
 		}
 		((ViewGroup) rowView).setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS); 
