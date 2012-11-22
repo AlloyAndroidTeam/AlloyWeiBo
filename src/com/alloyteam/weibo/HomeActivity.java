@@ -114,7 +114,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	
 	public void loadData(final int pageflag){
 		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
-
 			@Override
 			public void onSuccess(List<Weibo> tmpList) {
 				if(tmpList==null){
@@ -202,7 +201,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		Bundle bundle = new Bundle();
 		bundle.putString("uid", account.uid);
 		bundle.putInt("type", account.type);
-		bundle.putInt("position", position);
+		bundle.putInt("position", position);//+parent.getFirstVisiblePosition());
 		intent.putExtras(bundle);
 		startActivity(intent);		
 	}
