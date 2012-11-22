@@ -307,6 +307,7 @@ public class ApiManager {
 							long timestamp = item.getLong("timestamp");
 							weibo.type = type;
 							weibo.timestamp = timestamp;
+							weibo.id=item.getString("id");
 							if (type == 2) {
 								JSONObject source = item
 										.getJSONObject("source");

@@ -13,6 +13,7 @@ public class Weibo {
 	public String avatarUrl2="";
 	public int type=1;
 	public int count=0;
+	public String id="";
 	
 	public Weibo(){
 		
