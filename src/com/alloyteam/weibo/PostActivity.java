@@ -75,7 +75,7 @@ public class PostActivity extends Activity implements OnClickListener{
 	private AlertDialog tipsDlg;
 	private String picFilePath;
 	
-	private int type = 0;//操作类型，0写，1转发，2评论
+	private int type = 0;//操作类型，0写，1转发，2评论, 3回复
 	private String tid;
 	
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
@@ -85,7 +85,7 @@ public class PostActivity extends Activity implements OnClickListener{
 	
 	private String SD_CARD_TEMP_DIR; //存储照片图片路径
 	
-	private String titles[] = {"写微博","转发", "评论"};
+	private String titles[] = {"写微博","转发", "评论", "回复"};
 	
 	
 	
@@ -455,6 +455,9 @@ public class PostActivity extends Activity implements OnClickListener{
 			case 2:
 				ApiManager.reply(account, tid, content, listener);
 				break;
+			case 3:
+				ApiManager.comment(account, tid, content, listener);
+				break;	
 			default:
 				if (picFilePath != null){
 					ApiManager.add(account, content, picFilePath, listener);  

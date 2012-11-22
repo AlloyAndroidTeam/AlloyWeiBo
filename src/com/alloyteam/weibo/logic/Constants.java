@@ -47,7 +47,8 @@ public class Constants {
 		public static final String T_ADD = API_ROOT + "/t/add"; //写微博
 		public static final String T_ADD_PIC = API_ROOT + "/t/add_pic";//写微博pic
 		public static final String T_READD = API_ROOT + "/t/re_add";//转发
-		public static final String T_REPLY = API_ROOT + "/t/reply";//评论
+		public static final String T_REPLY = API_ROOT + "/t/reply";//回复一条微博（即对话）
+		public static final String T_COMMENT = API_ROOT + "/t/comment";//评论一条微博
 		
 
 	}
