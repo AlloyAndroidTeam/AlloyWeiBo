@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;
@@ -58,13 +59,8 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			/*String uid = intent.getStringExtra("uid");
-			Log.v(TAG, "onReceive: " + uid + " added.");
-			int type = intent.getIntExtra("type", 0);
-			Account account = AccountManager.getAccount(uid, type);*/
 			String action = intent.getAction();
 			if("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)){
-				Log.d("my","account change");
 				initHomeLine();
 			}
 			else if("com.alloyteam.weibo.WEIBO_ADDED".equals(action)){
@@ -74,13 +70,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		}
 	};
 
-	private Handler mainHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-
-			super.handleMessage(msg);
-		}
-	};
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -111,145 +100,62 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	}
 	
 	public void loadData(final int pageflag){
-		Bundle params = new Bundle();
-		params.putInt("pageflag", pageflag);
+		ApiManager.GetHomeLineListener listener=new ApiManager.GetHomeLineListener(){
+
+			@Override
+			public void onSuccess(List<Weibo> tmpList) {
+				// TODO Auto-generated method stub
+				if(pageflag==WHAT_DID_LOAD_DATA){
+					mPullDownView.notifyDidLoad();
+					list.addAll(tmpList);							
+					if(list.size()>0){
+						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						upTimeStamp=tmpList.get(0).timestamp;
+					}
+					DataManager.set(account.uid,list);
+				}
+				else if(pageflag==WHAT_DID_MORE){
+					mPullDownView.notifyDidMore();								
+					list.addAll(tmpList);
+					if(tmpList.size()>0){
+						upTimeStamp=tmpList.get(0).timestamp;
+					}
+				}
+				else{				
+					mPullDownView.notifyDidRefresh();
+					list.addAll(0, tmpList);
+					if(tmpList.size()>0){
+						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+					}
+				}
+				mAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onError(int type) {
+				// TODO Auto-generated method stub
+				if(pageflag==WHAT_DID_LOAD_DATA){
+					mPullDownView.notifyDidLoad();
+				}
+				else if(pageflag==WHAT_DID_MORE){
+					mPullDownView.notifyDidMore();
+				}
+				else{				
+					mPullDownView.notifyDidRefresh();
+				}
+			}			
+		};
+		long timeStamp;
 		if(pageflag==WHAT_DID_REFRESH){
-			params.putLong("pagetime", upTimeStamp);
+			timeStamp=upTimeStamp;
 		}
 		else if(pageflag==WHAT_DID_MORE){
-			params.putLong("pagetime", downTimeStamp);
+			timeStamp=downTimeStamp;
 		}
 		else{
-			params.putLong("pagetime", 0);
+			timeStamp=0;
 		}
-		params.putInt("reqnum", 10);
-		params.putInt("type", 0);
-		params.putInt("contenttype", 0);
-		params.putString("format", "json");
-		params.putLong("t", System.currentTimeMillis());
-
-		ApiManager.requestAsync(account, Constants.Tencent.HOME_TIMELINE,
-				params, "GET", new ApiManager.IApiListener() {
-
-					@Override
-					public void onJSONException(JSONException exception) {
-						if(pageflag==WHAT_DID_LOAD_DATA){
-							mPullDownView.notifyDidLoad();
-						}
-						else if(pageflag==WHAT_DID_MORE){
-							mPullDownView.notifyDidMore();
-						}
-						else{				
-							mPullDownView.notifyDidRefresh();
-						}
-					}
-
-					public void onFailure(String msg) {
-						if(pageflag==WHAT_DID_LOAD_DATA){
-							mPullDownView.notifyDidLoad();
-						}
-						else if(pageflag==WHAT_DID_MORE){
-							mPullDownView.notifyDidMore();
-						}
-						else{				
-							mPullDownView.notifyDidRefresh();
-						}	
-					}
-
-					@Override
-					public void onComplete(JSONObject result) {
-						Log.d("my","complete");
-						Log.d("json",result.toString());
-						try {
-							List<Weibo> tmpList=new ArrayList<Weibo>();
-							if (result.get("data") == JSONObject.NULL){
-								if(pageflag==WHAT_DID_LOAD_DATA){
-									mPullDownView.notifyDidLoad();
-								}
-								else if(pageflag==WHAT_DID_MORE){
-									mPullDownView.notifyDidMore();
-								}
-								else{				
-									mPullDownView.notifyDidRefresh();
-								}								
-							}
-							else{
-								JSONObject data = result.getJSONObject("data");
-								JSONArray info = data.getJSONArray("info");
-								Log.d("json", "parse");
-								long tmpDownStamp=0,tmpUpStamp=0;
-								for (int i = 0; i < info.length(); ++i) {
-									JSONObject item = info.getJSONObject(i);
-									int status=item.getInt("status");
-									if(status!=0){
-										continue;
-									}
-									String text = item.getString("text");
-									String name = item.getString("name");						
-									String avatarUrl = item.getString("head")
-											+ "/50";
-									int type = item.getInt("type");
-									Weibo weibo = new Weibo(name, text, avatarUrl);
-									long timestamp = item.getLong("timestamp");
-									weibo.type = type;
-									weibo.timestamp = timestamp;
-									if (type == 2) {
-										JSONObject source = item
-												.getJSONObject("source");
-										String text2 = source.getString("text");
-										String name2 = source.getString("name");
-										String avatarUrl2 = source
-												.getString("head") + "/50";
-										weibo.mText2 = text2;
-										weibo.mAvatarUrl2 = avatarUrl2;
-										weibo.mName2 = name2;
-										if (source.get("image") != JSONObject.NULL) {
-											Log.d("my", "image");
-											JSONArray images = source
-													.getJSONArray("image");
-											weibo.mImage = images.getString(0);
-										}
-										weibo.count = item.getInt("count");
-									} else {
-										if (item.get("image") != JSONObject.NULL) {
-											Log.d("my", "image");
-											JSONArray images = item
-													.getJSONArray("image");
-											weibo.mImage = images.getString(0);
-										}
-									}
-									tmpList.add(weibo);
-									if(i==0){
-										tmpUpStamp=timestamp;
-									}
-									if(i==info.length()-1){
-										tmpDownStamp=timestamp;
-									}
-								}
-								if(pageflag==WHAT_DID_LOAD_DATA){
-									mPullDownView.notifyDidLoad();
-									list.addAll(tmpList);
-									upTimeStamp=tmpUpStamp;
-									downTimeStamp=tmpDownStamp;
-								}
-								else if(pageflag==WHAT_DID_MORE){
-									mPullDownView.notifyDidMore();								
-									list.addAll(tmpList);
-									downTimeStamp=tmpDownStamp;
-								}
-								else{				
-									mPullDownView.notifyDidRefresh();
-									list.addAll(0, tmpList);
-									upTimeStamp=tmpUpStamp;
-								}
-								mAdapter.notifyDataSetChanged();
-							}
-							
-						} catch (JSONException je) {
-							Log.d("json", "error");
-						}
-					}
-				});
+		ApiManager.getHomeLine(account, pageflag, timeStamp, listener);
 	}
 
 	@Override
@@ -275,7 +181,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.i(TAG, "onPause");
 	}
 
 	@Override
@@ -283,7 +188,11 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			long id) {
 		// TODO Auto-generated method stub
 		Intent intent = new Intent(this, DetailActivity.class);
-		intent.putExtra("position", position);
+		Weibo weibo=list.get(position);
+		Bundle bundle = new Bundle();
+		bundle.putString("uid", account.uid);
+		bundle.putInt("position", position);
+		intent.putExtras(bundle);
 		startActivity(intent);		
 	}
 

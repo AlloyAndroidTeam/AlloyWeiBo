@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import com.alloyteam.weibo.R;
+import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.Weibo;
 import android.content.Context;
 import android.content.Intent;
@@ -78,26 +79,6 @@ public class WeiboListAdapter extends BaseAdapter {
 		return output;
 	}
 
-	@SuppressWarnings("deprecation")
-	public static String formatDate(long timestamp) {
-		Date curDate = new Date(System.currentTimeMillis());
-		Date date = new Date(timestamp);
-		if (curDate.getDate() == date.getDate()) {
-			SimpleDateFormat format = new SimpleDateFormat("今天 HH:mm:ss");
-			return format.format(date);
-		} else if (curDate.getDate() == date.getDate() + 1) {
-			SimpleDateFormat format = new SimpleDateFormat("昨天 HH:mm:ss");
-			return format.format(date);
-		} else if (curDate.getDate() == date.getDate() + 2) {
-			SimpleDateFormat format = new SimpleDateFormat("前天 HH:mm:ss");
-			return format.format(date);
-		} else {
-			SimpleDateFormat format = new SimpleDateFormat(
-					"yyyy-MM-dd HH:mm:ss");
-			return format.format(date);
-		}
-	}
-
 	public int getCount() {
 		// TODO Auto-generated method stub
 		return mItems.size();
@@ -118,21 +99,6 @@ public class WeiboListAdapter extends BaseAdapter {
 		}
 	};
 
-    static Hashtable<String, String> html_specialchars_table = new Hashtable<String, String>();
-    static {
-            html_specialchars_table.put("&lt;","<");
-            html_specialchars_table.put("&gt;",">");
-            html_specialchars_table.put("&amp;","&");
-    }
-    static String htmlspecialchars_decode_ENT_NOQUOTES(String s){
-            Enumeration<String> en = html_specialchars_table.keys();
-            while(en.hasMoreElements()){
-                    String key = (String)en.nextElement();
-                    String val = (String)html_specialchars_table.get(key);
-                    s = s.replaceAll(key, val);
-            }
-            return s;
-    }
 	private OnClickListener listener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -179,20 +145,20 @@ public class WeiboListAdapter extends BaseAdapter {
 			name = viewCache.getName();
 			time = viewCache.getTime();
 			image = viewCache.getImage();
-			String avatarUrl = weibo.getAvatarUrl();
+			String avatarUrl = weibo.avatarUrl;
 			avatar.setTag(avatarUrl);
-			text.setText(Html.fromHtml(htmlspecialchars_decode_ENT_NOQUOTES(weibo.getText())));
-			name.setText(weibo.getName());
-			time.setText(formatDate(weibo.timestamp * 1000));
-			imageLoader.displayImage(avatarUrl, avatar, callback);
-			if(weibo.mImage!=null){
+			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
+			name.setText(weibo.name);
+			time.setText(Utility.formatDate(weibo.timestamp * 1000));
+			imageLoader.displayImage(avatarUrl+"/50", avatar, callback);
+			if(weibo.imageUrl!=null){
 				image.setVisibility(View.VISIBLE);
-				imageLoader.displayImage(weibo.mImage+"/160", image, null);
+				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
 			}
 			else{
 				image.setVisibility(View.GONE);
 			}
-			image.setTag(weibo.mImage);
+			image.setTag(weibo.imageUrl);
 			image.setOnClickListener(listener);
 		} else if (type == 2) {
 			TextView text2;
@@ -217,25 +183,25 @@ public class WeiboListAdapter extends BaseAdapter {
 			avatar = viewCache.getAvatar();
 			name = viewCache.getName();
 			time = viewCache.getTime();
-			String avatarUrl = weibo.getAvatarUrl();
+			String avatarUrl = weibo.avatarUrl;
 			avatar.setTag(avatarUrl);
-			text.setText(Html.fromHtml(htmlspecialchars_decode_ENT_NOQUOTES(weibo.getText())));
-			name.setText(weibo.getName());
-			time.setText(formatDate(weibo.timestamp * 1000));
+			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
+			name.setText(weibo.name);
+			time.setText(Utility.formatDate(weibo.timestamp * 1000));
 			imageLoader.displayImage(avatarUrl, avatar, callback); 
 			text2 = viewCache.getText2();
 			avatar2 = viewCache.getAvatar2();
 			name2 = viewCache.getName2();
-			String avatarUrl2 = weibo.mAvatarUrl2;
+			String avatarUrl2 = weibo.avatarUrl2;
 			avatar2.setTag(avatarUrl2);
-			text2.setText(Html.fromHtml(htmlspecialchars_decode_ENT_NOQUOTES(weibo.mText2)));
-			name2.setText(weibo.mName2);
-			imageLoader.displayImage(avatarUrl2, avatar2, callback); 
+			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text2)));
+			name2.setText(weibo.name2);
+			imageLoader.displayImage(avatarUrl2+"/50", avatar2, callback); 
 			image=viewCache.getImage();
 			count=viewCache.getCount();
-			if(weibo.mImage!=null){
+			if(weibo.imageUrl!=null){
 				image.setVisibility(View.VISIBLE);
-				imageLoader.displayImage(weibo.mImage+"/160", image, null);
+				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
 			}
 			else{
 				image.setVisibility(View.GONE);
@@ -247,7 +213,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			else{
 				count.setVisibility(View.GONE);
 			}
-			image.setTag(weibo.mImage);
+			image.setTag(weibo.imageUrl);
 			image.setOnClickListener(listener);
 		}
 		((ViewGroup) rowView).setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS); 
