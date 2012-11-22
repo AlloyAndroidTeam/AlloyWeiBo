@@ -39,9 +39,9 @@ public class DetailActivity extends Activity implements OnClickListener {
 		Bundle b=i.getExtras();
 		String uid=b.getString("uid");
 		this.uid=uid;
-		this.position=position;
 		List<Weibo> list=DataManager.get(uid);
 		int position = b.getInt("position");
+		this.position=position;
 		Weibo weibo=list.get(position);		
 		String avatarUrl=weibo.avatarUrl;
 		HomeActivity.imageLoader.displayImage(avatarUrl+"/50", avatar, null);
