@@ -44,20 +44,16 @@ public class AuthActivity extends Activity {
 		progressBar = (ProgressBar) findViewById(R.id.authProgressBar);
 
 		accountType = this.getIntent().getIntExtra("type", Constants.TENCENT);
-		String url = "";
-		if (accountType == Constants.TENCENT) {
-			url = Constants.Tencent.OAUTH_GET_ACCESS_TOKEN + "?client_id="
-					+ Constants.Tencent.APP_KEY + "&response_type=token"
-					+ "&redirect_uri=" + Constants.Tencent.REDIRECT_URL;
-		}
+		String url = Constants.getAuthUrl(accountType);  
 		Log.v(TAG, "load: " + url);
 
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
-				// Log.v(TAG, "onPageStarted url: " + url);
-				if (url.indexOf(Constants.Tencent.REDIRECT_URL) == 0) {
+				Log.v(TAG, "onPageStarted url: " + url);
+				String redirectUrl = Constants.getRedirectUrl(accountType);
+				if (url.indexOf(redirectUrl) == 0) {
 					view.stopLoading();
 					progressBar.setVisibility(View.GONE);
 					handleAuthResult(view, url);
@@ -66,7 +62,7 @@ public class AuthActivity extends Activity {
 				progressBar.setVisibility(View.VISIBLE);
 				super.onPageStarted(view, url, favicon);
 			}
-
+			
 			@Override
 			public void onPageFinished(WebView view, String url) {
 				progressBar.setVisibility(View.GONE);
@@ -86,7 +82,10 @@ public class AuthActivity extends Activity {
 	private void handleAuthResult(WebView view, String url) {
 		Bundle values = Utility.parseUrl(url, "#");
 		Activity context = AuthActivity.this;
-		String uid = values.getString("name");
+		String uid = values.getString("uid");
+		if(uid == null){
+			uid = values.getString("name");
+		}
 		
 		Account old = AccountManager.getAccount(uid, accountType);
 		
@@ -94,14 +93,23 @@ public class AuthActivity extends Activity {
 		account.type = accountType;
 		account.uid = uid;
 		account.nick = values.getString("nick");
+		if(account.nick == null){
+			account.nick = account.uid;
+		}
 		
-		account.accessToken = values.getString("access_token");
 		account.refreshToken = values.getString("refresh_token");
 		account.openId = values.getString("openid");
 		account.openKey = values.getString("openkey");
+		
+		account.accessToken = values.getString("access_token");
+		
 		account.authTime = new Date();
+		long expiresTime = Long.parseLong(values.getString("expires_in"));
+		if(accountType == Constants.TENCENT){
+			expiresTime *= 1000;
+		}
 		account.invalidTime = new Date(account.authTime.getTime()
-				+ Integer.parseInt(values.getString("expires_in")) * 1000);
+				+  expiresTime);
 		Log.i(TAG,
 				account.authTime.getTime() + " : "
 						+ values.getString("expires_in"));
