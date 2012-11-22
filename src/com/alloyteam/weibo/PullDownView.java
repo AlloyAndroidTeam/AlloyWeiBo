@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -100,6 +101,8 @@ public class PullDownView extends LinearLayout implements OnScrollOverListener{
 	public interface OnPullDownListener {
 		void onRefresh();
 		void onMore();
+		void onItemClick(AdapterView<?> parent, View view, int position,
+				long id);
 	}
 	
 	/**
@@ -172,7 +175,7 @@ public class PullDownView extends LinearLayout implements OnScrollOverListener{
 	/**
 	 * 初始化界面
 	 */
-	private void initHeaderViewAndFooterViewAndListView(Context context){
+	public void initHeaderViewAndFooterViewAndListView(Context context){
 		setOrientation(LinearLayout.VERTICAL);
 		//setDrawingCacheEnabled(false);
 		/*
@@ -225,6 +228,7 @@ public class PullDownView extends LinearLayout implements OnScrollOverListener{
 		mListView = new ScrollOverListView(context);
 		mListView.setOnScrollOverListener(this);
 		mListView.setCacheColorHint(0);
+		mListView.setSelector(getBackground());
 		addView(mListView, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 		
 		// 空的listener
@@ -233,6 +237,12 @@ public class PullDownView extends LinearLayout implements OnScrollOverListener{
 			public void onRefresh() {}
 			@Override
 			public void onMore() {}
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 	
@@ -480,6 +490,13 @@ public class PullDownView extends LinearLayout implements OnScrollOverListener{
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

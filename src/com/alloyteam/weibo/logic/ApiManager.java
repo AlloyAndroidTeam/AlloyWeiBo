@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.alloyteam.weibo.AuthActivity;
@@ -26,7 +27,9 @@ import com.alloyteam.weibo.model.Account;
  * 
  */
 public class ApiManager {
-
+	
+	public static String TAG = "ApiManager";
+	
 	public interface IApiListener {
 
 		public void onComplete(JSONObject result);
@@ -118,9 +121,10 @@ public class ApiManager {
 		final Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
+				String result = "no data";
 				try {
 					Bundle data = msg.getData();
-					String result = data.getString("result");
+					result = data.getString("result");
 					boolean success = !result.equals("fail");
 					if (success) {
 						JSONObject jsonObject = new JSONObject(result);
@@ -137,6 +141,7 @@ public class ApiManager {
 					if (listener != null) {
 						listener.onJSONException(e);
 					}
+					Log.d(TAG, result);
 					e.printStackTrace();
 				}
 			}

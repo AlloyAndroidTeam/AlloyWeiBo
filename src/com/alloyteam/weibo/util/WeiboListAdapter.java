@@ -250,6 +250,8 @@ public class WeiboListAdapter extends BaseAdapter {
 			image.setTag(weibo.mImage);
 			image.setOnClickListener(listener);
 		}
+		((ViewGroup) rowView).setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS); 
+		rowView.requestFocusFromTouch();
 		return rowView;
 	}
 }
