@@ -145,12 +145,12 @@ public class WeiboListAdapter extends BaseAdapter {
 			name = viewCache.getName();
 			time = viewCache.getTime();
 			image = viewCache.getImage();
-			String avatarUrl = weibo.avatarUrl;
+			String avatarUrl = weibo.avatarUrl+"/50";
 			avatar.setTag(avatarUrl);
 			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			name.setText(weibo.name);
 			time.setText(Utility.formatDate(weibo.timestamp * 1000));
-			imageLoader.displayImage(avatarUrl+"/50", avatar, callback);
+			imageLoader.displayImage(avatarUrl, avatar, callback);
 			if(weibo.imageUrl!=null){
 				image.setVisibility(View.VISIBLE);
 				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
@@ -183,7 +183,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			avatar = viewCache.getAvatar();
 			name = viewCache.getName();
 			time = viewCache.getTime();
-			String avatarUrl = weibo.avatarUrl;
+			String avatarUrl = weibo.avatarUrl+"/50";
 			avatar.setTag(avatarUrl);
 			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			name.setText(weibo.name);
@@ -192,11 +192,11 @@ public class WeiboListAdapter extends BaseAdapter {
 			text2 = viewCache.getText2();
 			avatar2 = viewCache.getAvatar2();
 			name2 = viewCache.getName2();
-			String avatarUrl2 = weibo.avatarUrl2;
+			String avatarUrl2 = weibo.avatarUrl2+"/50";
 			avatar2.setTag(avatarUrl2);
 			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text2)));
 			name2.setText(weibo.name2);
-			imageLoader.displayImage(avatarUrl2+"/50", avatar2, callback); 
+			imageLoader.displayImage(avatarUrl2, avatar2, callback); 
 			image=viewCache.getImage();
 			count=viewCache.getCount();
 			if(weibo.imageUrl!=null){
