@@ -11,6 +11,7 @@ import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
+import com.alloyteam.weibo.model.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,7 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +37,8 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private List<Weibo> list;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
+	private int type=0;
+	private Account account;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -49,6 +52,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		Bundle b=i.getExtras();
 		String uid=b.getString("uid");
 		this.uid=uid;
+		type=b.getInt("type");
 		List<Weibo> list=DataManager.get(uid);
 		int position = b.getInt("position");
 		this.position=position;
@@ -102,6 +106,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			bundle = new Bundle();
 			bundle.putString("uid", uid);
 			bundle.putInt("type", 1);
+			bundle.putInt("weiboType", type);
 			bundle.putInt("position", position);
 			intent.putExtras(bundle);
 			startActivity(intent);
@@ -111,6 +116,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			bundle = new Bundle();
 			bundle.putString("uid", uid);
 			bundle.putInt("type", 2);
+			bundle.putInt("weiboType", type);
 			bundle.putInt("position", position);
 			intent.putExtras(bundle);
 			startActivity(intent);
@@ -141,10 +147,10 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 				this, list);
 		mylist.setAdapter(mAdapter);
 		mPullDownView.enableAutoFetchMore(true, 1);
-		account = AccountManager.getDefaultAccount();
+		account = AccountManager.getAccount(uid, type);
 		if (account == null)
 			return;
-		loadData(WHAT_DID_LOAD_DATA);
+		getCommentList(WHAT_DID_LOAD_DATA);
 	}
 		
 	public void getCommentList(final int pageflag){
@@ -199,6 +205,22 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		else{
 			timeStamp=0;
 		}
-		ApiManager.getHomeLine(account, pageflag, timeStamp, listener);
+		//ApiManager.getHomeLine(account, pageflag, timeStamp, listener);
+	}
+	@Override
+	public void onRefresh() {
+		getCommentList(WHAT_DID_REFRESH);
+	}
+	
+	@Override
+	public void onMore() {
+		getCommentList(WHAT_DID_MORE);
+	}
+	
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		
 	}
 }
