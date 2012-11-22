@@ -469,6 +469,22 @@ public class ApiManager {
 				break;
 		}
 	}
+	/**
+	 *	评论微博,统一接口
+	 */ 
+	public static void comment(Account account, String tid, String content,
+			final ApiManager.IApiListener listener) throws Exception {
+		     	 
+         //微博类型, 1: 新浪, 2: 腾讯
+		switch(account.type){
+			case 1:
+				commentToTencent(account, tid, content, listener);
+				break;
+			case 2:
+				commentToTencent(account, tid, content, listener);
+				break;
+		}
+	}
 	//********************腾讯相关方法****************************************
 	/**
 	 * 发布微博，发布到腾讯，不对外
@@ -523,6 +539,22 @@ public class ApiManager {
         params.putString("syncflag", "1");   
         params.putString("compatibleflag", "0");          
          ApiManager.requestAsync(account, Constants.Tencent.T_READD,
+					params, "POST", listener);         
+	}
+	 /**
+	 * 回复微博，文字
+	 */
+	private static void commentToTencent(Account account, String tid, String content,
+			final ApiManager.IApiListener listener) throws Exception {
+		Log.v(TAG, "readdToTencent");
+		Bundle params = new Bundle(); 
+        params.putString("format", "json");
+        params.putString("reid", tid);
+        params.putString("content", content);     
+        params.putString("longitude", "");
+        params.putString("syncflag", "1");   
+        params.putString("compatibleflag", "0");          
+         ApiManager.requestAsync(account, Constants.Tencent.T_COMMENT,
 					params, "POST", listener);         
 	}
 
