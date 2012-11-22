@@ -298,6 +298,7 @@ public class ApiManager {
 							long timestamp = item.getLong("timestamp");
 							weibo.type = type;
 							weibo.timestamp = timestamp;
+							weibo.id=item.getString("id");
 							if (type == 2) {
 								JSONObject source = item
 										.getJSONObject("source");
@@ -342,4 +343,163 @@ public class ApiManager {
 		void onSuccess(List<Weibo> list);
 		void onError(int type);
 	}
+	
+	
+	/**
+	 *	发布微博,统一接口
+	 */ 
+	public static void add(Account account, String content,final ApiManager.IApiListener listener) throws Exception {
+		     	 
+         //微博类型, 1: 新浪, 2: 腾讯
+		switch(account.type){
+			case 1:
+				addToTencent(account, content, null, listener);
+				break;
+			case 2:
+				addToTencent(account, content, null, listener);
+				break;
+		}
+	}
+	/**
+	 *	发布微博,统一接口
+	 *  带图片
+	 */
+	public static void add(Account account, String content, String picFilePath, 
+			final ApiManager.IApiListener listener) throws Exception {
+    	Log.v(TAG, "add:" + account.type); 
+		 //微博类型, 1: 新浪, 2: 腾讯
+		switch(account.type){
+			case 1:
+				addToTencent(account, content, picFilePath, listener);
+				break;
+			case 2:
+				addToTencent(account, content, picFilePath, listener);
+				break;
+		}         
+	}
+	/**
+	 *	回复微博,统一接口
+	 */ 
+	public static void readd(Account account, String tid, String content,
+			final ApiManager.IApiListener listener) throws Exception {
+		     	 
+         //微博类型, 1: 新浪, 2: 腾讯
+		switch(account.type){
+			case 1:
+				readdToTencent(account, tid, content, listener);
+				break;
+			case 2:
+				readdToTencent(account, tid, content, listener);
+				break;
+		}
+	}
+	/**
+	 *	转发微博,统一接口
+	 */ 
+	public static void reply(Account account, String tid, String content,
+			final ApiManager.IApiListener listener) throws Exception {
+		     	 
+         //微博类型, 1: 新浪, 2: 腾讯
+		switch(account.type){
+			case 1:
+				replyToTencent(account, tid, content, listener);
+				break;
+			case 2:
+				replyToTencent(account, tid, content, listener);
+				break;
+		}
+	}
+	/**
+	 *	评论微博,统一接口
+	 */ 
+	public static void comment(Account account, String tid, String content,
+			final ApiManager.IApiListener listener) throws Exception {
+		     	 
+         //微博类型, 1: 新浪, 2: 腾讯
+		switch(account.type){
+			case 1:
+				commentToTencent(account, tid, content, listener);
+				break;
+			case 2:
+				commentToTencent(account, tid, content, listener);
+				break;
+		}
+	}
+	//********************腾讯相关方法****************************************
+	/**
+	 * 发布微博，发布到腾讯，不对外
+	 */
+	private static void addToTencent(Account account, String content, String picFilePath, 
+			final ApiManager.IApiListener listener) throws Exception {
+    	
+		
+        Bundle params = new Bundle(); 
+        params.putString("format", "json");
+        params.putString("content", content);     
+        params.putString("longitude", "");
+        params.putString("syncflag", "1");   
+        params.putString("compatibleflag", "0"); 
+        
+        if (picFilePath != null){
+        	ApiManager.postAsync(account, Constants.Tencent.T_ADD_PIC, params, picFilePath, listener);
+        	Log.v(TAG, "addToTencent width pic");
+        }else{
+        	ApiManager.requestAsync(account, Constants.Tencent.T_ADD, params, "POST", listener); 
+        	Log.v(TAG, "addToTencent");
+        }
+	}
+	
+	/**
+	 * 评论微博，文字
+	 */
+	private static void replyToTencent(Account account, String tid, String content, 
+			final ApiManager.IApiListener listener) throws Exception {
+		Log.v(TAG, "replyToTencent");
+		Bundle params = new Bundle(); 
+        params.putString("format", "json");
+        params.putString("reid", tid);
+        params.putString("content", content);     
+        params.putString("longitude", "");
+        params.putString("syncflag", "1");   
+        params.putString("compatibleflag", "0");         
+        ApiManager.requestAsync(account, Constants.Tencent.T_REPLY,
+					params, "POST", listener);         
+	}
+	 /**
+	 * 转发微博，文字
+	 */
+	private static void readdToTencent(Account account, String tid, String content,
+			final ApiManager.IApiListener listener) throws Exception {
+		Log.v(TAG, "readdToTencent");
+		Bundle params = new Bundle(); 
+        params.putString("format", "json");
+        params.putString("reid", tid);
+        params.putString("content", content);     
+        params.putString("longitude", "");
+        params.putString("syncflag", "1");   
+        params.putString("compatibleflag", "0");          
+         ApiManager.requestAsync(account, Constants.Tencent.T_READD,
+					params, "POST", listener);         
+	}
+	 /**
+	 * 回复微博，文字
+	 */
+	private static void commentToTencent(Account account, String tid, String content,
+			final ApiManager.IApiListener listener) throws Exception {
+		Log.v(TAG, "readdToTencent");
+		Bundle params = new Bundle(); 
+        params.putString("format", "json");
+        params.putString("reid", tid);
+        params.putString("content", content);     
+        params.putString("longitude", "");
+        params.putString("syncflag", "1");   
+        params.putString("compatibleflag", "0");          
+         ApiManager.requestAsync(account, Constants.Tencent.T_COMMENT,
+					params, "POST", listener);         
+	}
+
+ 
+	
+	
+	
 }

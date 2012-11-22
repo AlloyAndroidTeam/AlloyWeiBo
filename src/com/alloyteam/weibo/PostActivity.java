@@ -21,11 +21,13 @@ import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo; 
 
 import android.app.Activity;
 import android.app.AlertDialog; 
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,6 +39,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images.Media;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -72,13 +75,18 @@ public class PostActivity extends Activity implements OnClickListener{
 	private AlertDialog tipsDlg;
 	private String picFilePath;
 	
-	private int type = 0;//操作类型，0写，1转发，2评论
+	private int type = 0;//操作类型，0写，1转发，2评论, 3回复
 	private String tid;
 	
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
 	private Runnable runner;
 	
-	private PopFriend popFrined;
+	private PopFriend popFrined; //好友选择窗口
+	
+	private String SD_CARD_TEMP_DIR; //存储照片图片路径
+	
+	private String titles[] = {"写微博","转发", "评论", "回复"};
+	
 	
 	
 	@Override
@@ -91,22 +99,23 @@ public class PostActivity extends Activity implements OnClickListener{
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.post_title);        
         
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);         
-        
-        /*
-        Bundle bundle = getIntent().getExtras();
-        Long id = bundle.getLong("id");           
-        titlebarTxt.setText("编辑:" + id.toString());         
-        tvWordCount = (TextView)findViewById(R.id.editWordCount);
-        */
-        Bundle bundle = getIntent().getExtras();
+         
+      	
+        Bundle bundle = getIntent().getExtras(); 
         try{
         	type = bundle.getInt("type");
         }catch(Exception e){
         	type = 0;
         }
         if (type != 0){        	
-        	tid = bundle.getString("tid");
+      		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
+      		Weibo weibo=list.get(bundle.getInt("position"));
+      		tid = weibo.id;
+      		
+        	Log.v("post", "" + type +", tid:" +tid);
         }
+        ((TextView)findViewById(R.id.tvPostTitle)).setText(titles[type]); 
+        
         tvMain = (EditText)findViewById(R.id.etPostMain);
         
         tvWordCount = (TextView)findViewById(R.id.tvPostCount);
@@ -206,7 +215,10 @@ public class PostActivity extends Activity implements OnClickListener{
 				     }
 			    }).
 		    create();
-		  alertDialog.show();	       	
+		  alertDialog.show();
+		  
+		  Log.v("getCacheDir",  this.getCacheDir().getName());
+		 
 	}
 	 /*
      * 响应选择图片dialog选项处理
@@ -216,14 +228,15 @@ public class PostActivity extends Activity implements OnClickListener{
 	    	 //Log.v("which:", which + "");
 	    	 switch (which) {  
 	            case 0: 
+	            	
+	            	/* 
+	                	
+	            	Intent getImageByCamera  = new Intent("android.media.action.IMAGE_CAPTURE"); 
+	            	startActivityForResult(getImageByCamera, 2);
+	            	*/ 
 	            	/*
-	            	Intent getImageByCamera  = new Intent("android.media.action.IMAGE_CAPTURE");  
-	                startActivityForResult(getImageByCamera, 2);  
-	                */	
 	                try{
-	                	//final String start = Environment.getExternalStorageState();
-	                
-	            	/**/
+	                	//final String start = Environment.getExternalStorageState(); 
 		                final String start = Environment.getExternalStorageState();
 		                final String PHOTOPATH = "/photo/";  
 		                if(start.equals(Environment.MEDIA_MOUNTED)){ 
@@ -245,7 +258,30 @@ public class PostActivity extends Activity implements OnClickListener{
 	            	}catch(Exception e){
 	                	Toast.makeText(PostActivity.this,	                		
 	 	                       "没有SD卡2", Toast.LENGTH_LONG).show();
-	                }
+	                }*/
+	            	  /* */
+	            	 
+	            	  
+	            	  
+	            	  
+                	//final String start = Environment.getExternalStorageState(); 
+	                final String start = Environment.getExternalStorageState();	                 
+	                if(start.equals(android.os.Environment.MEDIA_MOUNTED)){ 
+	                	 SD_CARD_TEMP_DIR = Environment.getExternalStorageDirectory() 
+        	  					 			+ File.separator + "weito.jpg";        	   
+		            	  Intent takePictureFromCameraIntent = new Intent(
+		            			  	MediaStore.ACTION_IMAGE_CAPTURE);
+		            	  takePictureFromCameraIntent.putExtra(
+		            	    android.provider.MediaStore.EXTRA_OUTPUT, Uri
+		            	      .fromFile(new File(SD_CARD_TEMP_DIR)));
+		            	  startActivityForResult(takePictureFromCameraIntent, 2);
+	                }else{
+	                	Toast.makeText(PostActivity.this,	                		
+	                       "没有SD卡", Toast.LENGTH_LONG).show();
+	           
+	            	}
+	                Log.v("start", start);
+		            	 
 					
 	                /*
 	                Intent intent = new Intent();  
@@ -254,6 +290,14 @@ public class PostActivity extends Activity implements OnClickListener{
 	                intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, photoUri);  
 	                startActivityForResult(intent, 2);  
 	                */
+	            	/*
+	            	Uri imageFileUri = getContentResolver().insert(  
+	            			MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());  
+        			 
+        			Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);  
+        			i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri);  
+        			startActivityForResult(i, 2); 
+	            			*/
 	                break; 
 	            case 1: 
 	            	Intent intent = new Intent();
@@ -279,7 +323,7 @@ public class PostActivity extends Activity implements OnClickListener{
             	Log.v("Result", "requestCode:"+requestCode+", result:" + resultCode+",RESULT_OK:"+RESULT_OK);
             	if (photoThumb == null){
 	            	photoThumb = new ImageView(this);    	
-	            	LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(30, 30);
+	            	LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(50, 50);
 	            	photoThumb.setLayoutParams(lp);
 	            	//photo.setBackgroundColor(0xFFFF0000);设置背景    	
 	            	((LinearLayout)findViewById(R.id.postStatebar)).addView(photoThumb);
@@ -301,15 +345,23 @@ public class PostActivity extends Activity implements OnClickListener{
                         e.printStackTrace();  
                     }  
                 } else {  
+                	picFilePath = SD_CARD_TEMP_DIR;
                     Bundle extras = data.getExtras();  
                     if (extras != null) {  
                         //这里是有些拍照后的图片是直接存放到Bundle中的所以我们可以从这里面获取Bitmap图片  
                         Bitmap image = extras.getParcelable("data");  
                         if (image != null) {  
                         	photoThumb.setImageBitmap(image);  
-                        }  
+                        } 
+                        /*
+                        //保存到相册
+                        ContentResolver cr = getContentResolver();                          
+                        Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(cr, image, "myPhoto", "alloy android"));
+                        picFilePath = getPicPath(uri);
+                        */
+                        
                     }  
-                    Log.v("onActivityResult", "from Bundle extras");
+                    Log.v("onActivityResult", "from Bundle extras" + picFilePath);
                 }  
   
             }  
@@ -375,11 +427,33 @@ public class PostActivity extends Activity implements OnClickListener{
 					btnSave.setEnabled(true);
 				}
 			};
-		 if (picFilePath != null){
-			 addPic("json", content + "addPic", "127.0.0.1", listener);
-		 }else{
-			 add("json", content + "add", "127.0.0.1", listener);
-		 }
+		
+		Account account = AccountManager.getDefaultAccount(); 
+		
+		////操作类型，0写，1转发，2评论
+		switch(type){
+			case 1:
+				ApiManager.readd(account, tid, content, listener);  
+				break;
+			case 2:
+				ApiManager.reply(account, tid, content, listener);
+				break;
+			case 3:
+				ApiManager.comment(account, tid, content, listener);
+				break;	
+			default:
+				if (picFilePath != null){
+					ApiManager.add(account, content, picFilePath, listener);  
+				 }else{
+					 ApiManager.add(account, content, listener); 
+				 }
+		}
+			
+		
+		
+		
+		
+		
     }
     
     /**
@@ -460,83 +534,7 @@ public class PostActivity extends Activity implements OnClickListener{
     	 tips(txt);
     }
     
-    /**
-	 * 发送微博，文字
-	 */
-	public void add(String format, String content,
-			String clientip, final ApiManager.IApiListener listener) throws Exception {
-		
-		 Account account = AccountManager.getDefaultAccount();    	 
-         Bundle params = new Bundle(); 
-         params.putString("format", format);
-         params.putString("content", content);     
-         params.putString("longitude", "");
-         params.putString("syncflag", "1");          
-         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-					params, "POST", listener);         
-	}
-	 /**
-		 * 转发微博，文字
-		 */
-		public void reply(String format, String content,
-				String clientip, final ApiManager.IApiListener listener) throws Exception {
-			
-			 Account account = AccountManager.getDefaultAccount();    	 
-	         Bundle params = new Bundle(); 
-	         params.putString("format", format);
-	         params.putString("content", content);     
-	         params.putString("longitude", "");
-	         params.putString("syncflag", "1");          
-	         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-						params, "POST", listener);         
-		}
-		 /**
-		 * 评论微博，文字
-		 */
-		public void readd(String format, String content,
-				String clientip, final ApiManager.IApiListener listener) throws Exception {
-			
-			 Account account = AccountManager.getDefaultAccount();    	 
-	         Bundle params = new Bundle(); 
-	         params.putString("format", format);
-	         params.putString("content", content);     
-	         params.putString("longitude", "");
-	         params.putString("syncflag", "1");          
-	         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-						params, "POST", listener);         
-		}
-	
-	/**
-	 * 发表一条带图片的微博
-	 * 
-	 * @param oAuth
-	 * @param format 返回数据的格式 是（json或xml）
-	 * @param content  微博内容
-	 * @param clientip 用户IP(以分析用户所在地)
-	 * @param jing 经度（可以填空）
-	 * @param wei 纬度（可以填空）
-	 * @param picpath 可以是本地图片路径 或 网络地址
-	 * @param syncflag  微博同步到空间分享标记（可选，0-同步，1-不同步，默认为0）  
-	 * @return
-	 * @throws Exception
-     * @see <a href="http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E5%8F%91%E8%A1%A8%E4%B8%80%E6%9D%A1%E5%B8%A6%E5%9B%BE%E7%89%87%E7%9A%84%E5%BE%AE%E5%8D%9A">腾讯微博开放平台上关于此条API的文档1-本地图片</a>
-     * @see <a href="http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E7%94%A8%E5%9B%BE%E7%89%87URL%E5%8F%91%E8%A1%A8%E5%B8%A6%E5%9B%BE%E7%89%87%E7%9A%84%E5%BE%AE%E5%8D%9A">腾讯微博开放平台上关于此条API的文档2-网络图片</a>
-	 */
-	public void addPic(String format, String content,
-			String clientip,  final ApiManager.IApiListener listener)
-			throws Exception {
-		Account account = AccountManager.getDefaultAccount();
-    	 
-        Bundle params = new Bundle(); 
-        params.putString("format", format);
-        params.putString("content", content);         
-        params.putString("clientip", clientip);
-        params.putString("longitude", "");
-        params.putString("syncflag", "1");
-        params.putString("compatibleflag", "0"); 
-        ApiManager.postAsync(account, Constants.Tencent.T_ADD_PIC, params, picFilePath, listener);
-        
-	};
+     
 	/**
 	 * 提示
 	 */
