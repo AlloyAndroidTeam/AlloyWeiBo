@@ -135,14 +135,14 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 					mPullDownView.notifyDidMore();								
 					list.addAll(tmpList);
 					if(tmpList.size()>0){
-						upTimeStamp=tmpList.get(0).timestamp;
+						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 					}
 				}
 				else{				
 					mPullDownView.notifyDidRefresh();
 					list.addAll(0, tmpList);
 					if(tmpList.size()>0){
-						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						upTimeStamp=tmpList.get(0).timestamp;
 					}
 				}
 				mAdapter.notifyDataSetChanged();
