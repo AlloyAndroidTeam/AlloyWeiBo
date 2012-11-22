@@ -26,6 +26,7 @@ import com.alloyteam.weibo.model.Weibo;
 import android.app.Activity;
 import android.app.AlertDialog; 
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,6 +38,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images.Media;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -79,6 +81,8 @@ public class PostActivity extends Activity implements OnClickListener{
 	private Runnable runner;
 	
 	private PopFriend popFrined;
+	
+	private String SD_CARD_TEMP_DIR;
 	
 	
 	@Override
@@ -206,7 +210,10 @@ public class PostActivity extends Activity implements OnClickListener{
 				     }
 			    }).
 		    create();
-		  alertDialog.show();	       	
+		  alertDialog.show();
+		  
+		  Log.v("getCacheDir",  this.getCacheDir().getName());
+		 
 	}
 	 /*
      * 响应选择图片dialog选项处理
@@ -216,14 +223,15 @@ public class PostActivity extends Activity implements OnClickListener{
 	    	 //Log.v("which:", which + "");
 	    	 switch (which) {  
 	            case 0: 
+	            	
+	            	/* 
+	                	
+	            	Intent getImageByCamera  = new Intent("android.media.action.IMAGE_CAPTURE"); 
+	            	startActivityForResult(getImageByCamera, 2);
+	            	*/ 
 	            	/*
-	            	Intent getImageByCamera  = new Intent("android.media.action.IMAGE_CAPTURE");  
-	                startActivityForResult(getImageByCamera, 2);  
-	                */	
 	                try{
-	                	//final String start = Environment.getExternalStorageState();
-	                
-	            	/**/
+	                	//final String start = Environment.getExternalStorageState(); 
 		                final String start = Environment.getExternalStorageState();
 		                final String PHOTOPATH = "/photo/";  
 		                if(start.equals(Environment.MEDIA_MOUNTED)){ 
@@ -245,7 +253,30 @@ public class PostActivity extends Activity implements OnClickListener{
 	            	}catch(Exception e){
 	                	Toast.makeText(PostActivity.this,	                		
 	 	                       "没有SD卡2", Toast.LENGTH_LONG).show();
-	                }
+	                }*/
+	            	  /* */
+	            	 
+	            	  
+	            	  
+	            	  
+                	//final String start = Environment.getExternalStorageState(); 
+	                final String start = Environment.getExternalStorageState();	                 
+	                if(start.equals(android.os.Environment.MEDIA_MOUNTED)){ 
+	                	 SD_CARD_TEMP_DIR = Environment.getExternalStorageDirectory() 
+        	  					 			+ File.separator + "weito.jpg";        	   
+		            	  Intent takePictureFromCameraIntent = new Intent(
+		            			  	MediaStore.ACTION_IMAGE_CAPTURE);
+		            	  takePictureFromCameraIntent.putExtra(
+		            	    android.provider.MediaStore.EXTRA_OUTPUT, Uri
+		            	      .fromFile(new File(SD_CARD_TEMP_DIR)));
+		            	  startActivityForResult(takePictureFromCameraIntent, 2);
+	                }else{
+	                	Toast.makeText(PostActivity.this,	                		
+	                       "没有SD卡", Toast.LENGTH_LONG).show();
+	           
+	            	}
+	                Log.v("start", start);
+		            	 
 					
 	                /*
 	                Intent intent = new Intent();  
@@ -254,6 +285,14 @@ public class PostActivity extends Activity implements OnClickListener{
 	                intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, photoUri);  
 	                startActivityForResult(intent, 2);  
 	                */
+	            	/*
+	            	Uri imageFileUri = getContentResolver().insert(  
+	            			MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());  
+        			 
+        			Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);  
+        			i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri);  
+        			startActivityForResult(i, 2); 
+	            			*/
 	                break; 
 	            case 1: 
 	            	Intent intent = new Intent();
@@ -279,7 +318,7 @@ public class PostActivity extends Activity implements OnClickListener{
             	Log.v("Result", "requestCode:"+requestCode+", result:" + resultCode+",RESULT_OK:"+RESULT_OK);
             	if (photoThumb == null){
 	            	photoThumb = new ImageView(this);    	
-	            	LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(30, 30);
+	            	LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(50, 50);
 	            	photoThumb.setLayoutParams(lp);
 	            	//photo.setBackgroundColor(0xFFFF0000);设置背景    	
 	            	((LinearLayout)findViewById(R.id.postStatebar)).addView(photoThumb);
@@ -301,15 +340,23 @@ public class PostActivity extends Activity implements OnClickListener{
                         e.printStackTrace();  
                     }  
                 } else {  
+                	picFilePath = SD_CARD_TEMP_DIR;
                     Bundle extras = data.getExtras();  
                     if (extras != null) {  
                         //这里是有些拍照后的图片是直接存放到Bundle中的所以我们可以从这里面获取Bitmap图片  
                         Bitmap image = extras.getParcelable("data");  
                         if (image != null) {  
                         	photoThumb.setImageBitmap(image);  
-                        }  
+                        } 
+                        /*
+                        //保存到相册
+                        ContentResolver cr = getContentResolver();                          
+                        Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(cr, image, "myPhoto", "alloy android"));
+                        picFilePath = getPicPath(uri);
+                        */
+                        
                     }  
-                    Log.v("onActivityResult", "from Bundle extras");
+                    Log.v("onActivityResult", "from Bundle extras" + picFilePath);
                 }  
   
             }  
@@ -376,9 +423,9 @@ public class PostActivity extends Activity implements OnClickListener{
 				}
 			};
 		 if (picFilePath != null){
-			 addPic("json", content + "addPic", "127.0.0.1", listener);
+			 addPic("json", content, "127.0.0.1", listener);
 		 }else{
-			 add("json", content + "add", "127.0.0.1", listener);
+			 add("json", content, "127.0.0.1", listener);
 		 }
     }
     

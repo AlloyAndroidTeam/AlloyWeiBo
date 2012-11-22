@@ -264,17 +264,6 @@ public class AccountManagerActivity extends Activity {
 												int which) {
 											AccountManager.removeAccount(account);
 											accountListAdatper.remove(account);
-//											if(account.isDefault){
-//												if(accountListAdatper.getCount() == 0){
-//													return;
-//												}
-//												Account newDefault = accountListAdatper.getItem(0);
-//												if(newDefault != null){
-//													newDefault.isDefault = true;
-//													AccountManager.switchDefaultAccount(newDefault);
-//													accountListAdatper.notifyDataSetChanged();
-//												}
-//											}
 										}
 
 									}).show();

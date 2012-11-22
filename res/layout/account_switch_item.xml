@@ -8,11 +8,13 @@
     <TextView
         android:id="@+id/currentAccountText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="14dp"
-        android:text="azrael(腾讯微博)" />
+        android:gravity="center_vertical"
+        android:text="azrael(腾讯微博)"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

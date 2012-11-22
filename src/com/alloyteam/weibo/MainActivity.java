@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,9 +21,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
@@ -52,10 +55,8 @@ public class MainActivity extends TabActivity implements OnClickListener {
 				Account account = AccountManager.getDefaultAccount();
 				if (account != null) {
 					accountSwitchBtn.setText(getAccountDescption(account));
-					accountSwitchBtn.setTag(0);
 				} else {
 					accountSwitchBtn.setText("绑定帐号");
-					accountSwitchBtn.setTag(1);
 				}
 			}
 
@@ -84,10 +85,8 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		Account defaultAccount = AccountManager.getDefaultAccount();
 		if (defaultAccount != null) {
 			accountSwitchBtn.setText(getAccountDescption(defaultAccount));
-			accountSwitchBtn.setTag(0);
 		} else {
 			accountSwitchBtn.setText("绑定帐号");
-			accountSwitchBtn.setTag(1);
 		}
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
@@ -189,30 +188,45 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		case R.id.btnHomeTitleAccount: // 帐号
 			// i = new Intent(this, AccountManagerActivity.class);
 			// startActivity(i);
+			AlertDialog.Builder builder;
 			ArrayList<Account> accounts = AccountManager.getAccounts();
-			if (accounts.size() == 1) {
+			int count = accounts.size();
+			if (count == 0) {
+				builder = new AlertDialog.Builder(this);
+				builder.setMessage("您只绑定了一个帐号，继续添加帐号吗？")
+					.setPositiveButton("继续添加", new AlertDialog.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Intent i = new Intent(MainActivity.this, AccountManagerActivity.class);
+							startActivity(i);
+						}
+					}).show();
 				break;
-			}
-			Object tag = accountSwitchBtn.getTag();
-			if (tag.equals(1)) {
+			}else if(count == 1){
 				i = new Intent(this, AccountManagerActivity.class);
 				startActivity(i);
 				break;
 			}
+			
 			final AccountArrayAdapter adapter = new AccountArrayAdapter(this,
 					0, accounts);
-			AlertDialog dialog = new AlertDialog.Builder(this).setAdapter(
-					adapter, new AlertDialog.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Account account = adapter.getItem(which);
-							if (account != null) {
-								AccountManager.switchDefaultAccount(account);
-							}
-						}
-					}).create();
+
+			builder = new AlertDialog.Builder(this);
+			builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int position) {
+					Account account = adapter.getItem(position);
+					if (account != null) {
+						AccountManager.switchDefaultAccount(account);
+					}
+				}
+			});
+			AlertDialog dialog = builder.create();
+			dialog.setTitle("切换帐号");
 			dialog.setCanceledOnTouchOutside(true);
 			dialog.show();
+
+			
 
 			break;
 		}
