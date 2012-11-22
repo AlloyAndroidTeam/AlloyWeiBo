@@ -1,64 +1,151 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<RelativeLayout android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:paddingBottom="10dp"
-	    android:paddingRight="10dp"
-	    android:state_pressed="true"
-	    android:background="@layout/selector" >
-	
-	     <ImageView
-	         android:id="@+id/avatar"
-	         android:layout_width="25dp"
-	         android:layout_height="25dp"
-	         android:layout_alignParentLeft="true"
-	         android:layout_alignParentTop="true"
-	         android:layout_marginLeft="5dp"
-	         android:layout_marginTop="10dp"
-	         android:contentDescription="@string/hello_world"
-	         android:src="@drawable/avatar" />
-	
-	    <TextView
-	        android:id="@+id/name"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentLeft="true"
-	        android:layout_alignParentTop="true"
-	        android:layout_marginTop="6dp"
-	        android:layout_marginLeft="40dp"
-	        android:text="@string/app_name"
-	        android:textColor="#415aa7" />	
-	
-	     <TextView
-	         android:id="@+id/text"
-	         android:layout_width="wrap_content"
-	         android:layout_height="wrap_content"
-	         android:layout_alignParentLeft="true"
-	         android:layout_alignParentTop="true"
-	         android:layout_marginLeft="40dp"
-	         android:layout_marginTop="30dp"
-	         android:text="@string/app_name"
-	         android:textColor="#000"
-	         android:autoLink="web" />
-	
-	    <TextView
-	        android:id="@+id/date"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentTop="true"
-	        android:layout_marginTop="6dp"
-	        android:text="@string/hello_world" />
-	    
-	    <ImageView
-	        android:id="@+id/thumbImage"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignLeft="@+id/text"
-	        android:layout_below="@+id/text"
-	        android:layout_marginTop="14dp"
-	        android:minWidth="100dp" />
-	
-	</RelativeLayout>
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@layout/selector"
+        android:paddingBottom="10dp"
+        android:paddingRight="10dp"
+        android:state_pressed="true" >
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/avatar" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="6dp"
+            android:text="@string/app_name"
+            android:textColor="#415aa7" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="30dp"
+            android:autoLink="web"
+            android:text="@string/app_name"
+            android:textColor="#000" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="6dp"
+            android:text="@string/hello_world" />
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/text"
+            android:layout_below="@+id/text"
+            android:layout_marginTop="14dp"
+            android:minWidth="100dp" />
+
+        <RelativeLayout
+            android:id="@+id/source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/text"
+            android:layout_below="@+id/text"
+            android:layout_marginTop="5dp"
+            android:background="@layout/rect_gray"
+            android:paddingBottom="10dp"
+            android:paddingRight="10dp"
+            android:state_focused="true"
+            android:state_pressed="true" >
+
+            <ImageView
+                android:id="@+id/avatar2"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/avatar" />
+
+            <TextView
+                android:id="@+id/name2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/avatar2"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="-5dp"
+                android:layout_toRightOf="@+id/avatar2"
+                android:text="TextView" />
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/name2"
+                android:layout_below="@+id/name2"
+                android:text="TextView"
+                android:textColor="#000" />
+
+            <ImageView
+                android:id="@+id/image2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/text2"
+                android:layout_below="@+id/text2"
+                android:layout_marginTop="5dp"
+                android:minWidth="100dp" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/text"
+            android:layout_below="@+id/source"
+            android:layout_marginTop="3dp"
+            android:text="TextView"
+            android:textColor="#3333ff" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/buttons"
+        android:layout_below="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/re"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="转发" />
+
+        <Button
+            android:id="@+id/comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/re"
+            android:layout_alignBottom="@+id/re"
+            android:layout_toRightOf="@+id/re"
+            android:text="评论" />
+    </RelativeLayout>
+
 </LinearLayout>
