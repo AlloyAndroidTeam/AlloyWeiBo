@@ -65,7 +65,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				initHomeLine();
 			}
 			else if("com.alloyteam.weibo.WEIBO_ADDED".equals(action)){
-				mPullDownView.initHeaderViewAndFooterViewAndListView(context);
+				//mPullDownView.initHeaderViewAndFooterViewAndListView(context);
 				onRefresh();
 			}
 		}
@@ -197,7 +197,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			long id) {
 		// TODO Auto-generated method stub
 		Intent intent = new Intent(this, DetailActivity.class);
-		Weibo weibo=list.get(position);
 		Bundle bundle = new Bundle();
 		bundle.putString("uid", account.uid);
 		bundle.putInt("position", position);
