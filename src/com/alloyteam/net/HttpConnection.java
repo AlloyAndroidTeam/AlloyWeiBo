@@ -27,7 +27,7 @@ import android.util.Log;
  * 异步http请求
  * 
  * @author azraellong
- * 
+ * @deprecated
  */
 public class HttpConnection implements Runnable {
 

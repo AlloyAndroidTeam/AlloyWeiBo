@@ -100,16 +100,7 @@ public class ApiManager {
 			final IApiListener listener) {
 		
 		if (!account.isValid() /*|| true*/) {
-			// if (requestQueue == null) {
-			// requestQueue = new ArrayList<RequestObject>();
-			// }
-			// RequestObject requestObject = new RequestObject();
-			// requestObject.account = account;
-			// requestObject.url = url;
-			// requestObject.params = params;
-			// requestObject.method = method;
-			// requestObject.listener = listener;
-			// requestQueue.add(requestObject);
+
 
 			Intent intent = new Intent(apiContext, AuthActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

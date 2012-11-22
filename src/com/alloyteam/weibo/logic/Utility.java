@@ -163,9 +163,11 @@ public class Utility {
 
 		if (method.equals("GET")) {
 			String encodedParam = toQueryString(params);
-
-			if (!url.endsWith("?"))
+			if(url.indexOf("?") == -1){
 				url = url + "?";
+			}else{
+				url = url + "&";
+			}
 			url = url + encodedParam;
 			Log.i("http request", "get: " + url);
 			request = new HttpGet(url);		

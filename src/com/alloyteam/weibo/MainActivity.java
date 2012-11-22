@@ -192,6 +192,10 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			ArrayList<Account> accounts = AccountManager.getAccounts();
 			int count = accounts.size();
 			if (count == 0) {
+				i = new Intent(this, AccountManagerActivity.class);
+				startActivity(i);
+				break;
+			}else if(count == 1){
 				builder = new AlertDialog.Builder(this);
 				builder.setMessage("您只绑定了一个帐号，继续添加帐号吗？")
 					.setPositiveButton("继续添加", new AlertDialog.OnClickListener() {
@@ -201,10 +205,6 @@ public class MainActivity extends TabActivity implements OnClickListener {
 							startActivity(i);
 						}
 					}).show();
-				break;
-			}else if(count == 1){
-				i = new Intent(this, AccountManagerActivity.class);
-				startActivity(i);
 				break;
 			}
 			
