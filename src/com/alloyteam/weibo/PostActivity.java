@@ -239,12 +239,12 @@ public class PostActivity extends Activity implements OnClickListener{
 			                startActivityForResult(intent, 2);  
 		                }else{
 		                	Toast.makeText(PostActivity.this,	                		
-		                       "没有SD卡", Toast.LENGTH_LONG).show();
+		                       "没有SD卡1", Toast.LENGTH_LONG).show();
 		           
 		            	}
 	            	}catch(Exception e){
 	                	Toast.makeText(PostActivity.this,	                		
-	 	                       "没有SD卡", Toast.LENGTH_LONG).show();
+	 	                       "没有SD卡2", Toast.LENGTH_LONG).show();
 	                }
 					
 	                /*
