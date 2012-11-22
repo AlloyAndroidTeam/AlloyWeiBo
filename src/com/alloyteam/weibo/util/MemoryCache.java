@@ -11,14 +11,14 @@ import android.util.Log;
 
 public class MemoryCache {
     private static final String TAG = "MemoryCache";
-    // ���뻺��ʱ�Ǹ�ͬ������
-    // LinkedHashMap���췽�������һ������true������map���Ԫ�ؽ��������ʹ�ô������ٵ������У���LRU
-    // ����ĺô������Ҫ�������е�Ԫ���滻�����ȱ�����������ʹ�õ�Ԫ�����滻�����Ч��
+    // 放入缓存时是个同步操作
+    // LinkedHashMap构造方法的最后一个参数true代表这个map里的元素将按照最近使用次数由少到多排列，即LRU
+    // 这样的好处是如果要将缓存中的元素替换，则先遍历出最近最少使用的元素来替换以提高效率
     private Map<String, Bitmap> cache = Collections
                     .synchronizedMap(new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
-    // ������ͼƬ��ռ�õ��ֽڣ���ʼ0����ͨ��˱����ϸ���ƻ�����ռ�õĶ��ڴ�
+    // 缓存中图片所占用的字节，初始0，将通过此变量严格控制缓存所占用的堆内存
     private long size = 0;// current allocated size
-    // ����ֻ��ռ�õ������ڴ�
+    // 缓存只能占用的最大堆内存
     private long limit = 1000000;// max memory in bytes
 
     public MemoryCache() {
@@ -54,13 +54,13 @@ public class MemoryCache {
     }
 
     /**
-     * �ϸ���ƶ��ڴ棬���������滻�������ʹ�õ��Ǹ�ͼƬ����
+     * 严格控制堆内存，如果超过将首先替换最近最少使用的那个图片缓存
      * 
      */
     private void checkSize() {
             Log.i(TAG, "cache size=" + size + " length=" + cache.size());
             if (size > limit) {
-                    // �ȱ����������ʹ�õ�Ԫ��
+                    // 先遍历最近最少使用的元素
                     Iterator<Entry<String, Bitmap>> iter = cache.entrySet().iterator();
                     while (iter.hasNext()) {
                             Entry<String, Bitmap> entry = iter.next();
@@ -78,7 +78,7 @@ public class MemoryCache {
     }
 
     /**
-     * ͼƬռ�õ��ڴ�
+     * 图片占用的内存
      * 
      * @param bitmap
      * @return
