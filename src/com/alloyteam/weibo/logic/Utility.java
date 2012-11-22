@@ -179,8 +179,9 @@ public class Utility {
 			
 		}
 		HttpResponse response = httpClient.execute(request);
-		if (isHttpSuccessExecuted(response)) {
+		if (isHttpSuccessExecuted(response)) {			
 			result = EntityUtils.toString(response.getEntity());
+			Log.d("json",result);
 		}
 		
 		return result;

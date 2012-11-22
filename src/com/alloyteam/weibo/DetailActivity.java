@@ -38,6 +38,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
 	private int type=0;
+	private Weibo weibo;
 	private Account account;
 	@Override
 	protected void onCreate(Bundle bundle) {
@@ -56,7 +57,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		List<Weibo> list=DataManager.get(uid);
 		int position = b.getInt("position");
 		this.position=position;
-		Weibo weibo=list.get(position);
+		weibo=list.get(position);
 		Log.d("my","id:"+weibo.id);
 		String avatarUrl=weibo.avatarUrl;
 		HomeActivity.imageLoader.displayImage(avatarUrl+"/50", avatar, null);
@@ -94,6 +95,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		}
 		findViewById(R.id.re).setOnClickListener(this);
 		findViewById(R.id.comment).setOnClickListener(this);
+		initList();
 	}
 	@Override
 	public void onClick(View v) {
@@ -139,7 +141,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	}
 	
 	public void initList() {
-		mPullDownView = (PullDownView) findViewById(R.id.pull_down_view);
+		mPullDownView = (PullDownView) findViewById(R.id.commentList);
 		mPullDownView.setOnPullDownListener(this);
 		list = new ArrayList<Weibo>();
 		mylist = mPullDownView.getListView();
@@ -205,7 +207,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		else{
 			timeStamp=0;
 		}
-		//ApiManager.getHomeLine(account, pageflag, timeStamp, listener);
+		ApiManager.getCommentList(account, weibo.id, pageflag, timeStamp, listener);
 	}
 	@Override
 	public void onRefresh() {

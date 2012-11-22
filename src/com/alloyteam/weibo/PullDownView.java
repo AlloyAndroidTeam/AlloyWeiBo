@@ -228,7 +228,7 @@ public class PullDownView extends LinearLayout implements OnScrollOverListener{
 		mListView = new ScrollOverListView(context);
 		mListView.setOnScrollOverListener(this);
 		mListView.setCacheColorHint(0);
-		mListView.setSelector(getBackground());
+		//mListView.setSelector(getBackground());
 		addView(mListView, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 		
 		// 空的listener

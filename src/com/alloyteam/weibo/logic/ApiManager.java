@@ -382,6 +382,7 @@ public class ApiManager {
 			@Override
 			public void onComplete(JSONObject result) {
 				try {
+					Log.d("json",result.toString());
 					if (result.get("data") == JSONObject.NULL){
 						listener.onSuccess(null);
 					}

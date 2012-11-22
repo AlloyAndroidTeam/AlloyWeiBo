@@ -175,10 +175,10 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		}
 	}
 
-	public void showImage(String url, Bitmap bm){
-		Intent intent = new Intent(this, ImageActivity.class);
+	public static void showImage(Context context, String url, Bitmap bm){
+		Intent intent = new Intent(context, ImageActivity.class);
 		intent.putExtra("url", url);
-		startActivity(intent);
+		context.startActivity(intent);
 	}
 	
 	@Override
