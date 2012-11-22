@@ -8,7 +8,7 @@
         android:id="@+id/etPostMain"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"  
-	    android:layout_marginBottom="65dp" 
+	    android:layout_marginBottom="100dp" 
         android:gravity="top"
         android:ems="10"
         android:inputType="textMultiLine" >
@@ -17,7 +17,7 @@
     
      <RelativeLayout          
           android:layout_width="fill_parent"
-	      android:layout_height="30dp"
+	      android:layout_height="50dp"
 	       android:orientation="horizontal"
 	        android:layout_alignParentBottom="true" 
 		  android:layout_marginBottom="35dp"  >
