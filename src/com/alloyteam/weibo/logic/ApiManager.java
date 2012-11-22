@@ -33,10 +33,6 @@ import com.alloyteam.weibo.model.Weibo;
 public class ApiManager {
 	
 	public static String TAG = "ApiManager";
-	private static final int WHAT_DID_LOAD_DATA = 0;
-	private static final int WHAT_DID_REFRESH = 2;
-	private static final int WHAT_DID_MORE = 1;
-	
 	public interface IApiListener {
 
 		public void onComplete(JSONObject result);
@@ -104,16 +100,7 @@ public class ApiManager {
 			final IApiListener listener) {
 		
 		if (!account.isValid() /*|| true*/) {
-			// if (requestQueue == null) {
-			// requestQueue = new ArrayList<RequestObject>();
-			// }
-			// RequestObject requestObject = new RequestObject();
-			// requestObject.account = account;
-			// requestObject.url = url;
-			// requestObject.params = params;
-			// requestObject.method = method;
-			// requestObject.listener = listener;
-			// requestQueue.add(requestObject);
+
 
 			Intent intent = new Intent(apiContext, AuthActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -185,12 +172,14 @@ public class ApiManager {
 		if (bundle == null) {
 			bundle = new Bundle();
 		}
-		bundle.putString("oauth_version", "2.a");
-		bundle.putString("scope", "all");
-		bundle.putString("clientip", "127.0.0.1");
-		bundle.putString("oauth_consumer_key", Constants.Tencent.APP_KEY);
 		bundle.putString("access_token", account.accessToken);
-		bundle.putString("openid", account.openId);
+		if(account.type == Constants.TENCENT){
+			bundle.putString("oauth_version", "2.a");
+			bundle.putString("scope", "all");
+			bundle.putString("clientip", "127.0.0.1");
+			bundle.putString("oauth_consumer_key", Constants.Tencent.APP_KEY);
+			bundle.putString("openid", account.openId);
+		}
 		return bundle;
 	}
 	
@@ -257,10 +246,62 @@ public class ApiManager {
 		}.start();
 
 	}
+	public static List<Weibo> JsonArrayToWeiboList(JSONArray info) throws JSONException{
+		List<Weibo> tmpList=new ArrayList<Weibo>();
+		for (int i = 0; i < info.length(); ++i) {
+			JSONObject item = info.getJSONObject(i);
+			int status=item.getInt("status");
+			if(status!=0){
+				continue;
+			}
+			tmpList.add(JsonToWeibo(item));
+		}
+		return tmpList;
+	}
+	public static Weibo JsonToWeibo(JSONObject item) throws JSONException{
+		String text = item.getString("text");
+		String name = item.getString("name");						
+		String avatarUrl = item.getString("head");
+		int type = item.getInt("type");
+		Weibo weibo = new Weibo();
+		weibo.text=text;
+		weibo.name=name;
+		weibo.avatarUrl=avatarUrl;
+		long timestamp = item.getLong("timestamp");
+		weibo.type = type;
+		weibo.timestamp = timestamp;
+		weibo.id=item.getString("id");
+		if (type == 2) {
+			JSONObject source = item
+					.getJSONObject("source");
+			String text2 = source.getString("text");
+			String name2 = source.getString("name");
+			String avatarUrl2 = source
+					.getString("head");
+			weibo.text2 = text2;
+			weibo.avatarUrl2 = avatarUrl2;
+			weibo.name2 = name2;
+			if (source.get("image") != JSONObject.NULL) {
+				Log.d("my", "image");
+				JSONArray images = source
+						.getJSONArray("image");
+				weibo.imageUrl = images.getString(0);
+			}
+			weibo.count = item.getInt("count");
+		} else {
+			if (item.get("image") != JSONObject.NULL) {
+				Log.d("my", "image");
+				JSONArray images = item
+						.getJSONArray("image");
+				weibo.imageUrl = images.getString(0);
+			}
+		}
+		return weibo;
+	}
 	/**
 	 * 获取主页时间线
 	 */
-	public static void getHomeLine(Account account,int pageflag,long timeStamp,final GetHomeLineListener listener){
+	public static void getHomeLine(Account account,int pageflag,long timeStamp,final GetListListener listener){
 		Bundle params = new Bundle();
 		params.putInt("pageflag", pageflag);
 		params.putLong("pagetime", timeStamp);
@@ -283,58 +324,14 @@ public class ApiManager {
 			@Override
 			public void onComplete(JSONObject result) {
 				try {
-					List<Weibo> tmpList=new ArrayList<Weibo>();
 					if (result.get("data") == JSONObject.NULL){
 						listener.onSuccess(null);
 					}
 					else{
+						List<Weibo> tmpList=new ArrayList<Weibo>();
 						JSONObject data = result.getJSONObject("data");
 						JSONArray info = data.getJSONArray("info");
-						for (int i = 0; i < info.length(); ++i) {
-							JSONObject item = info.getJSONObject(i);
-							int status=item.getInt("status");
-							if(status!=0){
-								continue;
-							}
-							String text = item.getString("text");
-							String name = item.getString("name");						
-							String avatarUrl = item.getString("head");
-							int type = item.getInt("type");
-							Weibo weibo = new Weibo();
-							weibo.text=text;
-							weibo.name=name;
-							weibo.avatarUrl=avatarUrl;
-							long timestamp = item.getLong("timestamp");
-							weibo.type = type;
-							weibo.timestamp = timestamp;
-							weibo.id=item.getString("id");
-							if (type == 2) {
-								JSONObject source = item
-										.getJSONObject("source");
-								String text2 = source.getString("text");
-								String name2 = source.getString("name");
-								String avatarUrl2 = source
-										.getString("head");
-								weibo.text2 = text2;
-								weibo.avatarUrl2 = avatarUrl2;
-								weibo.name2 = name2;
-								if (source.get("image") != JSONObject.NULL) {
-									Log.d("my", "image");
-									JSONArray images = source
-											.getJSONArray("image");
-									weibo.imageUrl = images.getString(0);
-								}
-								weibo.count = item.getInt("count");
-							} else {
-								if (item.get("image") != JSONObject.NULL) {
-									Log.d("my", "image");
-									JSONArray images = item
-											.getJSONArray("image");
-									weibo.imageUrl = images.getString(0);
-								}
-							}
-							tmpList.add(weibo);
-						}
+						tmpList=JsonArrayToWeiboList(info);
 						listener.onSuccess(tmpList);
 					}
 					
@@ -348,10 +345,58 @@ public class ApiManager {
 				params, "GET", httpListener);
 	}
 	
-	public static interface GetHomeLineListener{
+	public static interface GetListListener{
 		void onSuccess(List<Weibo> list);
 		void onError(int type);
 	}
+	/**
+	 * 获取主页时间线
+	 */
+	public static void getCommentList(Account account,String id,int pageflag,long timeStamp,final GetListListener listener){
+		Bundle params = new Bundle();
+		params.putInt("pageflag", pageflag);
+		params.putLong("pagetime", timeStamp);
+		params.putInt("reqnum", 10);
+		params.putString("rootid", id);
+		params.putInt("twitterid", 0);
+		params.putString("format", "json");
+		params.putLong("t", System.currentTimeMillis());
+		ApiManager.IApiListener httpListener=new ApiManager.IApiListener() {
+
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				try {
+					Log.d("json",result.toString());
+					if (result.get("data") == JSONObject.NULL){
+						listener.onSuccess(null);
+					}
+					else{
+						List<Weibo> tmpList=new ArrayList<Weibo>();
+						JSONObject data = result.getJSONObject("data");
+						JSONArray info = data.getJSONArray("info");
+						tmpList=JsonArrayToWeiboList(info);
+						listener.onSuccess(tmpList);
+					}
+					
+				} catch (JSONException je) {
+					Log.d("json", "error");
+					listener.onError(0);
+				}
+			}
+		};
+		requestAsync(account, Constants.Tencent.COMMENT_LIST,
+				params, "GET", httpListener);
+	}
+	
 	
 	
 	/**

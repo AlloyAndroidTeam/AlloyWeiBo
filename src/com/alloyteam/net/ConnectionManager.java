@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * @author azraellong
- *
+ * @deprecated
  */
 public class ConnectionManager {
 	

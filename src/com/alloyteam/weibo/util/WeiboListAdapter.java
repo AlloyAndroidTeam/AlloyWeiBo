@@ -34,13 +34,14 @@ public class WeiboListAdapter extends BaseAdapter {
 	private static final int mResource2 = R.layout.weibo_item_type2;// xml布局文件
 	List<Weibo> mItems;
 	ImageLoader imageLoader;
+	Context mContext;
 	HomeActivity homeActivity;
 	
 	public WeiboListAdapter(Context context, List<Weibo> items) {
 		mItems = items;
+		mContext=context;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		homeActivity=((HomeActivity)context);
 		imageLoader=HomeActivity.imageLoader;//new ImageLoader(context);
 	}
 
@@ -106,7 +107,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			switch (v.getId()) {
 			case R.id.thumbImage:
 				Bitmap bm=v.getDrawingCache();
-				homeActivity.showImage((String)v.getTag(),bm);//+"/2000");
+				HomeActivity.showImage(mContext,(String)v.getTag(),bm);//+"/2000");
 				break;
 			default:
 				break;

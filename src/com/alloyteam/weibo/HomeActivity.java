@@ -42,10 +42,10 @@ import android.widget.ListView;
  */
 public class HomeActivity extends Activity implements OnPullDownListener, OnItemClickListener{
 	public static final String TAG = "HomeActivity";
-	public ListView mylist;
 	public ImageView bigImageView;
 	static public ImageLoader imageLoader;
 	public boolean isMove=false;
+	public ListView mylist;
 	private PullDownView mPullDownView;
 	private static final int WHAT_DID_LOAD_DATA = 0;
 	private static final int WHAT_DID_REFRESH = 2;
@@ -113,7 +113,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	}
 	
 	public void loadData(final int pageflag){
-		ApiManager.GetHomeLineListener listener=new ApiManager.GetHomeLineListener(){
+		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
 
 			@Override
 			public void onSuccess(List<Weibo> tmpList) {
@@ -175,10 +175,10 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		}
 	}
 
-	public void showImage(String url, Bitmap bm){
-		Intent intent = new Intent(this, ImageActivity.class);
+	public static void showImage(Context context, String url, Bitmap bm){
+		Intent intent = new Intent(context, ImageActivity.class);
 		intent.putExtra("url", url);
-		startActivity(intent);
+		context.startActivity(intent);
 	}
 	
 	@Override
@@ -199,6 +199,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		Intent intent = new Intent(this, DetailActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("uid", account.uid);
+		bundle.putInt("type", account.type);
 		bundle.putInt("position", position);
 		intent.putExtras(bundle);
 		startActivity(intent);		

@@ -148,4 +148,10 @@
             android:text="评论" />
     </RelativeLayout>
 
+    <com.alloyteam.weibo.PullDownView
+        android:id="@+id/commentList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </com.alloyteam.weibo.PullDownView>
+
 </LinearLayout>

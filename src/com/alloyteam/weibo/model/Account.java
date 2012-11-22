@@ -39,15 +39,22 @@ public class Account {
 	 */
 	public int type;
 
-	public String openId;
-
-	public String openKey;
+	
 
 	/**
 	 * token
 	 */
 	public String accessToken;
-
+	
+	/**
+	 * 腾讯微博才有
+	 */
+	public String openId;
+	/**
+	 * 腾讯微博才有
+	 */
+	public String openKey;
+	
 	/**
 	 * 腾讯微博才有的, 用于续期 accessToken
 	 */
