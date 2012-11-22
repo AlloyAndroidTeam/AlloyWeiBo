@@ -42,10 +42,10 @@ import android.widget.ListView;
  */
 public class HomeActivity extends Activity implements OnPullDownListener, OnItemClickListener{
 	public static final String TAG = "HomeActivity";
-	public ListView mylist;
 	public ImageView bigImageView;
 	static public ImageLoader imageLoader;
 	public boolean isMove=false;
+	public ListView mylist;
 	private PullDownView mPullDownView;
 	private static final int WHAT_DID_LOAD_DATA = 0;
 	private static final int WHAT_DID_REFRESH = 2;
@@ -113,7 +113,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	}
 	
 	public void loadData(final int pageflag){
-		ApiManager.GetHomeLineListener listener=new ApiManager.GetHomeLineListener(){
+		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
 
 			@Override
 			public void onSuccess(List<Weibo> tmpList) {
