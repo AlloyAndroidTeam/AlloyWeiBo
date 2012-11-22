@@ -11,6 +11,7 @@
 	    android:layout_marginBottom="100dp" 
         android:gravity="top"
         android:ems="10"
+        android:textColor="#CCC" 
         android:inputType="textMultiLine" >
         <requestFocus />
     </EditText>     

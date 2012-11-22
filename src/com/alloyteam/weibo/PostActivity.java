@@ -87,6 +87,8 @@ public class PostActivity extends Activity implements OnClickListener{
 	
 	private String titles[] = {"写微博","转发", "评论", "回复"};
 	
+	private String defaultText = "说点什么吧";
+	
 	
 	
 	@Override
@@ -117,6 +119,7 @@ public class PostActivity extends Activity implements OnClickListener{
         ((TextView)findViewById(R.id.tvPostTitle)).setText(titles[type]); 
         
         tvMain = (EditText)findViewById(R.id.etPostMain);
+        tvMain.setText(defaultText); 
         
         tvWordCount = (TextView)findViewById(R.id.tvPostCount);
         bindWordCount();
@@ -183,7 +186,12 @@ public class PostActivity extends Activity implements OnClickListener{
                 		tvWordCount.setTextColor(Color.rgb(0, 0, 255));                		
                 	}
                 	tvWordCount.setText(String.valueOf(c));                	 
-                	CharSequence ss = s.subSequence(start, s.length()); 
+                	CharSequence ss = s.subSequence(start, s.length());
+                	
+                	if (s.length() == 0){
+                		tvMain.setText(defaultText);
+                		//tvMain.settextc
+                	}
                 }
                 
                 public void beforeTextChanged(CharSequence s, int start, int count, int after)
@@ -196,7 +204,8 @@ public class PostActivity extends Activity implements OnClickListener{
                         // TODO Auto-generated method stub
                 }
         });
-	}
+	} 
+	
 	
 	/*
 	 * 插入图片
@@ -389,7 +398,11 @@ public class PostActivity extends Activity implements OnClickListener{
      */
     private void save() throws Exception{    	 
     	 String content = tvMain.getText().toString();
-    	 if (content == null || content.length() == 0 || content.length() > 140){
+//    	 if (content.length() > 140){
+//    		 return;
+//    	 }
+    	 if ((type == 0 && content.length() == 0) ||
+    			 content.length() > 140){
     		 return;
     	 }
     	 btnSave.setEnabled(false);
@@ -399,10 +412,14 @@ public class PostActivity extends Activity implements OnClickListener{
 				@Override
 				public void onJSONException(JSONException exception) {
 					Log.d("add", "onJSONException");
+					tips("发送失败，请重试！");
+					btnSave.setEnabled(true);
 				}
 
 				public void onFailure(String msg) {
 					Log.d("add", "onFailure");
+					tips("发送失败，请重试！");
+					btnSave.setEnabled(true);
 				}
 
 				@Override
