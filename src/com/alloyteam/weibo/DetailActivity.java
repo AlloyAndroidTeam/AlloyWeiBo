@@ -39,7 +39,7 @@ public class DetailActivity extends Activity {
 			HomeActivity.imageLoader.displayImage(weibo.imageUrl+"/160", imageView, null);
 		}			
 		String avatarUrl=weibo.avatarUrl;
-		HomeActivity.imageLoader.displayImage(avatarUrl, avatar, null);
+		HomeActivity.imageLoader.displayImage(avatarUrl+"/50", avatar, null);
 		String name=weibo.name;
 		nameText.setText(name);
 		String text=weibo.text;

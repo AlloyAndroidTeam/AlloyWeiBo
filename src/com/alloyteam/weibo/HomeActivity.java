@@ -100,11 +100,27 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		loadData(WHAT_DID_LOAD_DATA);
 	}
 	
+	public void pullCallback(int pageflag){
+		if(pageflag==WHAT_DID_LOAD_DATA){
+			mPullDownView.notifyDidLoad();
+		}
+		else if(pageflag==WHAT_DID_MORE){
+			mPullDownView.notifyDidMore();
+		}
+		else{				
+			mPullDownView.notifyDidRefresh();
+		}		
+	}
+	
 	public void loadData(final int pageflag){
 		ApiManager.GetHomeLineListener listener=new ApiManager.GetHomeLineListener(){
 
 			@Override
 			public void onSuccess(List<Weibo> tmpList) {
+				if(tmpList==null){
+					pullCallback(pageflag);
+					return;
+				}
 				// TODO Auto-generated method stub
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
@@ -135,15 +151,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			@Override
 			public void onError(int type) {
 				// TODO Auto-generated method stub
-				if(pageflag==WHAT_DID_LOAD_DATA){
-					mPullDownView.notifyDidLoad();
-				}
-				else if(pageflag==WHAT_DID_MORE){
-					mPullDownView.notifyDidMore();
-				}
-				else{				
-					mPullDownView.notifyDidRefresh();
-				}
+				pullCallback(pageflag);
 			}			
 		};
 		long timeStamp;
