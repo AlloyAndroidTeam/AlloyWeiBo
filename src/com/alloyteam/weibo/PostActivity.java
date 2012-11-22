@@ -422,11 +422,29 @@ public class PostActivity extends Activity implements OnClickListener{
 					btnSave.setEnabled(true);
 				}
 			};
-		 if (picFilePath != null){
-			 addPic("json", content, "127.0.0.1", listener);
+		
+		Account account = AccountManager.getDefaultAccount(); 
+		
+		////操作类型，0写，1转发，2评论
+		switch(type){
+			case 1:
+				ApiManager.reply(account, tid, content, listener);  
+				break;
+			case 2:
+				ApiManager.readd(account, tid, content, listener);
+				break;
+		
+		}
+			
+		if (picFilePath != null){
+			ApiManager.add(account, content, picFilePath, listener);  
 		 }else{
-			 add("json", content, "127.0.0.1", listener);
+			 ApiManager.add(account, content, listener); 
 		 }
+		
+		
+		
+		
     }
     
     /**
@@ -507,83 +525,7 @@ public class PostActivity extends Activity implements OnClickListener{
     	 tips(txt);
     }
     
-    /**
-	 * 发送微博，文字
-	 */
-	public void add(String format, String content,
-			String clientip, final ApiManager.IApiListener listener) throws Exception {
-		
-		 Account account = AccountManager.getDefaultAccount();    	 
-         Bundle params = new Bundle(); 
-         params.putString("format", format);
-         params.putString("content", content);     
-         params.putString("longitude", "");
-         params.putString("syncflag", "1");          
-         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-					params, "POST", listener);         
-	}
-	 /**
-		 * 转发微博，文字
-		 */
-		public void reply(String format, String content,
-				String clientip, final ApiManager.IApiListener listener) throws Exception {
-			
-			 Account account = AccountManager.getDefaultAccount();    	 
-	         Bundle params = new Bundle(); 
-	         params.putString("format", format);
-	         params.putString("content", content);     
-	         params.putString("longitude", "");
-	         params.putString("syncflag", "1");          
-	         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-						params, "POST", listener);         
-		}
-		 /**
-		 * 评论微博，文字
-		 */
-		public void readd(String format, String content,
-				String clientip, final ApiManager.IApiListener listener) throws Exception {
-			
-			 Account account = AccountManager.getDefaultAccount();    	 
-	         Bundle params = new Bundle(); 
-	         params.putString("format", format);
-	         params.putString("content", content);     
-	         params.putString("longitude", "");
-	         params.putString("syncflag", "1");          
-	         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-						params, "POST", listener);         
-		}
-	
-	/**
-	 * 发表一条带图片的微博
-	 * 
-	 * @param oAuth
-	 * @param format 返回数据的格式 是（json或xml）
-	 * @param content  微博内容
-	 * @param clientip 用户IP(以分析用户所在地)
-	 * @param jing 经度（可以填空）
-	 * @param wei 纬度（可以填空）
-	 * @param picpath 可以是本地图片路径 或 网络地址
-	 * @param syncflag  微博同步到空间分享标记（可选，0-同步，1-不同步，默认为0）  
-	 * @return
-	 * @throws Exception
-     * @see <a href="http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E5%8F%91%E8%A1%A8%E4%B8%80%E6%9D%A1%E5%B8%A6%E5%9B%BE%E7%89%87%E7%9A%84%E5%BE%AE%E5%8D%9A">腾讯微博开放平台上关于此条API的文档1-本地图片</a>
-     * @see <a href="http://wiki.open.t.qq.com/index.php/%E5%BE%AE%E5%8D%9A%E7%9B%B8%E5%85%B3/%E7%94%A8%E5%9B%BE%E7%89%87URL%E5%8F%91%E8%A1%A8%E5%B8%A6%E5%9B%BE%E7%89%87%E7%9A%84%E5%BE%AE%E5%8D%9A">腾讯微博开放平台上关于此条API的文档2-网络图片</a>
-	 */
-	public void addPic(String format, String content,
-			String clientip,  final ApiManager.IApiListener listener)
-			throws Exception {
-		Account account = AccountManager.getDefaultAccount();
-    	 
-        Bundle params = new Bundle(); 
-        params.putString("format", format);
-        params.putString("content", content);         
-        params.putString("clientip", clientip);
-        params.putString("longitude", "");
-        params.putString("syncflag", "1");
-        params.putString("compatibleflag", "0"); 
-        ApiManager.postAsync(account, Constants.Tencent.T_ADD_PIC, params, picFilePath, listener);
-        
-	};
+     
 	/**
 	 * 提示
 	 */
