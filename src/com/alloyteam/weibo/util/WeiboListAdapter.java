@@ -153,10 +153,11 @@ public class WeiboListAdapter extends BaseAdapter {
 			if(!weibo.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
 				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
+				image.setTag(weibo.imageUrl);
 			}
 			else{
 				image.setVisibility(View.GONE);
-			}
+			}			
 			image.setOnClickListener(listener);
 		} else if (type == 2) {
 			TextView text2;
@@ -198,6 +199,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			if(!weibo.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
 				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
+				image.setTag(weibo.imageUrl);
 			}
 			else{
 				image.setVisibility(View.GONE);
