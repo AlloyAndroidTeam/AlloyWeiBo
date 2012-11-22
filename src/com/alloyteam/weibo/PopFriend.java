@@ -39,11 +39,11 @@ public class PopFriend extends PopupWindow {
         //设置PopupWindow的View  
         this.setContentView(popView);  
         //设置SelectPicPopupWindow弹出窗体的宽  
-       // this.setWidth(LayoutParams.FILL_PARENT);  
+        this.setWidth(LayoutParams.FILL_PARENT);  
         //设置SelectPicPopupWindow弹出窗体的高  
-        //this.setHeight(LayoutParams.MATCH_PARENT);
-        this.setWidth(200);
-        this.setHeight(250); 
+       this.setHeight(LayoutParams.MATCH_PARENT);
+        //this.setWidth(200);
+        //this.setHeight(250); 
         
        
         

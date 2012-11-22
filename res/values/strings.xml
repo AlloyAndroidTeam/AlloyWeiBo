@@ -14,8 +14,10 @@
     <string name="ensure_text">确定</string>
     <string name="btn_back">返回</string>
     <string name="btn_save">保存</string>
+    <string name="btn_finish">完成</string>
     <string name="btn_add_pic">插图</string>
     <string name="btn_add_friend">\@好友</string>
     <string name="btn_add_topic">话题</string>
+    <string name="title_activity_take_photo">TakePhotoAct</string>
 
 </resources>
