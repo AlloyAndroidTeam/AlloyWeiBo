@@ -1,11 +1,17 @@
 package com.alloyteam.weibo;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.alloyteam.weibo.PullDownView.OnPullDownListener;
+import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo;
+import com.alloyteam.weibo.util.WeiboListAdapter;
 
+import com.alloyteam.weibo.model.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,35 +20,45 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
-public class DetailActivity extends Activity implements OnClickListener {
-	private ImageView imageView;
-	private ImageView avatar;
-	private TextView textText;
-	private TextView nameText;
-	private TextView dateText;
+public class DetailActivity extends Activity implements OnPullDownListener, OnClickListener {
 	private String uid;
 	private int position;
+	public ListView mylist;
+	private PullDownView mPullDownView;
+	private static final int WHAT_DID_LOAD_DATA = 0;
+	private static final int WHAT_DID_REFRESH = 2;
+	private static final int WHAT_DID_MORE = 1;
+	private WeiboListAdapter mAdapter;
+	private List<Weibo> list;
+	private long upTimeStamp=0;
+	private long downTimeStamp=0;
+	private int type=0;
+	private Weibo weibo;
+	private Account account;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_detail);
-		imageView=(ImageView) findViewById(R.id.image);
-		avatar=(ImageView) findViewById(R.id.avatar);
-		textText=(TextView)findViewById(R.id.text);
-		nameText=(TextView)findViewById(R.id.name);
-		dateText=(TextView)findViewById(R.id.date);
+		ImageView imageView=(ImageView) findViewById(R.id.image);
+		ImageView avatar=(ImageView) findViewById(R.id.avatar);
+		TextView textText=(TextView)findViewById(R.id.text);
+		TextView nameText=(TextView)findViewById(R.id.name);
+		TextView dateText=(TextView)findViewById(R.id.date);
 		Intent i=this.getIntent();
 		Bundle b=i.getExtras();
 		String uid=b.getString("uid");
 		this.uid=uid;
+		type=b.getInt("type");
 		List<Weibo> list=DataManager.get(uid);
 		int position = b.getInt("position");
 		this.position=position;
-		Weibo weibo=list.get(position);		
+		weibo=list.get(position);
+		Log.d("my","id:"+weibo.id);
 		String avatarUrl=weibo.avatarUrl;
 		HomeActivity.imageLoader.displayImage(avatarUrl+"/50", avatar, null);
 		String name=weibo.name;
@@ -79,6 +95,7 @@ public class DetailActivity extends Activity implements OnClickListener {
 		}
 		findViewById(R.id.re).setOnClickListener(this);
 		findViewById(R.id.comment).setOnClickListener(this);
+		initList();
 	}
 	@Override
 	public void onClick(View v) {
@@ -91,6 +108,7 @@ public class DetailActivity extends Activity implements OnClickListener {
 			bundle = new Bundle();
 			bundle.putString("uid", uid);
 			bundle.putInt("type", 1);
+			bundle.putInt("weiboType", type);
 			bundle.putInt("position", position);
 			intent.putExtras(bundle);
 			startActivity(intent);
@@ -100,6 +118,7 @@ public class DetailActivity extends Activity implements OnClickListener {
 			bundle = new Bundle();
 			bundle.putString("uid", uid);
 			bundle.putInt("type", 2);
+			bundle.putInt("weiboType", type);
 			bundle.putInt("position", position);
 			intent.putExtras(bundle);
 			startActivity(intent);
@@ -107,5 +126,103 @@ public class DetailActivity extends Activity implements OnClickListener {
 		default:
 			break;
 		}
+	}
+	
+	public void pullCallback(int pageflag){
+		if(pageflag==WHAT_DID_LOAD_DATA){
+			mPullDownView.notifyDidLoad();
+		}
+		else if(pageflag==WHAT_DID_MORE){
+			mPullDownView.notifyDidMore();
+		}
+		else{				
+			mPullDownView.notifyDidRefresh();
+		}		
+	}
+	
+	public void initList() {
+		mPullDownView = (PullDownView) findViewById(R.id.commentList);
+		mPullDownView.setOnPullDownListener(this);
+		list = new ArrayList<Weibo>();
+		mylist = mPullDownView.getListView();
+		mAdapter = new WeiboListAdapter(
+				this, list);
+		mylist.setAdapter(mAdapter);
+		mPullDownView.enableAutoFetchMore(true, 1);
+		account = AccountManager.getAccount(uid, type);
+		if (account == null)
+			return;
+		getCommentList(WHAT_DID_LOAD_DATA);
+	}
+		
+	public void getCommentList(final int pageflag){
+		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
+
+			@Override
+			public void onSuccess(List<Weibo> tmpList) {
+				if(tmpList==null){
+					pullCallback(pageflag);
+					return;
+				}
+				// TODO Auto-generated method stub
+				if(pageflag==WHAT_DID_LOAD_DATA){
+					mPullDownView.notifyDidLoad();
+					list.addAll(tmpList);							
+					if(list.size()>0){
+						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						upTimeStamp=tmpList.get(0).timestamp;
+					}
+					DataManager.set(account.uid,list);
+				}
+				else if(pageflag==WHAT_DID_MORE){
+					mPullDownView.notifyDidMore();								
+					list.addAll(tmpList);
+					if(tmpList.size()>0){
+						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+					}
+				}
+				else{				
+					mPullDownView.notifyDidRefresh();
+					list.addAll(0, tmpList);
+					if(tmpList.size()>0){
+						upTimeStamp=tmpList.get(0).timestamp;
+					}
+				}
+				mAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onError(int type) {
+				// TODO Auto-generated method stub
+				pullCallback(pageflag);
+			}			
+		};
+		long timeStamp;
+		if(pageflag==WHAT_DID_REFRESH){
+			timeStamp=upTimeStamp;
+		}
+		else if(pageflag==WHAT_DID_MORE){
+			timeStamp=downTimeStamp;
+		}
+		else{
+			timeStamp=0;
+		}
+		ApiManager.getCommentList(account, weibo.id, pageflag, timeStamp, listener);
+	}
+	@Override
+	public void onRefresh() {
+		getCommentList(WHAT_DID_REFRESH);
+	}
+	
+	@Override
+	public void onMore() {
+		getCommentList(WHAT_DID_MORE);
+	}
+	
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		
 	}
 }

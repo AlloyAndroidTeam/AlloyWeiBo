@@ -93,6 +93,8 @@ public class Constants {
 		public static final String HOME_TIMELINE = API_ROOT
 				+ "/statuses/home_timeline";
 
+		public static final String COMMENT_LIST = API_ROOT
+				+ "/t/re_list";
 		public static final String T_ADD = API_ROOT + "/t/add"; //写微博
 		public static final String T_ADD_PIC = API_ROOT + "/t/add_pic";//写微博pic
 		public static final String T_READD = API_ROOT + "/t/re_add";//转发
