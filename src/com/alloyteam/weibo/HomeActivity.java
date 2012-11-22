@@ -68,6 +68,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				initHomeLine();
 			}
 			else if("com.alloyteam.weibo.WEIBO_ADDED".equals(action)){
+				mPullDownView.initHeaderViewAndFooterViewAndListView(context);
 				onRefresh();
 			}
 		}

@@ -3,6 +3,7 @@
  */
 package com.alloyteam.weibo;
  
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import com.alloyteam.weibo.model.Weibo;
 import android.app.Activity;
 import android.app.AlertDialog; 
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +35,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -49,6 +52,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * @author pxz
@@ -67,6 +71,9 @@ public class PostActivity extends Activity implements OnClickListener{
 	//private PopFriend popFriend;
 	private AlertDialog tipsDlg;
 	private String picFilePath;
+	
+	private int type = 0;//操作类型，0写，1转发，2评论
+	private String tid;
 	
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
 	private Runnable runner;
@@ -91,7 +98,15 @@ public class PostActivity extends Activity implements OnClickListener{
         titlebarTxt.setText("编辑:" + id.toString());         
         tvWordCount = (TextView)findViewById(R.id.editWordCount);
         */
-        
+        Bundle bundle = getIntent().getExtras();
+        try{
+        	type = bundle.getInt("type");
+        }catch(Exception e){
+        	type = 0;
+        }
+        if (type != 0){        	
+        	tid = bundle.getString("tid");
+        }
         tvMain = (EditText)findViewById(R.id.etPostMain);
         
         tvWordCount = (TextView)findViewById(R.id.tvPostCount);
@@ -118,7 +133,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		Log.v("onClick","" + v.getId());
 		switch(v.getId()){
     	case R.id.btnPostAddFriend : //@好友
-    		//showFriend(v); 
+    		showFriend(v); 
     		break;
     	case R.id.btnPostAddPic : //插入图片
    		 	insertPhoto();
@@ -201,9 +216,45 @@ public class PostActivity extends Activity implements OnClickListener{
 	    	 //Log.v("which:", which + "");
 	    	 switch (which) {  
 	            case 0: 
+	            	/*
 	            	Intent getImageByCamera  = new Intent("android.media.action.IMAGE_CAPTURE");  
-	                startActivityForResult(getImageByCamera, 2);  	            	
-	                break;  
+	                startActivityForResult(getImageByCamera, 2);  
+	                */	
+	                try{
+	                	//final String start = Environment.getExternalStorageState();
+	                
+	            	/**/
+		                final String start = Environment.getExternalStorageState();
+		                final String PHOTOPATH = "/photo/";  
+		                if(start.equals(Environment.MEDIA_MOUNTED)){ 
+			                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);  
+			                File file = new File(Environment.getExternalStorageDirectory()+PHOTOPATH); 
+			                if(!file.exists()){  
+			                	file.mkdirs();  
+			                };	                
+			                String tempphontname = System.currentTimeMillis()+".jpg";  
+			                StringBuffer buffer = null;
+			                buffer.append(Environment.getExternalStorageDirectory()+PHOTOPATH).append(tempphontname); 
+			                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(buffer.toString())));  
+			                startActivityForResult(intent, 2);  
+		                }else{
+		                	Toast.makeText(PostActivity.this,	                		
+		                       "没有SD卡1", Toast.LENGTH_LONG).show();
+		           
+		            	}
+	            	}catch(Exception e){
+	                	Toast.makeText(PostActivity.this,	                		
+	 	                       "没有SD卡2", Toast.LENGTH_LONG).show();
+	                }
+					
+	                /*
+	                Intent intent = new Intent();  
+	                ContentValues values = new ContentValues();  
+	                Uri photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);  
+	                intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, photoUri);  
+	                startActivityForResult(intent, 2);  
+	                */
+	                break; 
 	            case 1: 
 	            	Intent intent = new Intent();
 			        //开启Pictures画面Type设定为image
@@ -217,6 +268,7 @@ public class PostActivity extends Activity implements OnClickListener{
 	                break;  
 	            }  
 	     }
+		 
     };
 //    /处理选择图片后返回
     protected void onActivityResult(int requestCode, int resultCode, Intent data) { 
@@ -288,6 +340,7 @@ public class PostActivity extends Activity implements OnClickListener{
     	 if (content == null || content.length() == 0 || content.length() > 140){
     		 return;
     	 }
+    	 btnSave.setEnabled(false);
     	 final Context _context = this;
     	 ApiManager.IApiListener listener =  new ApiManager.IApiListener() {
 
@@ -319,12 +372,13 @@ public class PostActivity extends Activity implements OnClickListener{
 					} catch (JSONException je) {
 						Log.d("json", "error");
 					}
+					btnSave.setEnabled(true);
 				}
 			};
 		 if (picFilePath != null){
-			 addPic("json", content, "127.0.0.1", listener);
+			 addPic("json", content + "addPic", "127.0.0.1", listener);
 		 }else{
-			 add("json", content, "127.0.0.1", listener);
+			 add("json", content + "add", "127.0.0.1", listener);
 		 }
     }
     
@@ -411,20 +465,46 @@ public class PostActivity extends Activity implements OnClickListener{
 	 */
 	public void add(String format, String content,
 			String clientip, final ApiManager.IApiListener listener) throws Exception {
-		 
 		
-		 Account account = AccountManager.getDefaultAccount();
-    	 
+		 Account account = AccountManager.getDefaultAccount();    	 
          Bundle params = new Bundle(); 
          params.putString("format", format);
          params.putString("content", content);     
          params.putString("longitude", "");
-         params.putString("syncflag", "1"); 
-         
+         params.putString("syncflag", "1");          
          ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
-					params, "POST", listener);
-         
+					params, "POST", listener);         
 	}
+	 /**
+		 * 转发微博，文字
+		 */
+		public void reply(String format, String content,
+				String clientip, final ApiManager.IApiListener listener) throws Exception {
+			
+			 Account account = AccountManager.getDefaultAccount();    	 
+	         Bundle params = new Bundle(); 
+	         params.putString("format", format);
+	         params.putString("content", content);     
+	         params.putString("longitude", "");
+	         params.putString("syncflag", "1");          
+	         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
+						params, "POST", listener);         
+		}
+		 /**
+		 * 评论微博，文字
+		 */
+		public void readd(String format, String content,
+				String clientip, final ApiManager.IApiListener listener) throws Exception {
+			
+			 Account account = AccountManager.getDefaultAccount();    	 
+	         Bundle params = new Bundle(); 
+	         params.putString("format", format);
+	         params.putString("content", content);     
+	         params.putString("longitude", "");
+	         params.putString("syncflag", "1");          
+	         ApiManager.requestAsync(account, Constants.Tencent.T_ADD,
+						params, "POST", listener);         
+		}
 	
 	/**
 	 * 发表一条带图片的微博
@@ -515,7 +595,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		popFrined = new PopFriend(this);				
 		LayoutInflater inflater = LayoutInflater.from(this);
 		//popFrined.setHeight(height)
-		popFrined.showAtLocation(v, Gravity.BOTTOM, 50, 40);
+		popFrined.showAtLocation(v, Gravity.BOTTOM, 0, 0);
 		//popFrined.showAsDropDown(btnAddFriend, 0, (- popFrined.getHeight() - 30));
 		
 	}
