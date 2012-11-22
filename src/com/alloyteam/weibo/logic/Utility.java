@@ -11,7 +11,11 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -48,6 +52,22 @@ public class Utility {
 	public static Bundle parseUrl(String url) {
 		return parseUrl(url, "?");
 	}
+	
+    static Hashtable<String, String> html_specialchars_table = new Hashtable<String, String>();
+    static {
+            html_specialchars_table.put("&lt;","<");
+            html_specialchars_table.put("&gt;",">");
+            html_specialchars_table.put("&amp;","&");
+    }
+    public static String htmlspecialchars_decode_ENT_NOQUOTES(String s){
+            Enumeration<String> en = html_specialchars_table.keys();
+            while(en.hasMoreElements()){
+                    String key = (String)en.nextElement();
+                    String val = (String)html_specialchars_table.get(key);
+                    s = s.replaceAll(key, val);
+            }
+            return s;
+    }
 
 	public static Bundle parseUrl(String url, String queryStart) {
 		Bundle values = new Bundle();
@@ -113,6 +133,26 @@ public class Utility {
 			data.add(new BasicNameValuePair(key, bundle.getString(key)));
 		}
 		return data;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static String formatDate(long timestamp) {
+		Date curDate = new Date(System.currentTimeMillis());
+		Date date = new Date(timestamp);
+		if (curDate.getDate() == date.getDate()) {
+			SimpleDateFormat format = new SimpleDateFormat("今天 HH:mm:ss");
+			return format.format(date);
+		} else if (curDate.getDate() == date.getDate() + 1) {
+			SimpleDateFormat format = new SimpleDateFormat("昨天 HH:mm:ss");
+			return format.format(date);
+		} else if (curDate.getDate() == date.getDate() + 2) {
+			SimpleDateFormat format = new SimpleDateFormat("前天 HH:mm:ss");
+			return format.format(date);
+		} else {
+			SimpleDateFormat format = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
+			return format.format(date);
+		}
 	}
 
 	public static String request(String url, String method, Bundle params)

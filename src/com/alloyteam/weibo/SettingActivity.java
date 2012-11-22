@@ -35,6 +35,7 @@ public class SettingActivity extends Activity {
 			switch (position) {
 			case 0:
 				Intent i = new Intent(SettingActivity.this, AccountManagerActivity.class);
+//				i.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 				startActivity(i);
 				break;
 

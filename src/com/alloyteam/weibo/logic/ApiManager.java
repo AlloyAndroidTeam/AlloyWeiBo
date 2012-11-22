@@ -5,9 +5,11 @@
 package com.alloyteam.weibo.logic;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +23,8 @@ import android.widget.Toast;
 
 import com.alloyteam.weibo.AuthActivity;
 import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.model.DataManager;
+import com.alloyteam.weibo.model.Weibo;
 
 /**
  * @author azraellong
@@ -29,6 +33,9 @@ import com.alloyteam.weibo.model.Account;
 public class ApiManager {
 	
 	public static String TAG = "ApiManager";
+	private static final int WHAT_DID_LOAD_DATA = 0;
+	private static final int WHAT_DID_REFRESH = 2;
+	private static final int WHAT_DID_MORE = 1;
 	
 	public interface IApiListener {
 
@@ -207,7 +214,7 @@ public class ApiManager {
 				try {
 					Bundle data = msg.getData();
 					String result = data.getString("result");
-					boolean success = !result.equals("fail");
+					boolean success = !"fail".equals(result);
 					if (success) {
 						JSONObject jsonObject = new JSONObject(result);
 						if (listener != null) {
@@ -249,5 +256,99 @@ public class ApiManager {
 			}
 		}.start();
 
+	}
+	/**
+	 * 获取主页时间线
+	 */
+	public static void getHomeLine(Account account,int pageflag,long timeStamp,final GetHomeLineListener listener){
+		Bundle params = new Bundle();
+		params.putInt("pageflag", pageflag);
+		params.putLong("pagetime", timeStamp);
+		params.putInt("reqnum", 10);
+		params.putInt("type", 0);
+		params.putInt("contenttype", 0);
+		params.putString("format", "json");
+		params.putLong("t", System.currentTimeMillis());
+		ApiManager.IApiListener httpListener=new ApiManager.IApiListener() {
+
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				try {
+					List<Weibo> tmpList=new ArrayList<Weibo>();
+					if (result.get("data") == JSONObject.NULL){
+						listener.onSuccess(null);
+					}
+					else{
+						JSONObject data = result.getJSONObject("data");
+						JSONArray info = data.getJSONArray("info");
+						for (int i = 0; i < info.length(); ++i) {
+							JSONObject item = info.getJSONObject(i);
+							int status=item.getInt("status");
+							if(status!=0){
+								continue;
+							}
+							String text = item.getString("text");
+							String name = item.getString("name");						
+							String avatarUrl = item.getString("head");
+							int type = item.getInt("type");
+							Weibo weibo = new Weibo();
+							weibo.text=text;
+							weibo.name=name;
+							weibo.avatarUrl=avatarUrl;
+							long timestamp = item.getLong("timestamp");
+							weibo.type = type;
+							weibo.timestamp = timestamp;
+							if (type == 2) {
+								JSONObject source = item
+										.getJSONObject("source");
+								String text2 = source.getString("text");
+								String name2 = source.getString("name");
+								String avatarUrl2 = source
+										.getString("head");
+								weibo.text2 = text2;
+								weibo.avatarUrl2 = avatarUrl2;
+								weibo.name2 = name2;
+								if (source.get("image") != JSONObject.NULL) {
+									Log.d("my", "image");
+									JSONArray images = source
+											.getJSONArray("image");
+									weibo.imageUrl = images.getString(0);
+								}
+								weibo.count = item.getInt("count");
+							} else {
+								if (item.get("image") != JSONObject.NULL) {
+									Log.d("my", "image");
+									JSONArray images = item
+											.getJSONArray("image");
+									weibo.imageUrl = images.getString(0);
+								}
+							}
+							tmpList.add(weibo);
+						}
+						listener.onSuccess(tmpList);
+					}
+					
+				} catch (JSONException je) {
+					Log.d("json", "error");
+					listener.onError(0);
+				}
+			}
+		};
+		requestAsync(account, Constants.Tencent.HOME_TIMELINE,
+				params, "GET", httpListener);
+	}
+	
+	public static interface GetHomeLineListener{
+		void onSuccess(List<Weibo> list);
+		void onError(int type);
 	}
 }
