@@ -188,11 +188,11 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		case R.id.btnHomeTitleAccount: // 帐号
 			// i = new Intent(this, AccountManagerActivity.class);
 			// startActivity(i);
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			AlertDialog dialog;
+			AlertDialog.Builder builder;
 			ArrayList<Account> accounts = AccountManager.getAccounts();
 			int count = accounts.size();
 			if (count == 0) {
+				builder = new AlertDialog.Builder(this);
 				builder.setMessage("您只绑定了一个帐号，继续添加帐号吗？")
 					.setPositiveButton("继续添加", new AlertDialog.OnClickListener() {
 						@Override
@@ -210,25 +210,23 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			
 			final AccountArrayAdapter adapter = new AccountArrayAdapter(this,
 					0, accounts);
-			ListView listView = new ListView(this);
-			listView.setBackgroundColor(Color.WHITE);
-			listView.setAdapter(adapter);
-			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			builder = new AlertDialog.Builder(this);
+			builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
 				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int position, long arg3) {
+				public void onClick(DialogInterface dialog, int position) {
 					Account account = adapter.getItem(position);
 					if (account != null) {
 						AccountManager.switchDefaultAccount(account);
 					}
 				}
-				
 			});
-			builder.setTitle("切换帐号");
-			dialog = builder.create();
-			dialog.setView(listView, 0, 0, 0, 0);
+			AlertDialog dialog = builder.create();
+			dialog.setTitle("切换帐号");
 			dialog.setCanceledOnTouchOutside(true);
 			dialog.show();
+
+			
 
 			break;
 		}
