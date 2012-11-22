@@ -303,6 +303,25 @@ public class AccountManager {
 				);
 		return cursor.getCount();
 	}
+	
+	/**
+	 * 
+	 * @return  是否有绑定过任何帐号
+	 */
+	public static boolean hasAccount(){
+		DBHelper dbHelper = DBHelper.getInstance();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+				null, // Columns to return
+				null, // SQL WHERE
+				null, // Selection Args
+				null, // SQL GROUP BY
+				null, // SQL HAVING
+				null, // SQL ORDER BY
+				"1"
+				);
+		return cursor.getCount() > 0;
+	}
 
 	/**
 	 * 获取当前已经授权的帐号列表

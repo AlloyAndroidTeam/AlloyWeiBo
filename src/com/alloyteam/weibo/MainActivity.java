@@ -10,8 +10,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -42,26 +44,27 @@ public class MainActivity extends TabActivity implements OnClickListener {
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-//			String uid = intent.getStringExtra("uid");
-//			int type = intent.getIntExtra("type", 0);
-//			Log.v(TAG, "onReceive: " + uid + " added.");
+			// String uid = intent.getStringExtra("uid");
+			// int type = intent.getIntExtra("type", 0);
+			// Log.v(TAG, "onReceive: " + uid + " added.");
 			String action = intent.getAction();
 			if ("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)) {
 				Account account = AccountManager.getDefaultAccount();
-				if(account != null){
+				if (account != null) {
 					accountSwitchBtn.setText(getAccountDescption(account));
 					accountSwitchBtn.setTag(0);
-				}else{
+				} else {
 					accountSwitchBtn.setText("绑定帐号");
 					accountSwitchBtn.setTag(1);
 				}
-			} 
+			}
 
 		}
 	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.activity_main);
@@ -88,9 +91,50 @@ public class MainActivity extends TabActivity implements OnClickListener {
 		}
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
-//		intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_REMOVE");
-//		intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
+		// intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_REMOVE");
+		// intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		this.registerReceiver(broadcastReceiver, intentFilter);
+		
+		if(!AccountManager.hasAccount()){
+			Intent i = new Intent(this, AccountManagerActivity.class);
+			startActivity(i);
+			return;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#dispatchKeyEvent(android.view.KeyEvent)
+	 */
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
+				&& event.getAction() == KeyEvent.ACTION_DOWN) {
+			boolean isHomeCurrent = mTabHost.getCurrentTab() == 0;
+			if(isHomeCurrent){
+				AlertDialog.Builder builder = new AlertDialog.Builder(this)
+					.setMessage("您确定要退出吗?")
+					.setPositiveButton("退出",new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							MainActivity.this.finish();
+						}
+					})
+					.setNegativeButton("后台运行", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							MainActivity.this.moveTaskToBack(true);
+						}
+					});
+				
+				builder.show();
+			}else{
+				mTabHost.setCurrentTab(0);
+			}
+			return true;
+		}
+		return super.dispatchKeyEvent(event);
 	}
 
 	@Override
@@ -146,7 +190,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			// i = new Intent(this, AccountManagerActivity.class);
 			// startActivity(i);
 			ArrayList<Account> accounts = AccountManager.getAccounts();
-			if(accounts.size() == 1){
+			if (accounts.size() == 1) {
 				break;
 			}
 			Object tag = accountSwitchBtn.getTag();
@@ -206,8 +250,12 @@ public class MainActivity extends TabActivity implements OnClickListener {
 			TextView textView = (TextView) convertView
 					.findViewById(R.id.currentAccountText);
 			Account account = this.getItem(position);
+			String text = getAccountDescption(account);
+			if (account.isDefault) {
+				text += " ∨";
+			}
+			textView.setText(text);
 
-			textView.setText(getAccountDescption(account));
 			return convertView;
 		}
 
@@ -216,9 +264,7 @@ public class MainActivity extends TabActivity implements OnClickListener {
 	private String getAccountDescption(Account account) {
 		String text = account.uid + "(" + Constants.getProvider(account.type)
 				+ ")";
-		// if(account.isDefault){
-		// text += " 当前帐号";
-		// }
+
 		return text;
 	}
 
