@@ -99,36 +99,19 @@ public class PostActivity extends Activity implements OnClickListener{
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.post_title);        
         
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);         
-        
-        /*
-        Bundle bundle = getIntent().getExtras();
-        Long id = bundle.getLong("id");           
-        titlebarTxt.setText("编辑:" + id.toString());         
-        tvWordCount = (TextView)findViewById(R.id.editWordCount);
-        */
-        
-        /*
-         * Intent i=this.getIntent();
-		Bundle b=i.getExtras();
-		String uid=b.getString("uid");
-		this.uid=uid;
-		List<Weibo> list=DataManager.get(uid);
-		int position = b.getInt("position");
-		this.position=position;
-		Weibo weibo=list.get(position);		
-         */
+         
+      	
         Bundle bundle = getIntent().getExtras(); 
-		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
-		Weibo weibo=list.get(bundle.getInt("position"));	
-		
         try{
         	type = bundle.getInt("type");
         }catch(Exception e){
         	type = 0;
         }
         if (type != 0){        	
-        	//tid = weibo.bundle.getString("tid");
-        	tid = weibo.id;
+      		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
+      		Weibo weibo=list.get(bundle.getInt("position"));
+      		tid = weibo.id;
+      		
         	Log.v("post", "" + type +", tid:" +tid);
         }
         ((TextView)findViewById(R.id.tvPostTitle)).setText(titles[type]); 
