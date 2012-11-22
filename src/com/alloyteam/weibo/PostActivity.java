@@ -21,6 +21,7 @@ import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo; 
 
 import android.app.Activity;
@@ -80,9 +81,12 @@ public class PostActivity extends Activity implements OnClickListener{
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
 	private Runnable runner;
 	
-	private PopFriend popFrined;
+	private PopFriend popFrined; //好友选择窗口
 	
-	private String SD_CARD_TEMP_DIR;
+	private String SD_CARD_TEMP_DIR; //存储照片图片路径
+	
+	private String titles[] = {"写微博","转发", "评论"};
+	
 	
 	
 	@Override
@@ -102,15 +106,33 @@ public class PostActivity extends Activity implements OnClickListener{
         titlebarTxt.setText("编辑:" + id.toString());         
         tvWordCount = (TextView)findViewById(R.id.editWordCount);
         */
-        Bundle bundle = getIntent().getExtras();
+        
+        /*
+         * Intent i=this.getIntent();
+		Bundle b=i.getExtras();
+		String uid=b.getString("uid");
+		this.uid=uid;
+		List<Weibo> list=DataManager.get(uid);
+		int position = b.getInt("position");
+		this.position=position;
+		Weibo weibo=list.get(position);		
+         */
+        Bundle bundle = getIntent().getExtras(); 
+		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
+		Weibo weibo=list.get(bundle.getInt("position"));	
+		
         try{
         	type = bundle.getInt("type");
         }catch(Exception e){
         	type = 0;
         }
         if (type != 0){        	
-        	tid = bundle.getString("tid");
+        	//tid = weibo.bundle.getString("tid");
+        	tid = weibo.id;
+        	Log.v("post", "" + type +", tid:" +tid);
         }
+        ((TextView)findViewById(R.id.tvPostTitle)).setText(titles[type]); 
+        
         tvMain = (EditText)findViewById(R.id.etPostMain);
         
         tvWordCount = (TextView)findViewById(R.id.tvPostCount);
@@ -428,19 +450,20 @@ public class PostActivity extends Activity implements OnClickListener{
 		////操作类型，0写，1转发，2评论
 		switch(type){
 			case 1:
-				ApiManager.reply(account, tid, content, listener);  
+				ApiManager.readd(account, tid, content, listener);  
 				break;
 			case 2:
-				ApiManager.readd(account, tid, content, listener);
+				ApiManager.reply(account, tid, content, listener);
 				break;
-		
+			default:
+				if (picFilePath != null){
+					ApiManager.add(account, content, picFilePath, listener);  
+				 }else{
+					 ApiManager.add(account, content, listener); 
+				 }
 		}
 			
-		if (picFilePath != null){
-			ApiManager.add(account, content, picFilePath, listener);  
-		 }else{
-			 ApiManager.add(account, content, listener); 
-		 }
+		
 		
 		
 		

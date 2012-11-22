@@ -443,11 +443,11 @@ public class ApiManager {
 	}
 	
 	/**
-	 * 转发微博，文字
+	 * 评论微博，文字
 	 */
 	private static void replyToTencent(Account account, String tid, String content, 
 			final ApiManager.IApiListener listener) throws Exception {
-		
+		Log.v(TAG, "replyToTencent");
 		Bundle params = new Bundle(); 
         params.putString("format", "json");
         params.putString("reid", tid);
@@ -459,11 +459,11 @@ public class ApiManager {
 					params, "POST", listener);         
 	}
 	 /**
-	 * 评论微博，文字
+	 * 转发微博，文字
 	 */
 	private static void readdToTencent(Account account, String tid, String content,
 			final ApiManager.IApiListener listener) throws Exception {
-		
+		Log.v(TAG, "readdToTencent");
 		Bundle params = new Bundle(); 
         params.putString("format", "json");
         params.putString("reid", tid);
