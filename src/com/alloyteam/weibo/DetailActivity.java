@@ -135,10 +135,10 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			re(3);
 			break;
 		case R.id.image:
-			Utility.showImage(this,weibo.imageUrl,null);//+"/2000");
+			Utility.showImage(this,weibo.imageUrl+"/2000",null);//);
 			break;
 		case R.id.image2:
-			Utility.showImage(this,weibo.imageUrl2,null);
+			Utility.showImage(this,weibo.imageUrl+"/2000",null);
 			break;
 		default:
 			break;

@@ -93,7 +93,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				this, list);
 		mylist.setAdapter(mAdapter);
 		mylist.setOnItemClickListener(this);
-		//mPullDownView.enableAutoFetchMore(true, 1);
+		mPullDownView.enableAutoFetchMore(true, 1);
 		account = AccountManager.getDefaultAccount();
 		if (account == null)
 			return;
