@@ -11,6 +11,7 @@ import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo;
+import com.alloyteam.weibo.model.Weibo2;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
 import com.alloyteam.weibo.model.Account;
@@ -42,11 +43,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private static final int WHAT_DID_REFRESH = 2;
 	private static final int WHAT_DID_MORE = 1;
 	private CommentListAdatper mAdapter;
-	private List<Weibo> list;
+	private List<Weibo2> list;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
 	private int type=0;
-	private Weibo weibo;
+	private Weibo2 weibo;
 	private Account account;
 	@Override
 	protected void onCreate(Bundle bundle) {
@@ -62,41 +63,42 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		String uid=b.getString("uid");
 		this.uid=uid;
 		type=b.getInt("type");
-		List<Weibo> list=DataManager.get(uid);
+		List<Weibo2> list=DataManager.get(uid);
 		int position = b.getInt("position");
 		this.position=position;
 		weibo=list.get(position);
 		Log.d("my","id:"+weibo.id);
 		String avatarUrl=weibo.avatarUrl;
-		HomeActivity.imageLoader.displayImage(avatarUrl+"/50", avatar, null);
-		String name=weibo.name;
+		HomeActivity.imageLoader.displayImage(avatarUrl, avatar, null);
+		String name=weibo.nick;
 		nameText.setText(name);
 		String text=weibo.text;
 		textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
 		long date=weibo.timestamp;
-		dateText.setText(Utility.formatDate(date*1000));
+		dateText.setText(Utility.formatDate(date));
 		if(weibo.type==1){
 			ViewGroup source=(ViewGroup)findViewById(R.id.source);
 			source.setVisibility(View.GONE);
 			if(!weibo.imageUrl.equals("")){
-				HomeActivity.imageLoader.displayImage(weibo.imageUrl+"/160", imageView, null);
+				HomeActivity.imageLoader.displayImage(weibo.imageThumbUrl, imageView, null);
 			}
 		}
 		else{
+			Weibo2 source = weibo.source;
 			ImageView image2=(ImageView)findViewById(R.id.image2);
-			if(!weibo.imageUrl.equals("")){
-				HomeActivity.imageLoader.displayImage(weibo.imageUrl+"/160", image2, null);
+			if(!source.imageUrl.equals("")){
+				HomeActivity.imageLoader.displayImage(source.imageThumbUrl, image2, null);
 			}
 			TextView text2=(TextView)findViewById(R.id.text2);
 			ImageView avatar2=(ImageView)findViewById(R.id.avatar2);
-			HomeActivity.imageLoader.displayImage(weibo.avatarUrl2+"/50", avatar2, null);
-			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text2)));
+			HomeActivity.imageLoader.displayImage(source.avatarUrl, avatar2, null);
+			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
 			TextView name2=(TextView)findViewById(R.id.name2);
-			name2.setText(weibo.name2);			
+			name2.setText(source.nick);			
 		}
 		TextView count=(TextView)findViewById(R.id.count);
-		if(weibo.count>0){
-		    count.setText("原文被转发"+weibo.count+"次");
+		if(weibo.rebroadcastCount>0){
+		    count.setText("原文被转发"+weibo.rebroadcastCount+"次");
 		}
 		else{
 			count.setVisibility(View.GONE);
@@ -160,7 +162,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	public void initList() {
 		mPullDownView = (PullDownView) findViewById(R.id.commentList);
 		mPullDownView.setOnPullDownListener(this);
-		list = new ArrayList<Weibo>();
+		list = new ArrayList<Weibo2>();
 		mylist = mPullDownView.getListView();
 		mAdapter = new CommentListAdatper(this, R.layout.comment, list);
 		mylist.setAdapter(mAdapter);
@@ -256,9 +258,9 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		TextView date;
 	}
 
-	class CommentListAdatper extends ArrayAdapter<Weibo> {
+	class CommentListAdatper extends ArrayAdapter<Weibo2> {
 
-		List<Weibo> commentList;
+		List<Weibo2> commentList;
 
 		LayoutInflater layoutInflater;
 		
@@ -270,7 +272,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		 * @param list
 		 */
 		public CommentListAdatper(Context context, int resourceId,
-				List<Weibo> list) {
+				List<Weibo2> list) {
 			super(context, resourceId, list);
 
 			this.layoutInflater = LayoutInflater.from(context);
@@ -294,11 +296,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			else{
 				holder = (CommentViewHolder) convertView.getTag();
 			}
-			Weibo weibo = commentList.get(position);
-			HomeActivity.imageLoader.displayImage(weibo.avatarUrl+"/50", holder.avatar,null);
-			holder.name.setText(weibo.name);
+			Weibo2 weibo = commentList.get(position);
+			HomeActivity.imageLoader.displayImage(weibo.avatarUrl, holder.avatar,null);
+			holder.name.setText(weibo.nick);
 			holder.text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
-			holder.date.setText(Utility.formatDate(weibo.timestamp*1000));
+			holder.date.setText(Utility.formatDate(weibo.timestamp));
 			return convertView;
 		}
 

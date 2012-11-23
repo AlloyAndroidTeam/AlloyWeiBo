@@ -1,5 +1,9 @@
 package com.alloyteam.weibo.model;
 
+/**
+ * @deprecated
+ *
+ */
 public class Weibo {
 	
 	public String name="";
