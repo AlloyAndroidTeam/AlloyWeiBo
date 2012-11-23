@@ -120,7 +120,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		// TODO Auto-generated method stub
 		View rowView = convertView;
 
-		int type = getItemViewType(position);
+		//int type = getItemViewType(position);
 		Weibo2 weibo = mItems.get(position);
 		TextView text;
 		TextView name;
@@ -128,7 +128,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		ImageView avatar;
 		ImageView image;
 
-		if (type == 1||type==3) {
+		if (weibo.source==null) {
 			ViewCache viewCache;
 			if (rowView == null) {
 

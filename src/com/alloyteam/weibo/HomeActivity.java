@@ -120,14 +120,14 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
 			@Override
 			public void onSuccess(ApiResult result) {
-				if(result.weiboList == null){
+				if(result == null || result.weiboList == null){
 					pullCallback(pageflag);
 					return;
 				}
 				ArrayList<Weibo2> tmpList = result.weiboList;
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
-					if(list.size()>0){
+					if(tmpList.size()>0){
 						downId=tmpList.get(tmpList.size()-1).id;
 						upId=tmpList.get(0).id;
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
@@ -143,7 +143,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 						list.addAll(tmpList);
 					}
-					//DataManager.set(account.uid,list);
 				}
 				else{				
 					mPullDownView.notifyDidRefresh();
@@ -152,7 +151,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 						upTimeStamp=tmpList.get(0).timestamp;
 						list.addAll(0, tmpList);
 					}
-					//DataManager.set(account.uid,list);
 				}
 				mAdapter.notifyDataSetChanged();
 			}
@@ -162,17 +160,21 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			}
 		};
 		String Id;
+		long timestamp;
 		if(pageflag==WHAT_DID_REFRESH){
 			Id=upId;
+			timestamp=upTimeStamp;
 		}
 		else if(pageflag==WHAT_DID_MORE){
 			Id=downId;
+			timestamp=downTimeStamp;
 		}
 		else{
 			Id="0";
+			timestamp=0;
 		}
 		
-		ApiManager.getHomeLine(account, 10, pageflag, Id, listener);
+		ApiManager.getHomeLine(account, 10, pageflag, timestamp, Id, listener);
 
 	}
 
