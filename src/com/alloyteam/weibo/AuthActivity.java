@@ -105,9 +105,9 @@ public class AuthActivity extends Activity {
 		
 		account.authTime = new Date();
 		long expiresTime = Long.parseLong(values.getString("expires_in"));
-		if(accountType == Constants.TENCENT){
+//		if(accountType == Constants.TENCENT){
 			expiresTime *= 1000;
-		}
+//		}
 		account.invalidTime = new Date(account.authTime.getTime()
 				+  expiresTime);
 		Log.i(TAG,
