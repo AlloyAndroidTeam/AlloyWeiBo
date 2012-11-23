@@ -38,8 +38,13 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+
+import com.alloyteam.weibo.ImageActivity;
  
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -198,7 +203,13 @@ public class Utility {
 		DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
 		return httpClient;
 	}
-
+	
+	public static void showImage(Context context, String url, Bitmap bm){
+		Intent intent = new Intent(context, ImageActivity.class);
+		intent.putExtra("url", url);
+		context.startActivity(intent);
+	}
+	
 	public static boolean isHttpSuccessExecuted(HttpResponse response) {
 		int statusCode = response.getStatusLine().getStatusCode();
 		return (statusCode > 199) && (statusCode < 400);

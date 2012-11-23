@@ -54,9 +54,11 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	private static final int WHAT_DID_MORE = 1;
 	private WeiboListAdapter mAdapter;
 	private List<Weibo2> list;
+	private String upId;
+	private String downId;
+	private Account account;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
-	private Account account;
 	
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -118,35 +120,37 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
 			@Override
 			public void onSuccess(ApiResult result) {
-				if(result.weiboList == null){
+				if(result == null || result.weiboList == null){
 					pullCallback(pageflag);
 					return;
 				}
 				ArrayList<Weibo2> tmpList = result.weiboList;
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
-					list.addAll(tmpList);							
-					if(list.size()>0){
+					if(tmpList.size()>0){
+						downId=tmpList.get(tmpList.size()-1).id;
+						upId=tmpList.get(0).id;
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 						upTimeStamp=tmpList.get(0).timestamp;
+						list.addAll(tmpList);							
 					}
 					DataManager.set(account.uid,list);
 				}
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
-					list.addAll(tmpList);
 					if(tmpList.size()>0){
+						downId=tmpList.get(tmpList.size()-1).id;
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						list.addAll(tmpList);
 					}
-					//DataManager.set(account.uid,list);
 				}
 				else{				
 					mPullDownView.notifyDidRefresh();
-					list.addAll(0, tmpList);
 					if(tmpList.size()>0){
+						upId=tmpList.get(0).id;
 						upTimeStamp=tmpList.get(0).timestamp;
+						list.addAll(0, tmpList);
 					}
-					//DataManager.set(account.uid,list);
 				}
 				mAdapter.notifyDataSetChanged();
 			}
@@ -155,62 +159,23 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				pullCallback(errorCode);
 			}
 		};
-		ApiManager.getHomeLine(account, 10, pageflag, 0, listener);
+		String Id;
+		long timestamp;
+		if(pageflag==WHAT_DID_REFRESH){
+			Id=upId;
+			timestamp=upTimeStamp;
+		}
+		else if(pageflag==WHAT_DID_MORE){
+			Id=downId;
+			timestamp=downTimeStamp;
+		}
+		else{
+			Id="0";
+			timestamp=0;
+		}
 		
-//		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
-//			@Override
-//			public void onSuccess(List<Weibo> tmpList) {
-//				if(tmpList==null){
-//					pullCallback(pageflag);
-//					return;
-//				}
-//				// TODO Auto-generated method stub
-//				if(pageflag==WHAT_DID_LOAD_DATA){
-//					mPullDownView.notifyDidLoad();
-//					list.addAll(tmpList);							
-//					if(list.size()>0){
-//						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-//						upTimeStamp=tmpList.get(0).timestamp;
-//					}
-//					DataManager.set(account.uid,list);
-//				}
-//				else if(pageflag==WHAT_DID_MORE){
-//					mPullDownView.notifyDidMore();								
-//					list.addAll(tmpList);
-//					if(tmpList.size()>0){
-//						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-//					}
-//					//DataManager.set(account.uid,list);
-//				}
-//				else{				
-//					mPullDownView.notifyDidRefresh();
-//					list.addAll(0, tmpList);
-//					if(tmpList.size()>0){
-//						upTimeStamp=tmpList.get(0).timestamp;
-//					}
-//					//DataManager.set(account.uid,list);
-//				}
-//				mAdapter.notifyDataSetChanged();
-//			}
-//
-//			@Override
-//			public void onError(int type) {
-//				// TODO Auto-generated method stub
-//				pullCallback(pageflag);
-//			}			
-//		};
-//		long timeStamp;
-//		if(pageflag==WHAT_DID_REFRESH){
-//			timeStamp=upTimeStamp;
-//		}
-//		else if(pageflag==WHAT_DID_MORE){
-//			timeStamp=downTimeStamp;
-//		}
-//		else{
-//			timeStamp=0;
-//		}
-		
-//		ApiManager.getHomeLine(account, pageflag, timeStamp, listener);
+		ApiManager.getHomeLine(account, 10, pageflag, timestamp, Id, listener);
+
 	}
 
 	@Override
@@ -221,12 +186,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		}
 	}
 
-	public static void showImage(Context context, String url, Bitmap bm){
-		Intent intent = new Intent(context, ImageActivity.class);
-		intent.putExtra("url", url);
-		context.startActivity(intent);
-	}
-	
 	@Override
 	protected void onResume() {
 		super.onResume();

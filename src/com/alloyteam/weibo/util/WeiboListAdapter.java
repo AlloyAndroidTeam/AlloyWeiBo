@@ -109,7 +109,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			switch (v.getId()) {
 			case R.id.thumbImage:
 				Bitmap bm=v.getDrawingCache();
-				HomeActivity.showImage(mContext,(String)v.getTag(),bm);//+"/2000");
+				Utility.showImage(mContext,(String)v.getTag(),bm);//+"/2000");
 				break;
 			default:
 				break;
@@ -120,7 +120,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		// TODO Auto-generated method stub
 		View rowView = convertView;
 
-		int type = getItemViewType(position);
+		//int type = getItemViewType(position);
 		Weibo2 weibo = mItems.get(position);
 		TextView text;
 		TextView name;
@@ -128,7 +128,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		ImageView avatar;
 		ImageView image;
 
-		if (type == 1||type==3) {
+		if (weibo.source==null) {
 			ViewCache viewCache;
 			if (rowView == null) {
 

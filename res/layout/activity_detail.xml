@@ -145,7 +145,7 @@
             android:layout_alignBaseline="@+id/re"
             android:layout_alignBottom="@+id/re"
             android:layout_toRightOf="@+id/re"
-            android:text="评论" />
+            android:text="对话" />
 
         <Button
             android:id="@+id/reply"
@@ -154,7 +154,7 @@
             android:layout_alignBaseline="@+id/comment"
             android:layout_alignBottom="@+id/comment"
             android:layout_toRightOf="@+id/comment"
-            android:text="回复" />
+            android:text="评论" />
     </RelativeLayout>
 
     <com.alloyteam.weibo.PullDownView

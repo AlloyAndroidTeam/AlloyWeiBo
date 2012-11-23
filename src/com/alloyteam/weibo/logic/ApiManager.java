@@ -280,14 +280,14 @@ public class ApiManager {
 	 *            api回调
 	 */
 	public static void getHomeLine(final Account account, int pageCount,
-			int pageFlag, long lastId, final IApiResultListener listener) {
+			int pageFlag, long timestamp, String lastId, final IApiResultListener listener) {
 		Bundle params = new Bundle();
 		String url;
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
 			url = Constants.Tencent.HOME_TIMELINE;
 			params.putInt("pageflag", pageFlag);
-			params.putLong("lastid", lastId);
+			params.putLong("pagetime", timestamp/1000);
 			params.putInt("reqnum", pageCount);
 			params.putInt("type", 0);
 			params.putInt("contenttype", 0);
@@ -299,9 +299,9 @@ public class ApiManager {
 			params.putInt("trim_user", 0);
 			params.putInt("feature", 0);
 			if (pageFlag == 1) {
-				params.putLong("max_id", lastId);
+				params.putString("max_id", lastId);
 			} else if (pageFlag == 2) {
-				params.putLong("since_id", lastId);
+				params.putString("since_id", lastId);
 			}
 		} else {
 			return;
@@ -389,8 +389,12 @@ public class ApiManager {
 			if (weibo.status > 2) {// 大于2的都是已删除的
 				weibo.status = Weibo2.WEIBO_STATUS_DELETE;
 			}
-			if (weibo.type == Weibo2.WEIBO_TYPE_REBROADCAST) {
-				JSONObject source = status.getJSONObject("source");
+			JSONObject source = null;
+			try{
+				source = status.getJSONObject("source");
+			}catch(Exception e){
+			}
+			if (source != null) {
 				weibo.source = JsonObjectToWeibo(source, type);
 			} else {
 				// 处理图片
