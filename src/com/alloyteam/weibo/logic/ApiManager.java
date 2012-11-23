@@ -334,7 +334,8 @@ public class ApiManager {
 							account.type);
 					listener.onSuccess(apiResult);
 				} catch (JSONException je) {
-					Log.d("json", "error");
+					Log.e("json", "error");
+					je.printStackTrace();
 					listener.onError(0);
 				}
 			}
@@ -422,21 +423,29 @@ public class ApiManager {
 
 			weibo.rebroadcastCount = status.getInt("reposts_count");
 			weibo.commentCount = status.getInt("comments_count");
-			
-			weibo.type = status.getInt("type");
-			weibo.status = status.getInt("status");
-			if (weibo.status > 2) {// 大于2的都是已删除的
-				weibo.status = 1;
+			JSONObject source = null;
+			try{
+				source = status.getJSONObject("retweeted_status");
+				weibo.type = Weibo2.WEIBO_TYPE_REBROADCAST;
+			}catch(Exception e){
+				weibo.type = Weibo2.WEIBO_TYPE_ORIGINAL;
 			}
-//			if (weibo.type == Weibo2.WEIBO_TYPE_REBROADCAST) {
-//				JSONObject source = status.getJSONObject("source");
-//				weibo.source = JsonObjectToWeibo(source, type);
-//			} else {
+			try{
+				if(status.get("deleted") != JSONObject.NULL){
+					weibo.status = Weibo2.WEIBO_STATUS_DELETE;
+				}
+			}catch(Exception e){
+				weibo.status = Weibo2.WEIBO_STATUS_NORMAL;
+			}
+
+			if (source != null) {
+				weibo.source = JsonObjectToWeibo(source, type);
+			} else {
 				// 处理图片
 				weibo.imageThumbUrl = status.getString("thumbnail_pic");
 				weibo.imageMiddleUrl = status.getString("bmiddle_pic");
 				weibo.imageUrl = status.getString("original_pic");
-//			}
+			}
 		}
 
 		return weibo;

@@ -183,7 +183,7 @@ public class Utility {
 		HttpResponse response = httpClient.execute(request);
 		if (isHttpSuccessExecuted(response)) {			
 			result = EntityUtils.toString(response.getEntity());
-			Log.d("json",result);
+//			Log.d("json",result);
 		}
 		
 		return result;
