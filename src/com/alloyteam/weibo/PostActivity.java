@@ -85,9 +85,10 @@ public class PostActivity extends Activity implements OnClickListener{
 	
 	private String SD_CARD_TEMP_DIR; //存储照片图片路径
 	
-	private String titles[] = {"写微博","转发", "评论", "回复"};
+	private String titles[] = {"写微博","转发", "对话", "评论"};
 	
-	private String defaultText = "说点什么吧";
+	private TextView tvTips;
+	
 	
 	
 	
@@ -109,17 +110,11 @@ public class PostActivity extends Activity implements OnClickListener{
         }catch(Exception e){
         	type = 0;
         }
-        if (type != 0){        	
-      		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
-      		Weibo weibo=list.get(bundle.getInt("position"));
-      		tid = weibo.id;
-      		
-        	Log.v("post", "" + type +", tid:" +tid);
-        }
-        ((TextView)findViewById(R.id.tvPostTitle)).setText(titles[type]); 
+        ((TextView)findViewById(R.id.tvPostTitle)).setText(titles[type]);
+         
         
-        tvMain = (EditText)findViewById(R.id.etPostMain);
-        tvMain.setText(defaultText); 
+        tvMain = (EditText)findViewById(R.id.etPostMain); 
+        tvTips = (TextView)findViewById(R.id.tvPostTips);
         
         tvWordCount = (TextView)findViewById(R.id.tvPostCount);
         bindWordCount();
@@ -129,6 +124,15 @@ public class PostActivity extends Activity implements OnClickListener{
         btnAddPic = (Button)findViewById(R.id.btnPostAddPic);
     	btnAddFriend = (Button)findViewById(R.id.btnPostAddFriend);
     	btnAddTopic = (Button)findViewById(R.id.btnPostAddTopic);
+    	
+    	 if (type != 0){        	
+       		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
+       		Weibo weibo=list.get(bundle.getInt("position"));
+       		tid = weibo.id;
+       		btnAddPic.setVisibility(View.INVISIBLE);
+         	Log.v("post", "" + type +", tid:" +tid);
+         }
+    	 
     	
     	btnBack.setOnClickListener(this);
     	btnSave.setOnClickListener(this);
@@ -173,11 +177,12 @@ public class PostActivity extends Activity implements OnClickListener{
 	private void bindWordCount(){
 		tvMain.addTextChangedListener(new TextWatcher()
         {
-                
+                private String beforeTxt;
                 public void onTextChanged(CharSequence s, int start, int before, int count)
                 {
                         // TODO Auto-generated method stub 
                 	//log("onTextChanged" + s + ",start:" + start + ",before:" +before+ ",length:"+s.length());
+                	
                 	CharSequence sCount = tvWordCount.getText();                	                	
                 	int c = 140 - s.length();
                 	if (c <= 0){
@@ -186,22 +191,38 @@ public class PostActivity extends Activity implements OnClickListener{
                 		tvWordCount.setTextColor(Color.rgb(0, 0, 255));                		
                 	}
                 	tvWordCount.setText(String.valueOf(c));                	 
-                	CharSequence ss = s.subSequence(start, s.length());
-                	
-                	if (s.length() == 0){
-                		tvMain.setText(defaultText);
-                		//tvMain.settextc
-                	}
+                	CharSequence ss = s.subSequence(start, s.length()); 
                 }
                 
                 public void beforeTextChanged(CharSequence s, int start, int count, int after)
                 {
-                        // TODO Auto-generated method stub
+                	//Log.v("beforeTextChanged", "editing:" + editing.toString()+", s:"+s);
+                	/*
+                	if (defaultText.equals(s.toString())){//if (!editing){
+                		//tvMain.setText("xxxx");
+                		tvMain.setTextColor(Color.rgb(0, 0, 0));
+                		editing = true;
+                		Log.v("beforeTextChanged", "in editing:" + editing.toString()+", s:"+s);
+                	}  
+                	beforeTxt = s.toString();*/
                 }
                 
                 public void afterTextChanged(Editable s)
                 {
-                        // TODO Auto-generated method stub
+                	/*
+                	if (s.length() == 0){
+                		editing = false;
+                		tvMain.setText(defaultText);
+                		tvMain.setTextColor(Color.rgb(192, 192, 192));
+                		Log.v("afterTextChanged", "in:editing:" + editing.toString()+", s:"+s + ",l:"+s.length());
+                	} 
+                	Log.v("afterTextChanged", "editing:" + editing.toString()+", s:"+s + ",l:"+s.length());
+                	*/ 
+                	if (s.length() == 0){
+                		tvTips.setVisibility(View.VISIBLE);
+                	}else{
+                		tvTips.setVisibility(View.INVISIBLE);
+                	}
                 }
         });
 	} 
