@@ -160,7 +160,7 @@ public class WeiboListAdapter extends BaseAdapter {
 				image.setVisibility(View.GONE);
 			}			
 			image.setOnClickListener(listener);
-		} else if (type == 2) {
+		} else {// if (type == 2) {
 			TextView text2;
 			TextView name2;
 			ImageView avatar2;
