@@ -179,7 +179,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 						upTimeStamp=tmpList.get(0).timestamp;
 					}
-					DataManager.set(account.uid,list);
+					//DataManager.set(account.uid,list);
 				}
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
