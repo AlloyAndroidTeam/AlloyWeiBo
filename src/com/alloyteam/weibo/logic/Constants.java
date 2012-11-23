@@ -75,7 +75,7 @@ public class Constants {
 		
 		public static final String API_ROOT = "https://api.weibo.com/2";
 
-		public static final String OAUTH_GET_ACCESS_TOKEN = "https://api.weibo.com/oauth2/authorize?display=mobile";
+		public static final String OAUTH_GET_ACCESS_TOKEN = "https://api.weibo.com/oauth2/authorize?display=mobile&forcelogin=true";
 
 		public static final String HOME_TIMELINE = API_ROOT
 				+ "/statuses/home_timeline.json";

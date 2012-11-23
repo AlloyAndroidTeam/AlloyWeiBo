@@ -62,6 +62,7 @@ public class AccountManagerActivity extends Activity {
 				if(newDefault != null){
 					int position = accountListAdatper.getPositionByAccount(newDefault);
 					if(position > -1){
+						currentDefaultAccountPosition = position;
 						accountListAdatper.accounts.set(position, newDefault);
 						accountListAdatper.notifyDataSetChanged();
 					}
@@ -266,7 +267,9 @@ public class AccountManagerActivity extends Activity {
 											accountListAdatper.remove(account);
 										}
 
-									}).show();
+									})
+									.setNegativeButton("取消", null)
+						.show();
 
 				}
 			});
