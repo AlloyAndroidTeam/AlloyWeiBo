@@ -373,6 +373,11 @@ public class ApiManager {
 	private static Weibo2 JsonObjectToWeibo(JSONObject status, int type) throws JSONException {
 		Weibo2 weibo = new Weibo2();
 		if (type == Constants.TENCENT) {
+			weibo.status = status.getInt("status");
+			if (weibo.status > 2) {// 大于2的都是已删除的
+				weibo.status = Weibo2.WEIBO_STATUS_DELETE;
+				return null;
+			}
 			weibo.uid = status.getString("name");
 			weibo.nick = status.getString("nick");
 			weibo.avatarUrl = status.getString("head") + "/50";
@@ -385,10 +390,7 @@ public class ApiManager {
 			weibo.commentCount = status.getInt("mcount");
 			
 			weibo.type = status.getInt("type");
-			weibo.status = status.getInt("status");
-			if (weibo.status > 2) {// 大于2的都是已删除的
-				weibo.status = Weibo2.WEIBO_STATUS_DELETE;
-			}
+			
 			JSONObject source = null;
 			try{
 				source = status.getJSONObject("source");
@@ -407,12 +409,16 @@ public class ApiManager {
 				}
 			}
 		} else if (type == Constants.SINA) {
-			JSONObject user = new JSONObject();
 			try{
-			 user = status.getJSONObject("user");
+				if(status.get("deleted") != JSONObject.NULL){
+//					weibo.status = Weibo2.WEIBO_STATUS_DELETE;
+					return null;
+				}
 			}catch(Exception e){
-				e.printStackTrace();
+				weibo.status = Weibo2.WEIBO_STATUS_NORMAL;
 			}
+			JSONObject user = status.getJSONObject("user");
+
 			weibo.uid = user.getString("id");
 			weibo.nick = user.getString("screen_name");
 			weibo.avatarUrl = user.getString("avatar_large");
@@ -437,13 +443,6 @@ public class ApiManager {
 				weibo.type = Weibo2.WEIBO_TYPE_REBROADCAST;
 			}catch(Exception e){
 				weibo.type = Weibo2.WEIBO_TYPE_ORIGINAL;
-			}
-			try{
-				if(status.get("deleted") != JSONObject.NULL){
-					weibo.status = Weibo2.WEIBO_STATUS_DELETE;
-				}
-			}catch(Exception e){
-				weibo.status = Weibo2.WEIBO_STATUS_NORMAL;
 			}
 
 			if (source != null) {
