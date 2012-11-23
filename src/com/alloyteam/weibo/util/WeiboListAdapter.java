@@ -51,13 +51,13 @@ public class WeiboListAdapter extends BaseAdapter {
 	public int getItemViewType(int position) {
 		// TODO Auto-generated method stub
 		Weibo2 weibo = (Weibo2) this.getItem(position);
-		return weibo.type;
+		return weibo.source==null?1:2;
 	}
 
 	@Override
 	public int getViewTypeCount() {
 		// TODO Auto-generated method stub
-		return 7;
+		return 3;
 	}
 
 	public static Bitmap toRoundCorner(Bitmap bitmap, int pixels) {
@@ -128,7 +128,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		ImageView avatar;
 		ImageView image;
 
-		if (type==1||type==3) {
+		if (type==1) {
 			ViewCache viewCache;
 			if (rowView == null) {
 
