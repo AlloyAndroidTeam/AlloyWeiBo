@@ -9,6 +9,7 @@ import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.logic.Utility;
+import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
@@ -49,6 +50,8 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private int type=0;
 	private Weibo2 weibo;
 	private Account account;
+	private String upId;
+	private String downId;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -137,10 +140,10 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			re(3);
 			break;
 		case R.id.image:
-			Utility.showImage(this,weibo.imageUrl+"/2000",null);//);
+			Utility.showImage(this,weibo.imageUrl,null);//);
 			break;
 		case R.id.image2:
-			Utility.showImage(this,weibo.imageUrl+"/2000",null);
+			Utility.showImage(this,weibo.source.imageUrl,null);
 			break;
 		default:
 			break;
@@ -174,65 +177,66 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	}
 		
 	public void getCommentList(final int pageflag){
-		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
-
+		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
 			@Override
-			public void onSuccess(List<Weibo> tmpList) {
-				if(tmpList==null){
+			public void onSuccess(ApiResult result) {
+				if(result == null || result.weiboList == null){
 					pullCallback(pageflag);
 					return;
 				}
-				for(int i=0;i<tmpList.size();++i){
-					if(tmpList.get(i).text.equals("")){
-						tmpList.remove(i);
-						--i;
-					}
-				}				// TODO Auto-generated method stub
+				ArrayList<Weibo2> tmpList = result.weiboList;
 				if(pageflag==WHAT_DID_LOAD_DATA){
-					mPullDownView.notifyDidLoad();											
+					mPullDownView.notifyDidLoad();
 					if(tmpList.size()>0){
-						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-						upTimeStamp=tmpList.get(0).timestamp;
-						//list.addAll(tmpList);
+						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						downId=lastWeibo.id;
+						downTimeStamp=lastWeibo.timestamp;
+						Weibo2 firstWeibo=tmpList.get(0);
+						upId=firstWeibo.id;
+						upTimeStamp=firstWeibo.timestamp;
+						list.addAll(tmpList);							
 					}
-					//DataManager.set(account.uid,list);
 				}
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
 					if(tmpList.size()>0){
-						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-						//list.addAll(tmpList);
+						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						downId=lastWeibo.id;
+						downTimeStamp=lastWeibo.timestamp;
+						list.addAll(tmpList);
 					}
 				}
 				else{				
-					mPullDownView.notifyDidRefresh();					
+					mPullDownView.notifyDidRefresh();
 					if(tmpList.size()>0){
-						if(upTimeStamp!=tmpList.get(0).timestamp){
-							upTimeStamp=tmpList.get(0).timestamp;
-							//list.addAll(0, tmpList);
-						}
+						Weibo2 firstWeibo=tmpList.get(0);
+						upId=firstWeibo.id;
+						upTimeStamp=firstWeibo.timestamp;
+						list.addAll(0, tmpList);
 					}
 				}
 				mAdapter.notifyDataSetChanged();
 			}
-
 			@Override
-			public void onError(int type) {
-				// TODO Auto-generated method stub
-				pullCallback(pageflag);
-			}			
+			public void onError(int errorCode) {
+				pullCallback(errorCode);
+			}
 		};
-		long timeStamp;
+		String Id;
+		long timestamp;
 		if(pageflag==WHAT_DID_REFRESH){
-			timeStamp=upTimeStamp;
+			Id=upId;
+			timestamp=upTimeStamp;
 		}
 		else if(pageflag==WHAT_DID_MORE){
-			timeStamp=downTimeStamp;
+			Id=downId;
+			timestamp=downTimeStamp;
 		}
 		else{
-			timeStamp=0;
+			Id="0";
+			timestamp=0;
 		}
-		ApiManager.getCommentList(account, weibo.id, pageflag, timeStamp, listener);
+		ApiManager.getCommentList(account, 10, pageflag, weibo.id, timestamp, Id, listener);
 	}
 	@Override
 	public void onRefresh() {

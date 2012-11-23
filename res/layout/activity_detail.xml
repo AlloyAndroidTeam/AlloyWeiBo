@@ -113,23 +113,24 @@
                 android:layout_marginTop="5dp"
                 android:minWidth="100dp" />
         </RelativeLayout>
-
-        <TextView
-            android:id="@+id/count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/text"
-            android:layout_below="@+id/source"
-            android:layout_marginTop="3dp"
-            android:text="TextView"
-            android:textColor="#3333ff" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/text"
+        android:layout_below="@+id/source"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="40dp"
+        android:text="TextView"
+        android:textColor="#3333ff" />
 
     <RelativeLayout
         android:id="@+id/buttons"
-        android:layout_below="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/content" >
 
         <Button
             android:id="@+id/re"

@@ -80,9 +80,9 @@ public class Constants {
 		public static final String HOME_TIMELINE = API_ROOT
 				+ "/statuses/home_timeline.json";
 		public static final String COMMENT_LIST = API_ROOT
-				+ "comments/show.json";//获取评论列表
+				+ "/comments/show.json";//获取评论列表
 		public static final String REBOARDCAST_LIST = API_ROOT
-				+ "statuses/repost_timeline.json";//获取转播列表
+				+ "/statuses/repost_timeline.json";//获取转播列表
 	}
 
 	public class Tencent {

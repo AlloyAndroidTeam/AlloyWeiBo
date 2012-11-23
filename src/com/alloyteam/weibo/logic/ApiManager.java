@@ -151,6 +151,7 @@ public class ApiManager {
 					}
 
 				} catch (JSONException e) {
+					Log.e("api",e.toString());
 					if (listener != null) {
 						listener.onJSONException(e);
 					}
@@ -468,7 +469,7 @@ public class ApiManager {
 	 * 获取评论列表
 	 */
 	public static void  getCommentList(final Account account, int pageCount,
-			int pageFlag, String weiboId, String lastId, final IApiResultListener listener){
+			int pageFlag, String weiboId, long timestamp, String lastId, final IApiResultListener listener){
 		Bundle params = new Bundle();
 		String url;
 		params.putLong("t", System.currentTimeMillis());
@@ -477,40 +478,39 @@ public class ApiManager {
 			
 			params.putInt("reqnum", pageCount);
 			params.putInt("pageflag", pageFlag);
+			params.putLong("pagetime", timestamp/1000);
 			params.putString("twitterid", lastId);
 			params.putString("rootid", weiboId);
-			
-//			params.putLong("pagetime", timeStamp);
-		
 			params.putString("format", "json");
 
 		} else if (account.type == Constants.SINA) {
 			url = Constants.Sina.COMMENT_LIST;
-//			params.putInt("count", pageCount);
-//			params.putInt("type", 0);
-//			params.putInt("trim_user", 0);
-//			params.putInt("feature", 0);
-//			if (pageFlag == 1) {
-//				params.putLong("max_id", lastId);
-//			} else if (pageFlag == 2) {
-//				params.putLong("since_id", lastId);
-//			}
+			params.putInt("count", pageCount);
+			params.putString("id", weiboId);
+			if (pageFlag == 1) {
+				params.putString("max_id", lastId);
+			} else if (pageFlag == 2) {
+				params.putString("since_id", lastId);
+			}
 		} else {
 			return;
 		}
 		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
 			@Override
 			public void onJSONException(JSONException exception) {
+				Log.d("json","comment:err1");
 				listener.onError(0);
 			}
 
 			public void onFailure(String msg) {
+				Log.d("json","comment:err");
 				listener.onError(1);
 			}
 
 			@Override
 			public void onComplete(JSONObject result) {
 				try {
+					Log.d("json","comment:"+result.toString());
 					JSONArray statuses = null;
 					if (account.type == Constants.TENCENT) {
 						if (result.get("data") == JSONObject.NULL) {
@@ -520,7 +520,7 @@ public class ApiManager {
 									.getJSONArray("info");
 						}
 					} else if (account.type == Constants.SINA) {
-						statuses = result.getJSONArray("statuses");
+						statuses = result.getJSONArray("comments");
 					}
 					ApiResult apiResult = JsonArrayToWeiboList(statuses,
 							account.type);

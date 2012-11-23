@@ -180,15 +180,16 @@ public class Utility {
 		} else if (method.equals("POST")) {
 			
 			HttpPost post = new HttpPost(url);
+			Log.i("http request", "post: " + url);
 			ArrayList<NameValuePair> data = toPostData(params);
 			post.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
 			request = post;
 			
 		}
 		HttpResponse response = httpClient.execute(request);
-		if (isHttpSuccessExecuted(response)) {			
+		if (isHttpSuccessExecuted(response)) {
 			result = EntityUtils.toString(response.getEntity());
-			Log.d("json",result);
+			Log.d("http request",result);
 		}
 		
 		return result;
