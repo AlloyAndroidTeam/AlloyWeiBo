@@ -193,7 +193,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 					if(tmpList.size()>0){
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 						upTimeStamp=tmpList.get(0).timestamp;
-						list.addAll(tmpList);
+						//list.addAll(tmpList);
 					}
 					//DataManager.set(account.uid,list);
 				}
@@ -201,7 +201,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 					mPullDownView.notifyDidMore();								
 					if(tmpList.size()>0){
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-						list.addAll(tmpList);
+						//list.addAll(tmpList);
 					}
 				}
 				else{				
@@ -209,7 +209,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 					if(tmpList.size()>0){
 						if(upTimeStamp!=tmpList.get(0).timestamp){
 							upTimeStamp=tmpList.get(0).timestamp;
-							list.addAll(0, tmpList);
+							//list.addAll(0, tmpList);
 						}
 					}
 				}

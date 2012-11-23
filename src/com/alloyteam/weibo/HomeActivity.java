@@ -54,9 +54,11 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	private static final int WHAT_DID_MORE = 1;
 	private WeiboListAdapter mAdapter;
 	private List<Weibo2> list;
+	private String upId;
+	private String downId;
+	private Account account;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
-	private Account account;
 	
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -125,26 +127,30 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				ArrayList<Weibo2> tmpList = result.weiboList;
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
-					list.addAll(tmpList);							
 					if(list.size()>0){
+						downId=tmpList.get(tmpList.size()-1).id;
+						upId=tmpList.get(0).id;
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 						upTimeStamp=tmpList.get(0).timestamp;
+						list.addAll(tmpList);							
 					}
 					DataManager.set(account.uid,list);
 				}
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
-					list.addAll(tmpList);
 					if(tmpList.size()>0){
+						downId=tmpList.get(tmpList.size()-1).id;
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						list.addAll(tmpList);
 					}
 					//DataManager.set(account.uid,list);
 				}
 				else{				
 					mPullDownView.notifyDidRefresh();
-					list.addAll(0, tmpList);
 					if(tmpList.size()>0){
+						upId=tmpList.get(0).id;
 						upTimeStamp=tmpList.get(0).timestamp;
+						list.addAll(0, tmpList);
 					}
 					//DataManager.set(account.uid,list);
 				}
@@ -155,62 +161,19 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				pullCallback(errorCode);
 			}
 		};
-		ApiManager.getHomeLine(account, 10, pageflag, 0, listener);
+		String Id;
+		if(pageflag==WHAT_DID_REFRESH){
+			Id=upId;
+		}
+		else if(pageflag==WHAT_DID_MORE){
+			Id=downId;
+		}
+		else{
+			Id="0";
+		}
 		
-//		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
-//			@Override
-//			public void onSuccess(List<Weibo> tmpList) {
-//				if(tmpList==null){
-//					pullCallback(pageflag);
-//					return;
-//				}
-//				// TODO Auto-generated method stub
-//				if(pageflag==WHAT_DID_LOAD_DATA){
-//					mPullDownView.notifyDidLoad();
-//					list.addAll(tmpList);							
-//					if(list.size()>0){
-//						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-//						upTimeStamp=tmpList.get(0).timestamp;
-//					}
-//					DataManager.set(account.uid,list);
-//				}
-//				else if(pageflag==WHAT_DID_MORE){
-//					mPullDownView.notifyDidMore();								
-//					list.addAll(tmpList);
-//					if(tmpList.size()>0){
-//						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-//					}
-//					//DataManager.set(account.uid,list);
-//				}
-//				else{				
-//					mPullDownView.notifyDidRefresh();
-//					list.addAll(0, tmpList);
-//					if(tmpList.size()>0){
-//						upTimeStamp=tmpList.get(0).timestamp;
-//					}
-//					//DataManager.set(account.uid,list);
-//				}
-//				mAdapter.notifyDataSetChanged();
-//			}
-//
-//			@Override
-//			public void onError(int type) {
-//				// TODO Auto-generated method stub
-//				pullCallback(pageflag);
-//			}			
-//		};
-//		long timeStamp;
-//		if(pageflag==WHAT_DID_REFRESH){
-//			timeStamp=upTimeStamp;
-//		}
-//		else if(pageflag==WHAT_DID_MORE){
-//			timeStamp=downTimeStamp;
-//		}
-//		else{
-//			timeStamp=0;
-//		}
-		
-//		ApiManager.getHomeLine(account, pageflag, timeStamp, listener);
+		ApiManager.getHomeLine(account, 10, pageflag, Id, listener);
+
 	}
 
 	@Override
