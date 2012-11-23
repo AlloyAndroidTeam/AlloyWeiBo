@@ -334,7 +334,7 @@ public class ApiManager {
 							account.type);
 					listener.onSuccess(apiResult);
 				} catch (JSONException je) {
-					Log.e("json", "error");
+					Log.e("json", je.toString());
 					je.printStackTrace();
 					listener.onError(0);
 				}
@@ -407,8 +407,12 @@ public class ApiManager {
 				}
 			}
 		} else if (type == Constants.SINA) {
-			JSONObject user = status.getJSONObject("user");
-			
+			JSONObject user = new JSONObject();
+			try{
+			 user = status.getJSONObject("user");
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 			weibo.uid = user.getString("id");
 			weibo.nick = user.getString("screen_name");
 			weibo.avatarUrl = user.getString("avatar_large");
@@ -446,9 +450,13 @@ public class ApiManager {
 				weibo.source = JsonObjectToWeibo(source, type);
 			} else {
 				// 处理图片
-				weibo.imageThumbUrl = status.getString("thumbnail_pic");
-				weibo.imageMiddleUrl = status.getString("bmiddle_pic");
-				weibo.imageUrl = status.getString("original_pic");
+				try{
+					weibo.imageThumbUrl = status.getString("thumbnail_pic");
+					weibo.imageMiddleUrl = status.getString("bmiddle_pic");
+					weibo.imageUrl = status.getString("original_pic");
+				}catch(Exception e){
+					
+				}
 			}
 		}
 
