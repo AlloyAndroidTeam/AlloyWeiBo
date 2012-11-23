@@ -502,12 +502,6 @@ public class ApiManager {
 				weibo.imageUrl = images.getString(0);
 			}
 			weibo.count = item.getInt("count");
-		} else {
-			if (item.get("image") != JSONObject.NULL) {
-				Log.d("my", "image");
-				JSONArray images = item.getJSONArray("image");
-				weibo.imageUrl = images.getString(0);
-			}
 		}
 		return weibo;
 	}

@@ -129,8 +129,8 @@ public class PostActivity extends Activity implements OnClickListener{
     	btnAddTopic = (Button)findViewById(R.id.btnPostAddTopic);
     	
     	 if (type != 0){        	
-       		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
-       		Weibo weibo=list.get(bundle.getInt("position"));
+       		List<Weibo2> list=DataManager.get(bundle.getString("uid"));  
+       		Weibo2 weibo=list.get(bundle.getInt("position"));
        		tid = weibo.id;
        		btnAddPic.setVisibility(View.INVISIBLE); 
        		/*
