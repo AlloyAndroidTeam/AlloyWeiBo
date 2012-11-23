@@ -79,7 +79,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
 		long date=weibo.timestamp;
 		dateText.setText(Utility.formatDate(date));
-		if(weibo.type==1){
+		if(weibo.source==null){
 			ViewGroup source=(ViewGroup)findViewById(R.id.source);
 			source.setVisibility(View.GONE);
 			if(!weibo.imageUrl.equals("")){
