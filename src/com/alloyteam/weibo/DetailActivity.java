@@ -3,9 +3,11 @@ package com.alloyteam.weibo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alloyteam.weibo.AccountManagerActivity.AccountViewHolder;
 import com.alloyteam.weibo.PullDownView.OnPullDownListener;
 import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.ApiManager;
+import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo;
@@ -13,14 +15,20 @@ import com.alloyteam.weibo.util.WeiboListAdapter;
 
 import com.alloyteam.weibo.model.Account;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,7 +41,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private static final int WHAT_DID_LOAD_DATA = 0;
 	private static final int WHAT_DID_REFRESH = 2;
 	private static final int WHAT_DID_MORE = 1;
-	private WeiboListAdapter mAdapter;
+	private CommentListAdatper mAdapter;
 	private List<Weibo> list;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
@@ -95,33 +103,34 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		}
 		findViewById(R.id.re).setOnClickListener(this);
 		findViewById(R.id.comment).setOnClickListener(this);
+		findViewById(R.id.reply).setOnClickListener(this);
 		initList();
+	}
+	private void re(int type){
+		Intent intent;
+		Bundle bundle;
+		intent=new Intent(this, PostActivity.class);
+		bundle = new Bundle();
+		bundle.putString("uid", uid);
+		bundle.putInt("type", type);
+		bundle.putInt("weiboType", type);
+		bundle.putInt("position", position);
+		intent.putExtras(bundle);
+		startActivity(intent);
 	}
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		Intent intent;
-		Bundle bundle;
+
 		switch (v.getId()) {
 		case R.id.re:
-			intent=new Intent(this, PostActivity.class);
-			bundle = new Bundle();
-			bundle.putString("uid", uid);
-			bundle.putInt("type", 1);
-			bundle.putInt("weiboType", type);
-			bundle.putInt("position", position);
-			intent.putExtras(bundle);
-			startActivity(intent);
+			re(1);
 			break;
 		case R.id.comment:
-			intent=new Intent(this, PostActivity.class);
-			bundle = new Bundle();
-			bundle.putString("uid", uid);
-			bundle.putInt("type", 2);
-			bundle.putInt("weiboType", type);
-			bundle.putInt("position", position);
-			intent.putExtras(bundle);
-			startActivity(intent);
+			re(2);
+			break;
+		case R.id.reply:
+			re(3);
 			break;
 		default:
 			break;
@@ -145,8 +154,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		mPullDownView.setOnPullDownListener(this);
 		list = new ArrayList<Weibo>();
 		mylist = mPullDownView.getListView();
-		mAdapter = new WeiboListAdapter(
-				this, list);
+		mAdapter = new CommentListAdatper(this, R.layout.comment, list);
 		mylist.setAdapter(mAdapter);
 		mPullDownView.enableAutoFetchMore(true, 1);
 		account = AccountManager.getAccount(uid, type);
@@ -172,7 +180,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 						upTimeStamp=tmpList.get(0).timestamp;
 					}
-					DataManager.set(account.uid,list);
+					//DataManager.set(account.uid,list);
 				}
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
@@ -224,5 +232,60 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			long id) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	class CommentViewHolder {
+		ImageView avatar;
+		TextView name;
+		TextView text;
+		TextView date;
+	}
+
+	class CommentListAdatper extends ArrayAdapter<Weibo> {
+
+		List<Weibo> commentList;
+
+		LayoutInflater layoutInflater;
+		
+		int mResourceId;
+
+		/**
+		 * @param context
+		 * @param textViewResourceId
+		 * @param list
+		 */
+		public CommentListAdatper(Context context, int resourceId,
+				List<Weibo> list) {
+			super(context, resourceId, list);
+
+			this.layoutInflater = LayoutInflater.from(context);
+
+			this.commentList = list;
+			mResourceId=resourceId;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			CommentViewHolder holder;
+			if (convertView == null) {
+				holder = new CommentViewHolder();
+				convertView = layoutInflater.inflate(mResourceId, null);
+				holder.avatar=(ImageView)convertView.findViewById(R.id.avatar);
+				holder.name=(TextView)convertView.findViewById(R.id.name);
+				holder.text=(TextView)convertView.findViewById(R.id.text);
+				holder.date=(TextView)convertView.findViewById(R.id.date);
+				convertView.setTag(holder);
+			}
+			else{
+				holder = (CommentViewHolder) convertView.getTag();
+			}
+			Weibo weibo = commentList.get(position);
+			HomeActivity.imageLoader.displayImage(weibo.avatarUrl+"/50", holder.avatar,null);
+			holder.name.setText(weibo.name);
+			holder.text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
+			holder.date.setText(Utility.formatDate(weibo.timestamp*1000));
+			return convertView;
+		}
+
 	}
 }

@@ -114,7 +114,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	
 	public void loadData(final int pageflag){
 		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
-
 			@Override
 			public void onSuccess(List<Weibo> tmpList) {
 				if(tmpList==null){
@@ -137,7 +136,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 					if(tmpList.size()>0){
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 					}
-					DataManager.set(account.uid,list);
+					//DataManager.set(account.uid,list);
 				}
 				else{				
 					mPullDownView.notifyDidRefresh();
@@ -145,7 +144,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 					if(tmpList.size()>0){
 						upTimeStamp=tmpList.get(0).timestamp;
 					}
-					DataManager.set(account.uid,list);
+					//DataManager.set(account.uid,list);
 				}
 				mAdapter.notifyDataSetChanged();
 			}
@@ -202,7 +201,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		Bundle bundle = new Bundle();
 		bundle.putString("uid", account.uid);
 		bundle.putInt("type", account.type);
-		bundle.putInt("position", position);
+		bundle.putInt("position", position);//+parent.getFirstVisiblePosition());
 		intent.putExtras(bundle);
 		startActivity(intent);		
 	}
