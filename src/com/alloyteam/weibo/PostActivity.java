@@ -23,6 +23,7 @@ import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo; 
+import com.alloyteam.weibo.model.Weibo2;
 
 import android.app.Activity;
 import android.app.AlertDialog; 
@@ -108,8 +109,8 @@ public class PostActivity extends Activity implements OnClickListener{
         	type = 0;
         }
         if (type != 0){        	
-      		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
-      		Weibo weibo=list.get(bundle.getInt("position"));
+      		List<Weibo2> list=DataManager.get(bundle.getString("uid"));  
+      		Weibo2 weibo=list.get(bundle.getInt("position"));
       		tid = weibo.id;
       		
         	Log.v("post", "" + type +", tid:" +tid);

@@ -78,7 +78,7 @@ public class Constants {
 		public static final String OAUTH_GET_ACCESS_TOKEN = "https://api.weibo.com/oauth2/authorize?display=mobile";
 
 		public static final String HOME_TIMELINE = API_ROOT
-				+ "/statuses/home_timeline";
+				+ "/statuses/home_timeline.json";
 	}
 
 	public class Tencent {

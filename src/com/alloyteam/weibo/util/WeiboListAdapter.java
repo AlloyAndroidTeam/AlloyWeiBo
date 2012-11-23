@@ -8,6 +8,8 @@ import java.util.List;
 import com.alloyteam.weibo.R;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.Weibo;
+import com.alloyteam.weibo.model.Weibo2;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,12 +34,12 @@ public class WeiboListAdapter extends BaseAdapter {
 	protected LayoutInflater mInflater;
 	private static final int mResource1 = R.layout.weibo_item;// xml布局文件
 	private static final int mResource2 = R.layout.weibo_item_type2;// xml布局文件
-	List<Weibo> mItems;
+	List<Weibo2> mItems;
 	ImageLoader imageLoader;
 	Context mContext;
 	HomeActivity homeActivity;
 	
-	public WeiboListAdapter(Context context, List<Weibo> items) {
+	public WeiboListAdapter(Context context, List<Weibo2> items) {
 		mItems = items;
 		mContext=context;
 		mInflater = (LayoutInflater) context
@@ -48,7 +50,7 @@ public class WeiboListAdapter extends BaseAdapter {
 	@Override
 	public int getItemViewType(int position) {
 		// TODO Auto-generated method stub
-		Weibo weibo = (Weibo) this.getItem(position);
+		Weibo2 weibo = (Weibo2) this.getItem(position);
 		return weibo.type;
 	}
 
@@ -119,7 +121,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		View rowView = convertView;
 
 		int type = getItemViewType(position);
-		Weibo weibo = mItems.get(position);
+		Weibo2 weibo = mItems.get(position);
 		TextView text;
 		TextView name;
 		TextView time;
@@ -146,14 +148,14 @@ public class WeiboListAdapter extends BaseAdapter {
 			name = viewCache.getName();
 			time = viewCache.getTime();
 			image = viewCache.getImage();
-			String avatarUrl = weibo.avatarUrl+"/50";
+			String avatarUrl = weibo.avatarUrl;
 			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
-			name.setText(weibo.name);
-			time.setText(Utility.formatDate(weibo.timestamp * 1000));
+			name.setText(weibo.nick);
+			time.setText(Utility.formatDate(weibo.timestamp));
 			imageLoader.displayImage(avatarUrl, avatar, callback);
-			if(!weibo.imageUrl.equals("")){
+			if(weibo.imageUrl != null && !weibo.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
-				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
+				imageLoader.displayImage(weibo.imageThumbUrl, image, null);
 				image.setTag(weibo.imageUrl);
 			}
 			else{
@@ -161,6 +163,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			}			
 			image.setOnClickListener(listener);
 		} else if (type == 2) {
+			Weibo2 source = weibo.source;
 			TextView text2;
 			TextView name2;
 			ImageView avatar2;
@@ -183,31 +186,32 @@ public class WeiboListAdapter extends BaseAdapter {
 			avatar = viewCache.getAvatar();
 			name = viewCache.getName();
 			time = viewCache.getTime();
-			String avatarUrl = weibo.avatarUrl+"/50";
+			String avatarUrl = weibo.avatarUrl;
 			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
-			name.setText(weibo.name);
-			time.setText(Utility.formatDate(weibo.timestamp * 1000));
+			name.setText(weibo.nick);
+			time.setText(Utility.formatDate(weibo.timestamp));
 			imageLoader.displayImage(avatarUrl, avatar, callback); 
+			
 			text2 = viewCache.getText2();
 			avatar2 = viewCache.getAvatar2();
 			name2 = viewCache.getName2();
-			String avatarUrl2 = weibo.avatarUrl2+"/50";
-			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text2)));
-			name2.setText(weibo.name2);
+			String avatarUrl2 = source.avatarUrl;
+			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
+			name2.setText(source.nick);
 			imageLoader.displayImage(avatarUrl2, avatar2, callback); 
 			image=viewCache.getImage();
 			count=viewCache.getCount();
-			if(!weibo.imageUrl.equals("")){
+			if(source.imageUrl != null && !source.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
-				imageLoader.displayImage(weibo.imageUrl+"/160", image, null);
-				image.setTag(weibo.imageUrl);
+				imageLoader.displayImage(source.imageThumbUrl, image, null);
+				image.setTag(source.imageUrl);
 			}
 			else{
 				image.setVisibility(View.GONE);
 			}
-			if(weibo.count!=0){
+			if(source.rebroadcastCount != 0){
 				count.setVisibility(View.VISIBLE);
-				count.setText(String.valueOf(weibo.count));
+				count.setText(String.valueOf(source.rebroadcastCount));
 			}
 			else{
 				count.setVisibility(View.GONE);
