@@ -128,10 +128,12 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
 					if(tmpList.size()>0){
-						downId=tmpList.get(tmpList.size()-1).id;
-						upId=tmpList.get(0).id;
-						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-						upTimeStamp=tmpList.get(0).timestamp;
+						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						downId=lastWeibo.id;
+						downTimeStamp=lastWeibo.timestamp;
+						Weibo2 firstWeibo=tmpList.get(0);
+						upId=firstWeibo.id;
+						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(tmpList);							
 					}
 					DataManager.set(account.uid,list);
@@ -139,16 +141,18 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
 					if(tmpList.size()>0){
-						downId=tmpList.get(tmpList.size()-1).id;
-						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						downId=lastWeibo.id;
+						downTimeStamp=lastWeibo.timestamp;
 						list.addAll(tmpList);
 					}
 				}
 				else{				
 					mPullDownView.notifyDidRefresh();
 					if(tmpList.size()>0){
-						upId=tmpList.get(0).id;
-						upTimeStamp=tmpList.get(0).timestamp;
+						Weibo2 firstWeibo=tmpList.get(0);
+						upId=firstWeibo.id;
+						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(0, tmpList);
 					}
 				}

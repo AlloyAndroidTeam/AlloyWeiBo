@@ -299,10 +299,11 @@ public class ApiManager {
 			params.putInt("type", 0);
 			params.putInt("trim_user", 0);
 			params.putInt("feature", 0);
+			long id=Long.parseLong(lastId)-1;
 			if (pageFlag == 1) {
-				params.putString("max_id", lastId);
+				params.putLong("max_id", id);
 			} else if (pageFlag == 2) {
-				params.putString("since_id", lastId);
+				params.putLong("since_id", id);
 			}
 		} else {
 			return;
