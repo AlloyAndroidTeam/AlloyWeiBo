@@ -271,7 +271,7 @@ public class ApiManager {
 		weibo.type = type;
 		weibo.timestamp = timestamp;
 		weibo.id=item.getString("id");
-		if (type == 1||type==3||type==5||type==6) {
+		if (type == 1||type==3) {
 			if (item.get("image") != JSONObject.NULL) {
 				Log.d("my", "image");
 				JSONArray images = item
