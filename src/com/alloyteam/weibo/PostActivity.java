@@ -422,7 +422,7 @@ public class PostActivity extends Activity implements OnClickListener{
 //    	 if (content.length() > 140){
 //    		 return;
 //    	 }
-    	 if ((type == 0 && content.length() == 0) ||
+    	 if ((type != 1 && content.length() == 0) ||
     			 content.length() > 140){
     		 return;
     	 }
