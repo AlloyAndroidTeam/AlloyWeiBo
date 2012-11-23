@@ -434,9 +434,10 @@ public class ApiManager {
 				weibo.timestamp = 0;
 				e.printStackTrace();
 			}
-
-			weibo.rebroadcastCount = status.getInt("reposts_count");
-			weibo.commentCount = status.getInt("comments_count");
+			try{
+				weibo.rebroadcastCount = status.getInt("reposts_count");
+				weibo.commentCount = status.getInt("comments_count");
+			}catch(Exception e){}
 			JSONObject source = null;
 			try{
 				source = status.getJSONObject("retweeted_status");
@@ -444,7 +445,12 @@ public class ApiManager {
 			}catch(Exception e){
 				weibo.type = Weibo2.WEIBO_TYPE_ORIGINAL;
 			}
-
+			try{
+				source = status.getJSONObject("status");
+				weibo.type = Weibo2.WEIBO_TYPE_COMMENT;
+			}catch(Exception e){
+				weibo.type = Weibo2.WEIBO_TYPE_ORIGINAL;
+			}
 			if (source != null) {
 				weibo.source = JsonObjectToWeibo(source, type);
 			} else {
