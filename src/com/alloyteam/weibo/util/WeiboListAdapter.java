@@ -57,7 +57,7 @@ public class WeiboListAdapter extends BaseAdapter {
 	@Override
 	public int getViewTypeCount() {
 		// TODO Auto-generated method stub
-		return 3;
+		return 7;
 	}
 
 	public static Bitmap toRoundCorner(Bitmap bitmap, int pixels) {
@@ -128,7 +128,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		ImageView avatar;
 		ImageView image;
 
-		if (type == 1) {
+		if (type == 1||type==3) {
 			ViewCache viewCache;
 			if (rowView == null) {
 
@@ -162,7 +162,7 @@ public class WeiboListAdapter extends BaseAdapter {
 				image.setVisibility(View.GONE);
 			}			
 			image.setOnClickListener(listener);
-		} else if (type == 2) {
+		} else {
 			Weibo2 source = weibo.source;
 			TextView text2;
 			TextView name2;

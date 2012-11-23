@@ -105,33 +105,34 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		}
 		findViewById(R.id.re).setOnClickListener(this);
 		findViewById(R.id.comment).setOnClickListener(this);
+		findViewById(R.id.reply).setOnClickListener(this);
 		initList();
+	}
+	private void re(int type){
+		Intent intent;
+		Bundle bundle;
+		intent=new Intent(this, PostActivity.class);
+		bundle = new Bundle();
+		bundle.putString("uid", uid);
+		bundle.putInt("type", type);
+		bundle.putInt("weiboType", type);
+		bundle.putInt("position", position);
+		intent.putExtras(bundle);
+		startActivity(intent);
 	}
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		Intent intent;
-		Bundle bundle;
+
 		switch (v.getId()) {
 		case R.id.re:
-			intent=new Intent(this, PostActivity.class);
-			bundle = new Bundle();
-			bundle.putString("uid", uid);
-			bundle.putInt("type", 1);
-			bundle.putInt("weiboType", type);
-			bundle.putInt("position", position);
-			intent.putExtras(bundle);
-			startActivity(intent);
+			re(1);
 			break;
 		case R.id.comment:
-			intent=new Intent(this, PostActivity.class);
-			bundle = new Bundle();
-			bundle.putString("uid", uid);
-			bundle.putInt("type", 2);
-			bundle.putInt("weiboType", type);
-			bundle.putInt("position", position);
-			intent.putExtras(bundle);
-			startActivity(intent);
+			re(2);
+			break;
+		case R.id.reply:
+			re(3);
 			break;
 		default:
 			break;

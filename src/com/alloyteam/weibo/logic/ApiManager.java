@@ -481,7 +481,14 @@ public class ApiManager {
 		weibo.type = type;
 		weibo.timestamp = timestamp;
 		weibo.id = item.getString("id");
-		if (type == 2) {
+		if (type == 1||type==3) {
+			if (item.get("image") != JSONObject.NULL) {
+				Log.d("my", "image");
+				JSONArray images = item
+						.getJSONArray("image");
+				weibo.imageUrl = images.getString(0);
+			}
+		} else {
 			JSONObject source = item.getJSONObject("source");
 			String text2 = source.getString("text");
 			String name2 = source.getString("name");
