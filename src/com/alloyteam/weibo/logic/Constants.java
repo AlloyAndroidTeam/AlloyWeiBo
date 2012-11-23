@@ -104,6 +104,7 @@ public class Constants {
 		public static final String T_READD = API_ROOT + "/t/re_add";//转发
 		public static final String T_REPLY = API_ROOT + "/t/reply";//回复一条微博（即对话）
 		public static final String T_COMMENT = API_ROOT + "/t/comment";//评论一条微博
+		public static final String T_GETintimate_friends = API_ROOT + "/friends/get_intimate_friends";//获取最近联系人列表
 		
 
 	}
