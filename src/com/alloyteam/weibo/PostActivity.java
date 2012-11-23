@@ -46,6 +46,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -54,6 +55,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -129,7 +131,12 @@ public class PostActivity extends Activity implements OnClickListener{
        		List<Weibo> list=DataManager.get(bundle.getString("uid"));  
        		Weibo weibo=list.get(bundle.getInt("position"));
        		tid = weibo.id;
-       		btnAddPic.setVisibility(View.INVISIBLE);
+       		btnAddPic.setVisibility(View.INVISIBLE); 
+       		/*
+       		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,100);
+       		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+       		btnAddFriend.setLayoutParams(params);
+       		*/
          	Log.v("post", "" + type +", tid:" +tid);
          }
     	 

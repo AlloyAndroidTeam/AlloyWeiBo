@@ -59,7 +59,8 @@
             android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:orientation="horizontal"  >
-	         <Button
+	        
+            <Button
 		        android:id="@+id/btnPostAddPic"
 		        android:layout_width="wrap_content" 
 		        android:layout_height="35dp" 
@@ -67,9 +68,10 @@
 		        android:paddingTop="5dp" 
 		        android:layout_margin="0dp"
 		        android:textColor="#060"
-		        android:textSize="12dp" 
-		        android:layout_alignParentLeft="true"
+		        android:textSize="12dp" 		        
+		        android:layout_centerInParent="true"
 		        android:text="@string/btn_add_pic" /> 
+		        
 	         <Button
 		        android:id="@+id/btnPostAddFriend"
 		        android:layout_width="wrap_content" 
@@ -78,9 +80,12 @@
 		        android:paddingTop="5dp" 
 		        android:layout_margin="0dp"
 		        android:textColor="#060"
-		        android:textSize="12dp" 
-		        android:layout_centerInParent="true"
+		        android:textSize="12dp"		        
+		        android:layout_alignParentLeft="true"
 		        android:text="@string/btn_add_friend" />
+	         
+	         
+	        
 	        <Button
 		        android:id="@+id/btnPostAddTopic"
 		        android:layout_width="wrap_content" 
