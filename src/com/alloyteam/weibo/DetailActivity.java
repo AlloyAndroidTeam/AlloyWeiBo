@@ -166,58 +166,58 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	}
 		
 	public void getCommentList(final int pageflag){
-//		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
-//
-//			@Override
-//			public void onSuccess(List<Weibo2> tmpList) {
-//				if(tmpList==null){
-//					pullCallback(pageflag);
-//					return;
-//				}
-//				// TODO Auto-generated method stub
-//				if(pageflag==WHAT_DID_LOAD_DATA){
-//					mPullDownView.notifyDidLoad();
-//					list.addAll(tmpList);							
-//					if(list.size()>0){
-//						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-//						upTimeStamp=tmpList.get(0).timestamp;
-//					}
-//					//DataManager.set(account.uid,list);
-//				}
-//				else if(pageflag==WHAT_DID_MORE){
-//					mPullDownView.notifyDidMore();								
-//					list.addAll(tmpList);
-//					if(tmpList.size()>0){
-//						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
-//					}
-//				}
-//				else{				
-//					mPullDownView.notifyDidRefresh();
-//					list.addAll(0, tmpList);
-//					if(tmpList.size()>0){
-//						upTimeStamp=tmpList.get(0).timestamp;
-//					}
-//				}
-//				mAdapter.notifyDataSetChanged();
-//			}
-//
-//			@Override
-//			public void onError(int type) {
-//				// TODO Auto-generated method stub
-//				pullCallback(pageflag);
-//			}			
-//		};
-//		long timeStamp;
-//		if(pageflag==WHAT_DID_REFRESH){
-//			timeStamp=upTimeStamp;
-//		}
-//		else if(pageflag==WHAT_DID_MORE){
-//			timeStamp=downTimeStamp;
-//		}
-//		else{
-//			timeStamp=0;
-//		}
-//		ApiManager.getCommentList(account, weibo.id, pageflag, timeStamp, listener);
+		ApiManager.GetListListener listener=new ApiManager.GetListListener(){
+
+			@Override
+			public void onSuccess(List<Weibo2> tmpList) {
+				if(tmpList==null){
+					pullCallback(pageflag);
+					return;
+				}
+				// TODO Auto-generated method stub
+				if(pageflag==WHAT_DID_LOAD_DATA){
+					mPullDownView.notifyDidLoad();
+					list.addAll(tmpList);							
+					if(list.size()>0){
+						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						upTimeStamp=tmpList.get(0).timestamp;
+					}
+					//DataManager.set(account.uid,list);
+				}
+				else if(pageflag==WHAT_DID_MORE){
+					mPullDownView.notifyDidMore();								
+					list.addAll(tmpList);
+					if(tmpList.size()>0){
+						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+					}
+				}
+				else{				
+					mPullDownView.notifyDidRefresh();
+					list.addAll(0, tmpList);
+					if(tmpList.size()>0){
+						upTimeStamp=tmpList.get(0).timestamp;
+					}
+				}
+				mAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onError(int type) {
+				// TODO Auto-generated method stub
+				pullCallback(pageflag);
+			}			
+		};
+		long timeStamp;
+		if(pageflag==WHAT_DID_REFRESH){
+			timeStamp=upTimeStamp;
+		}
+		else if(pageflag==WHAT_DID_MORE){
+			timeStamp=downTimeStamp;
+		}
+		else{
+			timeStamp=0;
+		}
+		ApiManager.getCommentList(account, weibo.id, pageflag, timeStamp, listener);
 	}
 	@Override
 	public void onRefresh() {

@@ -451,6 +451,78 @@ public class ApiManager {
 		return weibo;
 	}
 
+	
+	/**
+	 * 获取评论列表
+	 */
+	public static void  getCommentList(final Account account, int pageCount,
+			int pageFlag, String weiboId, String lastId, final IApiResultListener listener){
+		Bundle params = new Bundle();
+		String url;
+		params.putLong("t", System.currentTimeMillis());
+		if (account.type == Constants.TENCENT) {
+			url = Constants.Tencent.COMMENT_LIST;
+			
+			params.putInt("reqnum", pageCount);
+			params.putInt("pageflag", pageFlag);
+			params.putString("twitterid", lastId);
+			params.putString("rootid", weiboId);
+			
+//			params.putLong("pagetime", timeStamp);
+		
+			params.putString("format", "json");
+
+		} else if (account.type == Constants.SINA) {
+			url = Constants.Sina.COMMENT_LIST;
+//			params.putInt("count", pageCount);
+//			params.putInt("type", 0);
+//			params.putInt("trim_user", 0);
+//			params.putInt("feature", 0);
+//			if (pageFlag == 1) {
+//				params.putLong("max_id", lastId);
+//			} else if (pageFlag == 2) {
+//				params.putLong("since_id", lastId);
+//			}
+		} else {
+			return;
+		}
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				try {
+					JSONArray statuses = null;
+					if (account.type == Constants.TENCENT) {
+						if (result.get("data") == JSONObject.NULL) {
+							statuses = null;
+						} else {
+							statuses = result.getJSONObject("data")
+									.getJSONArray("info");
+						}
+					} else if (account.type == Constants.SINA) {
+						statuses = result.getJSONArray("statuses");
+					}
+					ApiResult apiResult = JsonArrayToWeiboList(statuses,
+							account.type);
+					listener.onSuccess(apiResult);
+				} catch (JSONException je) {
+					Log.e("json", "error");
+					je.printStackTrace();
+					listener.onError(0);
+				}
+			}
+		};
+		requestAsync(account, url, params, "GET", httpListener);
+	}
+	
 	/**
 	 * @deprecated
 	 * @param info
@@ -578,6 +650,7 @@ public class ApiManager {
 
 	/**
 	 * 获取主页时间线
+	 * @deprecated
 	 */
 	public static void getCommentList(Account account, String id, int pageflag,
 			long timeStamp, final GetListListener listener) {

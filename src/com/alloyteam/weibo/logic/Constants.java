@@ -79,6 +79,10 @@ public class Constants {
 
 		public static final String HOME_TIMELINE = API_ROOT
 				+ "/statuses/home_timeline.json";
+		public static final String COMMENT_LIST = API_ROOT
+				+ "comments/show.json";//获取评论列表
+		public static final String REBOARDCAST_LIST = API_ROOT
+				+ "statuses/repost_timeline.json";//获取转播列表
 	}
 
 	public class Tencent {
@@ -94,7 +98,7 @@ public class Constants {
 				+ "/statuses/home_timeline";
 
 		public static final String COMMENT_LIST = API_ROOT
-				+ "/t/re_list";
+				+ "/t/re_list";//获取评论和转播列表
 		public static final String T_ADD = API_ROOT + "/t/add"; //写微博
 		public static final String T_ADD_PIC = API_ROOT + "/t/add_pic";//写微博pic
 		public static final String T_READD = API_ROOT + "/t/re_add";//转发
