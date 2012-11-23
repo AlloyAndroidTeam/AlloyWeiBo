@@ -107,7 +107,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			switch (v.getId()) {
 			case R.id.thumbImage:
 				Bitmap bm=v.getDrawingCache();
-				HomeActivity.showImage(mContext,(String)v.getTag(),bm);//+"/2000");
+				Utility.showImage(mContext,(String)v.getTag(),bm);//+"/2000");
 				break;
 			default:
 				break;

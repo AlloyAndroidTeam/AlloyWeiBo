@@ -93,7 +93,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				this, list);
 		mylist.setAdapter(mAdapter);
 		mylist.setOnItemClickListener(this);
-		mPullDownView.enableAutoFetchMore(true, 1);
+		//mPullDownView.enableAutoFetchMore(true, 1);
 		account = AccountManager.getDefaultAccount();
 		if (account == null)
 			return;
@@ -176,12 +176,6 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		}
 	}
 
-	public static void showImage(Context context, String url, Bitmap bm){
-		Intent intent = new Intent(context, ImageActivity.class);
-		intent.putExtra("url", url);
-		context.startActivity(intent);
-	}
-	
 	@Override
 	protected void onResume() {
 		super.onResume();

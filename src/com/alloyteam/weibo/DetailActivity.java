@@ -104,6 +104,8 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		findViewById(R.id.re).setOnClickListener(this);
 		findViewById(R.id.comment).setOnClickListener(this);
 		findViewById(R.id.reply).setOnClickListener(this);
+		findViewById(R.id.image).setOnClickListener(this);
+		findViewById(R.id.image2).setOnClickListener(this);
 		initList();
 	}
 	private void re(int type){
@@ -132,6 +134,12 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		case R.id.reply:
 			re(3);
 			break;
+		case R.id.image:
+			Utility.showImage(this,weibo.imageUrl,null);//+"/2000");
+			break;
+		case R.id.image2:
+			Utility.showImage(this,weibo.imageUrl2,null);
+			break;
 		default:
 			break;
 		}
@@ -156,7 +164,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		mylist = mPullDownView.getListView();
 		mAdapter = new CommentListAdatper(this, R.layout.comment, list);
 		mylist.setAdapter(mAdapter);
-		mPullDownView.enableAutoFetchMore(true, 1);
+		//mPullDownView.enableAutoFetchMore(true, 1);
 		account = AccountManager.getAccount(uid, type);
 		if (account == null)
 			return;
@@ -172,28 +180,35 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 					pullCallback(pageflag);
 					return;
 				}
-				// TODO Auto-generated method stub
+				for(int i=0;i<tmpList.size();++i){
+					if(tmpList.get(i).text.equals("")){
+						tmpList.remove(i);
+						--i;
+					}
+				}				// TODO Auto-generated method stub
 				if(pageflag==WHAT_DID_LOAD_DATA){
-					mPullDownView.notifyDidLoad();
-					list.addAll(tmpList);							
-					if(list.size()>0){
+					mPullDownView.notifyDidLoad();											
+					if(tmpList.size()>0){
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
 						upTimeStamp=tmpList.get(0).timestamp;
+						list.addAll(tmpList);
 					}
 					//DataManager.set(account.uid,list);
 				}
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
-					list.addAll(tmpList);
 					if(tmpList.size()>0){
 						downTimeStamp=tmpList.get(tmpList.size()-1).timestamp;
+						list.addAll(tmpList);
 					}
 				}
 				else{				
-					mPullDownView.notifyDidRefresh();
-					list.addAll(0, tmpList);
+					mPullDownView.notifyDidRefresh();					
 					if(tmpList.size()>0){
-						upTimeStamp=tmpList.get(0).timestamp;
+						if(upTimeStamp!=tmpList.get(0).timestamp){
+							upTimeStamp=tmpList.get(0).timestamp;
+							list.addAll(0, tmpList);
+						}
 					}
 				}
 				mAdapter.notifyDataSetChanged();
