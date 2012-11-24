@@ -493,10 +493,11 @@ public class ApiManager {
 			url = Constants.Sina.COMMENT_LIST;
 			params.putInt("count", pageCount);
 			params.putString("id", weiboId);
+			long id=Long.parseLong(lastId)-1;
 			if (pageFlag == 1) {
-				params.putString("max_id", lastId);
+				params.putLong("max_id", id);
 			} else if (pageFlag == 2) {
-				params.putString("since_id", lastId);
+				params.putLong("since_id", id);
 			}
 		} else {
 			return;
