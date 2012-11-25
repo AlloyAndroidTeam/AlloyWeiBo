@@ -298,12 +298,12 @@ public class ApiManager {
 			params.putInt("count", pageCount);
 			params.putInt("type", 0);
 			params.putInt("trim_user", 0);
-			params.putInt("feature", 0);
-			long id=Long.parseLong(lastId)-1;
+			params.putInt("feature", 0);			
 			if (pageFlag == 1) {
+				long id=Long.parseLong(lastId)-1;
 				params.putLong("max_id", id);
 			} else if (pageFlag == 2) {
-				params.putLong("since_id", id);
+				params.putString("since_id", lastId);
 			}
 		} else {
 			return;
@@ -493,11 +493,11 @@ public class ApiManager {
 			url = Constants.Sina.COMMENT_LIST;
 			params.putInt("count", pageCount);
 			params.putString("id", weiboId);
-			long id=Long.parseLong(lastId)-1;
 			if (pageFlag == 1) {
+				long id=Long.parseLong(lastId)-1;
 				params.putLong("max_id", id);
 			} else if (pageFlag == 2) {
-				params.putLong("since_id", id);
+				params.putString("since_id", lastId);
 			}
 		} else {
 			return;
