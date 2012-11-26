@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.alloyteam.weibo.model.DataManager;
+import com.alloyteam.weibo.model.UserInfo;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
 import com.alloyteam.weibo.util.ImageLoader;
@@ -102,6 +103,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		if (account == null)
 			return;
 		loadData(WHAT_DID_LOAD_DATA);
+		
 	}
 	
 	public void pullCallback(int pageflag){
@@ -182,6 +184,8 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 
 	}
 
+	
+	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();

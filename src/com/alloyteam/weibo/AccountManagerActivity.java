@@ -23,8 +23,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
+import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.model.UserInfo;
 
 /**
  * @author pxz
@@ -51,6 +54,8 @@ public class AccountManagerActivity extends Activity {
 				Log.v(TAG, "onReceive: " + uid + " added.");
 				Account account = AccountManager.getAccount(uid, type);
 				accountListAdatper.add(account);
+				loadUserInfo(account);
+				
 			}else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
 				//TODO 未测试
 				Account account = AccountManager.getAccount(uid, type);
@@ -157,7 +162,7 @@ public class AccountManagerActivity extends Activity {
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -170,6 +175,28 @@ public class AccountManagerActivity extends Activity {
 			this.unregisterReceiver(broadcastReceiver);
 		}
 	}
+	
+	private void loadUserInfo(final Account account){
+		ApiManager.getUserInfo(account, new ApiManager.IApiResultListener() {
+			
+			@Override
+			public void onSuccess(ApiResult result) {
+				// TODO Auto-generated method stub
+				UserInfo userInfo = result.userInfo;
+				account.nick = userInfo.nick;
+				account.avatar = userInfo.avatar;
+				AccountManager.updateAccount(account);
+				Log.d(TAG, "update nick");
+			}
+			
+			@Override
+			public void onError(int errorCode) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
+
 
 	class AccountViewHolder {
 		Button deleteButton;
@@ -244,7 +271,7 @@ public class AccountManagerActivity extends Activity {
 				holder.defaultSelect.setVisibility(View.GONE);
 			}
 			holder.provider.setText(desc);
-			desc = account.uid + "(" + account.nick + ")";
+			desc = account.nick + "(" + account.uid + ")";
 			holder.description.setText(desc);
 
 			holder.deleteButton.setOnClickListener(new OnClickListener() {
