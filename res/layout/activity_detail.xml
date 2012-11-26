@@ -157,6 +157,15 @@
             android:layout_alignBottom="@+id/comment"
             android:layout_toRightOf="@+id/comment"
             android:text="评论" />
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/reply"
+            android:text="删除" />
+
     </RelativeLayout>
 
     <com.alloyteam.weibo.PullDownView

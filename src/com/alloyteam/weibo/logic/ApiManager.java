@@ -390,7 +390,7 @@ public class ApiManager {
 
 			weibo.rebroadcastCount = status.getInt("count");
 			weibo.commentCount = status.getInt("mcount");
-			
+			weibo.isSelf=status.getInt("self")>0;
 			weibo.type = status.getInt("type");
 			
 			JSONObject source = null;
@@ -480,7 +480,7 @@ public class ApiManager {
 		String url;
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
-			url = Constants.Tencent.COMMENT_LIST;
+			url = Constants.Tencent.T_COMMENT_LIST;
 			
 			params.putInt("reqnum", pageCount);
 			params.putInt("pageflag", pageFlag);
@@ -541,7 +541,50 @@ public class ApiManager {
 		};
 		requestAsync(account, url, params, "GET", httpListener);
 	}
-	
+	/**
+	 * 删除微博
+	 */
+	public static void DeleteWeibo(final Account account, String weiboId, final IApiResultListener listener){
+		Bundle params = new Bundle();
+		String url="";
+		params.putLong("t", System.currentTimeMillis());
+		if(account.type==Constants.TENCENT){
+			url = Constants.Tencent.T_DELETE;
+			params.putString("format","json");
+			params.putString("id",weiboId);
+		}else if (account.type == Constants.SINA) {
+			url = Constants.Sina.DELETE;
+			params.putString("id", weiboId);
+		}
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				int errcode=1;
+				try {
+					errcode = result.getInt("errcode");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(errcode==0){
+					listener.onSuccess(null);
+				}
+				else{
+					listener.onError(errcode);
+				}
+			}
+		};		
+		requestAsync(account, url, params, "POST", httpListener);
+	}
 	/**
 	 * @deprecated
 	 * @param info
@@ -712,7 +755,7 @@ public class ApiManager {
 				}
 			}
 		};
-		requestAsync(account, Constants.Tencent.COMMENT_LIST, params, "GET",
+		requestAsync(account, Constants.Tencent.T_COMMENT_LIST, params, "GET",
 				httpListener);
 	}
 

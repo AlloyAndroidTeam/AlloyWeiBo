@@ -106,6 +106,12 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		else{
 			count.setVisibility(View.GONE);
 		}
+		if(weibo.isSelf){
+			findViewById(R.id.delete).setOnClickListener(this);
+		}
+		else{
+			findViewById(R.id.delete).setVisibility(View.GONE);
+		}
 		findViewById(R.id.re).setOnClickListener(this);
 		findViewById(R.id.comment).setOnClickListener(this);
 		findViewById(R.id.reply).setOnClickListener(this);
@@ -145,6 +151,9 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		case R.id.image2:
 			Utility.showImage(this,weibo.source.imageUrl,null);
 			break;
+		case R.id.delete:
+			deleteWeibo();
+			break;
 		default:
 			break;
 		}
@@ -175,7 +184,19 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			return;
 		getCommentList(WHAT_DID_LOAD_DATA);
 	}
-		
+	public void deleteWeibo(){
+		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
+			@Override
+			public void onSuccess(ApiResult result) {
+				finish();
+			}
+			@Override
+			public void onError(int errorCode) {
+				pullCallback(errorCode);
+			}
+		};
+		ApiManager.DeleteWeibo(account, weibo.id, listener);
+	}
 	public void getCommentList(final int pageflag){
 		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
 			@Override
