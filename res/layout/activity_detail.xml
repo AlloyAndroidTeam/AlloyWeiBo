@@ -94,13 +94,14 @@
                 android:layout_marginTop="-5dp"
                 android:layout_toRightOf="@+id/avatar2"
                 android:text="TextView" />
-
+
             <TextView
                 android:id="@+id/text2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/name2"
                 android:layout_below="@+id/name2"
+                android:autoLink="web"
                 android:text="TextView"
                 android:textColor="#000" />
 
@@ -156,6 +157,15 @@
             android:layout_alignBottom="@+id/comment"
             android:layout_toRightOf="@+id/comment"
             android:text="评论" />
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/reply"
+            android:text="删除" />
+
     </RelativeLayout>
 
     <com.alloyteam.weibo.PullDownView
