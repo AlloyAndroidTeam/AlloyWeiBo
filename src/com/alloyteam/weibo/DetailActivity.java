@@ -122,6 +122,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		findViewById(R.id.image).setOnClickListener(this);
 		findViewById(R.id.image2).setOnClickListener(this);
 		avatar.setOnClickListener(this);
+		Bundle b2=new Bundle();
+		b2.putString("uid", weibo.uid);
+		b2.putString("nick", weibo.nick);
+		b2.putString("avatarUrl", weibo.avatarUrl);
+		avatar.setTag(b2);
 		
 		initList();
 	}
@@ -193,7 +198,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		mAdapter = new CommentListAdatper(this, R.layout.comment, list);
 		mylist.setAdapter(mAdapter);
 		//mPullDownView.enableAutoFetchMore(true, 1);
-		account = AccountManager.getAccount(uid, type);
+		account = AccountManager.getAccount(myuid, type);
 		if (account == null)
 			return;
 		getCommentList(WHAT_DID_LOAD_DATA);
@@ -336,7 +341,14 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 				holder = (CommentViewHolder) convertView.getTag();
 			}
 			Weibo2 weibo = commentList.get(position);
-			imageLoader.displayImage(weibo.avatarUrl, holder.avatar,null);
+			ImageView avatar=holder.avatar;
+			imageLoader.displayImage(weibo.avatarUrl, avatar,null);
+			Bundle b2=new Bundle();
+			b2.putString("uid", weibo.uid);
+			b2.putString("nick", weibo.nick);
+			b2.putString("avatarUrl", weibo.avatarUrl);
+			avatar.setOnClickListener(DetailActivity.this);
+			avatar.setTag(b2);
 			holder.name.setText(weibo.nick);
 			holder.text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			holder.date.setText(Utility.formatDate(weibo.timestamp));
