@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+
+import com.alloyteam.weibo.MainActivity;
 import com.alloyteam.weibo.R;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.Weibo;
@@ -44,20 +46,20 @@ public class WeiboListAdapter extends BaseAdapter {
 		mContext=context;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		imageLoader=HomeActivity.imageLoader;//new ImageLoader(context);
+		imageLoader=MainActivity.imageLoader;//new ImageLoader(context);
 	}
 
 	@Override
 	public int getItemViewType(int position) {
 		// TODO Auto-generated method stub
 		Weibo2 weibo = (Weibo2) this.getItem(position);
-		return weibo.source==null?1:2;
+		return weibo.source==null?0:1;
 	}
 
 	@Override
 	public int getViewTypeCount() {
 		// TODO Auto-generated method stub
-		return 3;
+		return 2;
 	}
 
 	public static Bitmap toRoundCorner(Bitmap bitmap, int pixels) {
@@ -128,7 +130,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		ImageView avatar;
 		ImageView image;
 
-		if (type==1) {
+		if (type==0) {
 			ViewCache viewCache;
 			if (rowView == null) {
 

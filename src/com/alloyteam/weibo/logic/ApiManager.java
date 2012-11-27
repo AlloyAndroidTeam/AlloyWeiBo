@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.alloyteam.weibo.AuthActivity;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
+import com.alloyteam.weibo.model.UserInfo;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
 
@@ -60,7 +61,7 @@ public class ApiManager {
 	public static class ApiResult {
 		public ArrayList<Weibo2> weiboList;
 		public Weibo2 weibo;
-		public JSONObject result; 
+		public UserInfo userInfo;
 
 	}
 
@@ -392,7 +393,7 @@ public class ApiManager {
 
 			weibo.rebroadcastCount = status.getInt("count");
 			weibo.commentCount = status.getInt("mcount");
-			
+			weibo.isSelf=status.getInt("self")>0;
 			weibo.type = status.getInt("type");
 			
 			JSONObject source = null;
@@ -482,7 +483,7 @@ public class ApiManager {
 		String url;
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
-			url = Constants.Tencent.COMMENT_LIST;
+			url = Constants.Tencent.T_COMMENT_LIST;
 			
 			params.putInt("reqnum", pageCount);
 			params.putInt("pageflag", pageFlag);
@@ -543,7 +544,120 @@ public class ApiManager {
 		};
 		requestAsync(account, url, params, "GET", httpListener);
 	}
+	public static void getUserInfo(final Account account, final IApiResultListener resultListener){
+		Bundle params = new Bundle();
+		String url;
+		params.putLong("t", System.currentTimeMillis());
+		if (account.type == Constants.TENCENT) {
+			url = Constants.Tencent.USER_INFO;
+
+			params.putString("format", "json");
+
+		} else if (account.type == Constants.SINA) {
+			url = Constants.Sina.USER_INFO;
+			params.putString("uid", account.uid);
+
+		} else {
+			return;
+		}
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				Log.d("json","getUserInfo:err1");
+				resultListener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				Log.d("json","getUserInfo:err");
+				resultListener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				try {
+					Log.d("json","userinfo:"+result.toString());
+					JSONObject userData  = null;
+					if (account.type == Constants.TENCENT) {
+						if (result.get("data") == JSONObject.NULL) {
+							userData = null;
+						} else {
+							userData = result.getJSONObject("data");
+						}
+					} else if (account.type == Constants.SINA) {
+						userData = result;
+					}
+					ApiResult apiResult = new ApiResult();
+					apiResult.userInfo = JsonObjectToUserInfo(userData,
+							account.type);
+					resultListener.onSuccess(apiResult);
+				} catch (JSONException je) {
+					Log.e("json", "error");
+					je.printStackTrace();
+					resultListener.onError(0);
+				}
+			}
+		};
+		requestAsync(account, url, params, "GET", httpListener);
+	}
 	
+	private static UserInfo JsonObjectToUserInfo(JSONObject jsonObject, int type) throws JSONException{
+		UserInfo userInfo = new UserInfo();
+		if(type == Constants.SINA){
+			userInfo.uid = jsonObject.getString("id");
+			userInfo.nick = jsonObject.getString("name");
+			userInfo.avatar = jsonObject.getString("avatar_large");
+		}else if(type == Constants.TENCENT){
+			userInfo.uid = jsonObject.getString("name");
+			userInfo.nick = jsonObject.getString("nick");
+			userInfo.avatar = jsonObject.getString("head");
+		}
+		return userInfo;
+	}
+	
+	/**
+	 * 删除微博
+	 */
+	public static void DeleteWeibo(final Account account, String weiboId, final IApiResultListener listener){
+		Bundle params = new Bundle();
+		String url="";
+		params.putLong("t", System.currentTimeMillis());
+		if(account.type==Constants.TENCENT){
+			url = Constants.Tencent.T_DELETE;
+			params.putString("format","json");
+			params.putString("id",weiboId);
+		}else if (account.type == Constants.SINA) {
+			url = Constants.Sina.DELETE;
+			params.putString("id", weiboId);
+		}
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				int errcode=1;
+				try {
+					errcode = result.getInt("errcode");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(errcode==0){
+					listener.onSuccess(null);
+				}
+				else{
+					listener.onError(errcode);
+				}
+			}
+		};		
+		requestAsync(account, url, params, "POST", httpListener);
+	}
 	/**
 	 * @deprecated
 	 * @param info
@@ -714,7 +828,7 @@ public class ApiManager {
 				}
 			}
 		};
-		requestAsync(account, Constants.Tencent.COMMENT_LIST, params, "GET",
+		requestAsync(account, Constants.Tencent.T_COMMENT_LIST, params, "GET",
 				httpListener);
 	}
 

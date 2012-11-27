@@ -112,6 +112,21 @@ public class Weibo2 {
 	 * 当微博类型 type = 2时 ,source就是被转播的weibo
 	 */
 	public Weibo2 source = null;
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Weibo2 [avatarUrl=" + avatarUrl + ", uid=" + uid + ", isSelf="
+				+ isSelf + ", nick=" + nick + ", isVip=" + isVip + ", id=" + id
+				+ ", text=" + text + ", imageUrl=" + imageUrl
+				+ ", imageThumbUrl=" + imageThumbUrl + ", imageMiddleUrl="
+				+ imageMiddleUrl + ", timestamp=" + timestamp
+				+ ", rebroadcastCount=" + rebroadcastCount + ", commentCount="
+				+ commentCount + ", type=" + type + ", status=" + status
+				+ ", source=" + source + "]";
+	}
 	
 	
 

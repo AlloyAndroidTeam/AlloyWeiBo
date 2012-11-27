@@ -32,7 +32,7 @@ public class Account {
 	/**
 	 * 头像url
 	 */
-	public String avator;
+	public String avatar;
 
 	/**
 	 * 微博类型, 1: 新浪, 2: 腾讯
@@ -83,7 +83,7 @@ public class Account {
 	
 	@Override
 	public String toString() {
-		return "Account [uid=" + uid + ", nick=" + nick + ", avator=" + avator
+		return "Account [uid=" + uid + ", nick=" + nick + ", avatar=" + avatar
 				+ ", type=" + type + ", openId=" + openId + ", openKey="
 				+ openKey + ", accessToken=" + accessToken + ", refreshToken="
 				+ refreshToken + ", authTime=" + authTime + ", invalidTime="
