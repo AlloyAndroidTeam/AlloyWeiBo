@@ -39,7 +39,7 @@ public class PopFriend extends PopupWindow {
         LayoutInflater inflater = (LayoutInflater) context  
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);  
         popView = inflater.inflate(R.layout.pop_friend, null); 
-        
+         
           
         //设置PopupWindow的View  
         this.setContentView(popView);  
@@ -90,8 +90,12 @@ public class PopFriend extends PopupWindow {
 		/*为ListView设置Adapter来绑定数据*/
 		dataList.add("111");
 		dataList.add("22");
-		dataList.add("33");
-		dataList.add("33");
+		dataList.add("55");
+		dataList.add("Adsdsd");
+		dataList.add("bdsdsd");
+		dataList.add("adsdsd");
+		dataList.add("好Adsdsd");
+		dataList.add("非dsdsd");
 		
 		adapter = new ArrayAdapter<String>(context,
                 android.R.layout.simple_list_item_1, dataList);
@@ -102,7 +106,7 @@ public class PopFriend extends PopupWindow {
 					long arg3) {
 				// TODO Auto-generated method stub
 				Log.v("onItemLongClick", "arg2:" + arg2 + ", arg3:" + arg3);
-				dataList.add("after:"+ arg2 );
+				//dataList.add("after:"+ arg2 );
 				adapter.notifyDataSetChanged();
 			}
 	    });
@@ -130,10 +134,32 @@ public class PopFriend extends PopupWindow {
                 
                 public void afterTextChanged(Editable s)
                 {
-                        // TODO Auto-generated method stub
+                	 final String txt = s.toString().toLowerCase(); 
+                	 dataList = getFilterList(txt);
+                	 adapter.notifyDataSetChanged();
                 }
         });
 	}
 
-
+	/**
+	 * 返回筛选后的数据
+	 * @param filter
+	 * @return
+	 */
+	private ArrayList getFilterList(String filter){
+		
+		if (filter == null || filter.equals("")){
+			return dataList;
+		}
+		ArrayList<String> list = new ArrayList<String>();
+		
+		int l = dataList.size();		
+		for (int k = 0; k < l; k++) {
+			String tmp = list.get(k);
+			if (tmp.startsWith(filter)){
+				list.add(tmp);
+			}
+		}
+		return list;
+	}
 }
