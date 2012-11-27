@@ -113,8 +113,8 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 				R.layout.home_title);
 		accountSwitchBtn = (Button) findViewById(R.id.btnHomeTitleAccount);
 		accountSwitchBtn.setOnClickListener(this);
-		settingBtn = (Button) findViewById(R.id.btnHomeTitleSetting);
-		settingBtn.setOnClickListener(this);
+		//settingBtn = (Button) findViewById(R.id.btnHomeTitleAccountSetting);
+		//settingBtn.setOnClickListener(this);
 		findViewById(R.id.btnHomeTitlePost).setOnClickListener(this);
 		Account defaultAccount = AccountManager.getDefaultAccount();
 		if (defaultAccount != null) {
@@ -283,7 +283,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		account.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				Intent i = new Intent(MainActivity.this, AccountManager.class);
+				Intent i = new Intent(MainActivity.this, AccountManagerActivity.class);
 				startActivity(i);
 				return false;
 			}
@@ -318,8 +318,8 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 			i = new Intent(this, PostActivity.class);
 			startActivity(i);
 			break;
-		case R.id.btnHomeTitleSetting:
-			i = new Intent(this, SettingActivity.class);
+		case R.id.btnHomeTitleAccountSetting:
+			i = new Intent(this, AccountManagerActivity.class);
 			startActivity(i);
 			break;
 		case R.id.btnHomeTitleAccount: // 帐号
