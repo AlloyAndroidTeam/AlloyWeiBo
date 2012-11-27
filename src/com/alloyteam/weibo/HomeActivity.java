@@ -12,6 +12,7 @@ import com.alloyteam.weibo.model.UserInfo;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
 import com.alloyteam.weibo.util.ImageLoader;
+import com.alloyteam.weibo.util.UserWeiboListAdapter;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
 import com.alloyteam.weibo.model.Account;
@@ -32,9 +33,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -52,13 +55,14 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	private static final int WHAT_DID_LOAD_DATA = 0;
 	private static final int WHAT_DID_REFRESH = 2;
 	private static final int WHAT_DID_MORE = 1;
-	private WeiboListAdapter mAdapter;
+	private UserWeiboListAdapter mAdapter;
 	private List<Weibo2> list;
 	private String upId;
 	private String downId;
 	private Account account;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
+	private String uid;
 	
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -78,14 +82,16 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
+		this.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_home);
-		imageLoader=new ImageLoader(this);
-		initHomeLine();
 		IntentFilter intentFilter = new IntentFilter();
 		//intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
 		intentFilter.addAction("com.alloyteam.weibo.WEIBO_ADDED");		
 		this.registerReceiver(broadcastReceiver, intentFilter);
+		Intent i=this.getIntent();
+		Bundle b=i.getExtras();
+		loadUser(b);
 	}
 
 	public void initHomeLine() {
@@ -93,7 +99,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		mPullDownView.setOnPullDownListener(this);
 		list = new ArrayList<Weibo2>();
 		mylist = mPullDownView.getListView();
-		mAdapter = new WeiboListAdapter(
+		mAdapter = new UserWeiboListAdapter(
 				this, list);
 		mylist.setAdapter(mAdapter);
 		mylist.setOnItemClickListener(this);
@@ -105,6 +111,22 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		
 	}
 	
+	public void loadUser(Bundle b){
+		String uid=b.getString("uid");
+		this.uid=uid;
+		ImageView avatar=(ImageView) findViewById(R.id.avatar);
+		TextView nameText=(TextView)findViewById(R.id.name);		
+		imageLoader=MainActivity.imageLoader;
+		avatar.setImageResource(R.drawable.avatar);
+		imageLoader.displayImage(b.getString("avatarUrl"), avatar, null);
+		nameText.setText(b.getString("nick"));
+		initHomeLine();		
+	}
+	@Override
+	public void onStart(){
+		super.onStart();
+		
+	}
 	public void pullCallback(int pageflag){
 		if(pageflag==WHAT_DID_LOAD_DATA){
 			mPullDownView.notifyDidLoad();
@@ -137,7 +159,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(tmpList);							
 					}
-					DataManager.set(account.uid,list);
+					DataManager.set(uid,list);
 				}
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
@@ -179,7 +201,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			timestamp=0;
 		}
 		
-		ApiManager.getHomeLine(account, 10, pageflag, timestamp, Id, listener);
+		ApiManager.getHomeLine(account, uid, 10, pageflag, timestamp, Id, listener);
 
 	}
 
@@ -210,7 +232,8 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		// TODO Auto-generated method stub
 		Intent intent = new Intent(this, DetailActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putString("uid", account.uid);
+		bundle.putString("myuid", account.uid);
+		bundle.putString("uid", uid);
 		bundle.putInt("type", account.type);
 		bundle.putInt("position", position);//+parent.getFirstVisiblePosition());
 		intent.putExtras(bundle);

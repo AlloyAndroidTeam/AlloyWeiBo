@@ -283,19 +283,25 @@ public class ApiManager {
 	 * @param listener
 	 *            api回调
 	 */
-	public static void getHomeLine(final Account account, int pageCount,
+	public static void getHomeLine(final Account account, String uid, int pageCount,
 			int pageFlag, long timestamp, String lastId, final IApiResultListener listener) {
 		Bundle params = new Bundle();
 		String url;
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
-			url = Constants.Tencent.HOME_TIMELINE;
 			params.putInt("pageflag", pageFlag);
 			params.putLong("pagetime", timestamp/1000);
 			params.putInt("reqnum", pageCount);
 			params.putInt("type", 0);
 			params.putInt("contenttype", 0);
 			params.putString("format", "json");
+			if(uid!=null){
+				params.putString("name",uid);
+				url = Constants.Tencent.USER_TIMELINE;
+			}
+			else{
+				url = Constants.Tencent.HOME_TIMELINE;				
+			}
 		} else if (account.type == Constants.SINA) {
 			url = Constants.Sina.HOME_TIMELINE;
 			params.putInt("count", pageCount);
@@ -307,6 +313,13 @@ public class ApiManager {
 				params.putLong("max_id", id);
 			} else if (pageFlag == 2) {
 				params.putString("since_id", lastId);
+			}
+			if(uid!=null){
+				params.putString("uid",uid);
+				url = Constants.Sina.USER_TIMELINE;
+			}
+			else{
+				url = Constants.Sina.HOME_TIMELINE;
 			}
 		} else {
 			return;

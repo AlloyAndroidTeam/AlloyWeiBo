@@ -80,6 +80,9 @@ public class Constants {
 		public static final String HOME_TIMELINE = API_ROOT
 				+ "/statuses/home_timeline.json";
 		
+		public static final String USER_TIMELINE = API_ROOT
+				+ "/statuses/user_timeline.json";
+		
 		public static final String USER_INFO = API_ROOT
 				+ "/users/show.json";
 		
@@ -108,6 +111,9 @@ public class Constants {
 
 		public static final String HOME_TIMELINE = API_ROOT
 				+ "/statuses/home_timeline";
+		
+		public static final String USER_TIMELINE = API_ROOT
+				+ "/statuses/user_timeline";
 		
 		public static final String USER_INFO = API_ROOT
 				+ "/user/info";

@@ -54,28 +54,28 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private String upId;
 	private String downId;
 	private ImageLoader imageLoader;
+	private String myuid;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_detail);
 		ImageView imageView=(ImageView) findViewById(R.id.image);
 		ImageView avatar=(ImageView) findViewById(R.id.avatar);
-		TextView textText=(TextView)findViewById(R.id.text);
 		TextView nameText=(TextView)findViewById(R.id.name);
+		TextView textText=(TextView)findViewById(R.id.text);
 		TextView dateText=(TextView)findViewById(R.id.date);
 		imageLoader=MainActivity.imageLoader;
 		Intent i=this.getIntent();
 		Bundle b=i.getExtras();
-		String uid=b.getString("uid");
-		this.uid=uid;
+		myuid=b.getString("myuid");
+		uid=b.getString("uid");
 		type=b.getInt("type");
 		List<Weibo2> list=DataManager.get(uid);
 		int position = b.getInt("position");
 		this.position=position;
 		weibo=list.get(position);
-		Log.d("my","id:"+weibo.id);
 		String avatarUrl=weibo.avatarUrl;
-		MainActivity.imageLoader.displayImage(avatarUrl, avatar, null);
+		imageLoader.displayImage(avatarUrl, avatar, null);
 		String name=weibo.nick;
 		nameText.setText(name);
 		String text=weibo.text;
@@ -128,6 +128,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		intent=new Intent(this, PostActivity.class);
 		bundle = new Bundle();
 		bundle.putString("uid", uid);
+		bundle.putString("myuid", myuid);
 		bundle.putInt("type", type);
 		bundle.putInt("weiboType", type);
 		bundle.putInt("position", position);

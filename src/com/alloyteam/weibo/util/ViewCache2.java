@@ -40,7 +40,7 @@ public class ViewCache2 {
 
         if (text2 == null) {
 
-        	text2 = (TextView) baseView.findViewById(R.id.textView5);
+        	text2 = (TextView) baseView.findViewById(R.id.text2);
 
         }
 
@@ -53,7 +53,7 @@ public class ViewCache2 {
 
         if (name2 == null) {
 
-        	name2 = (TextView) baseView.findViewById(R.id.textView4);
+        	name2 = (TextView) baseView.findViewById(R.id.name2);
 
         }
 
@@ -65,7 +65,7 @@ public class ViewCache2 {
 
         if (avatar2 == null) {
 
-            avatar2 = (ImageView) baseView.findViewById(R.id.imageView2);
+            avatar2 = (ImageView) baseView.findViewById(R.id.avatar2);
 
         }
 
@@ -77,7 +77,7 @@ public class ViewCache2 {
 
         if (text == null) {
 
-        	text = (TextView) baseView.findViewById(R.id.textView1);
+        	text = (TextView) baseView.findViewById(R.id.text);
 
         }
 
@@ -89,7 +89,7 @@ public class ViewCache2 {
 
         if (count == null) {
 
-        	count = (TextView) baseView.findViewById(R.id.textView6);
+        	count = (TextView) baseView.findViewById(R.id.count);
 
         }
 
@@ -101,7 +101,7 @@ public class ViewCache2 {
 
         if (name == null) {
 
-        	name = (TextView) baseView.findViewById(R.id.textView2);
+        	name = (TextView) baseView.findViewById(R.id.name);
 
         }
 
@@ -113,7 +113,7 @@ public class ViewCache2 {
 
         if (avatar == null) {
 
-            avatar = (ImageView) baseView.findViewById(R.id.imageView1);
+            avatar = (ImageView) baseView.findViewById(R.id.avatar);
 
         }
 
@@ -125,7 +125,7 @@ public class ViewCache2 {
 
         if (image == null) {
 
-            image = (ImageView) baseView.findViewById(R.id.thumbImage);
+            image = (ImageView) baseView.findViewById(R.id.image2);
 
         }
 
@@ -137,7 +137,7 @@ public class ViewCache2 {
 
         if (time == null) {
 
-        	time = (TextView) baseView.findViewById(R.id.textView3);
+        	time = (TextView) baseView.findViewById(R.id.date);
 
         }
 
