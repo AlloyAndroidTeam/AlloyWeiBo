@@ -83,14 +83,14 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 				} else {
 					accountSwitchBtn.setText("绑定帐号");
 				}
-			}/*else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
+			}else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
 				String uid = intent.getStringExtra("uid");
 				int type = intent.getIntExtra("type", 0);
 				Account account = AccountManager.getAccount(uid, type);
-				if(account != null){
-					loadUserInfo(account);
+				if (account != null) {
+					accountSwitchBtn.setText(getAccountDescption(account));
 				}
-			}*/
+			}
 			if("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)){
 				initHomeLine();
 			}
