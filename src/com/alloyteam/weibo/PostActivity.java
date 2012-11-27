@@ -92,6 +92,8 @@ public class PostActivity extends Activity implements OnClickListener{
 	
 	private TextView tvTips;
 	
+	private Account account;
+	
 	
 	
 	
@@ -114,7 +116,9 @@ public class PostActivity extends Activity implements OnClickListener{
         	type = 0;
         }
         ((TextView)findViewById(R.id.tvPostTitle)).setText(titles[type]);
-         
+        
+
+        
         
         tvMain = (EditText)findViewById(R.id.etPostMain); 
         tvTips = (TextView)findViewById(R.id.tvPostTips);
@@ -128,8 +132,11 @@ public class PostActivity extends Activity implements OnClickListener{
     	btnAddFriend = (Button)findViewById(R.id.btnPostAddFriend);
     	btnAddTopic = (Button)findViewById(R.id.btnPostAddTopic);
     	
-    	 if (type != 0){        	
-       		List<Weibo2> list=DataManager.get(bundle.getString("uid"));  
+    	 if (type != 0){        
+    		String uid = bundle.getString("uid");
+	        int weiboType = bundle.getInt("weiboType");
+	        account = AccountManager.getAccount(uid, weiboType); 
+       		List<Weibo2> list=DataManager.get(uid);  
        		Weibo2 weibo=list.get(bundle.getInt("position"));
        		tid = weibo.id;
        		btnAddPic.setVisibility(View.INVISIBLE); 
@@ -139,6 +146,8 @@ public class PostActivity extends Activity implements OnClickListener{
        		btnAddFriend.setLayoutParams(params);
        		*/
          	Log.v("post", "" + type +", tid:" +tid);
+         }else{
+        	account = AccountManager.getDefaultAccount();        	 
          }
     	 
     	
@@ -157,7 +166,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		Log.v("onClick","" + v.getId());
 		switch(v.getId()){
     	case R.id.btnPostAddFriend : //@好友
-    		showFriend(v); 
+    		//showFriend(v); 
     		break;
     	case R.id.btnPostAddPic : //插入图片
    		 	insertPhoto();
@@ -453,28 +462,23 @@ public class PostActivity extends Activity implements OnClickListener{
 
 				@Override
 				public void onComplete(JSONObject result) {
-					Log.d("add", "onComplete"+result.toString()); 
-					try {							 
-						String errcode = result.getString("errcode");
-						String ret = result.getString("ret");
-						if (errcode.equals("0")){												
-							//tips("发送成功.");
-							Intent intent = new Intent();						    	
-					    	intent.setAction("com.alloyteam.weibo.WEIBO_ADDED"); 					
-							_context.sendBroadcast(intent);								 
-							finish();
-						}else{								
-							checkErrcode(Integer.parseInt(ret), Integer.parseInt(errcode));//tips("发送失败，请重试！");
-						} 
-						 
-					} catch (JSONException je) {
-						Log.d("json", "error");
-					}
+					Log.d("add", "onComplete"+result.toString());
+					String checkTxt = "发送失败，请重试！";					 					 
+					checkTxt = ApiManager.checkResult(account, result); 
+					if (checkTxt.equals("0")){												
+						//tips("发送成功.");
+						Intent intent = new Intent();						    	
+				    	intent.setAction("com.alloyteam.weibo.WEIBO_ADDED"); 					
+						_context.sendBroadcast(intent);								 
+						finish();
+					}else{								
+						tips(checkTxt);
+					} 					 
 					btnSave.setEnabled(true);
 				}
 			};
 		
-		Account account = AccountManager.getDefaultAccount(); 
+		//Account account = AccountManager.getDefaultAccount(); 
 		
 		////操作类型，0写，1转发，2评论
 		switch(type){
@@ -502,83 +506,6 @@ public class PostActivity extends Activity implements OnClickListener{
 		
     }
     
-    /**
-     * 检查返回的错误
-     */
-    private void checkErrcode(int ret, int errcode){
-    	String txt = "发送失败，请重试！";
-    	  
-		 switch(errcode){
-	 		case 1:
-	 			txt = "必须为用户侧真实ip";
-	 			break;
-	 		case 2:
-	 			txt = "微博内容超出长度限制";
-	 			break;
-// 		 		case 3:
-// 		 			txt = "经度值错误";
-// 		 			break;
-// 		 		case 4:
-// 		 			txt = "纬度值错误";
-// 		 			break;
-	 		case 3:
-	 			txt = "格式错误、用户无效";
-	 			break;	
-	 		
-	 		case 4:
-	 			txt = "有过多脏话";
-	 			break;
-	 		case 5:
-	 			txt = "禁止访问，如城市，uin黑名单限制等";
-	 			break;
-	 		case 9:
-	 			if (ret == 1){
-	 				txt = "图片大小超出限制或为0";
-	 			}else{
-	 				txt = "包含垃圾信息";
-	 			}
-	 			break;
-	 		case 10:
-	 			if (ret == 1){
-	 				txt = "图片格式错误，目前仅支持gif、jpeg、jpg、png、bmp及ico格式";
-	 			}else{
-	 				txt = "发表太快";
-	 			}
-	 			
-	 			break;
-	 		case 12:
-	 			txt = "源消息审核中";
-	 			break;	
-	 		case 13:
-	 			txt = "重复发表";
-	 			break;
-	 		case 14:
-	 			txt = "未实名认证";
-	 			break;
-	 		case 16:
-	 			txt = "服务器内部错误导致发表失败";
-	 			break;
-	 		case 15: 
-	 			
-	 		case 1001:
-	 			txt = "公共uin黑名单限制";
-	 			break;
-	 		case 1002:
-	 			txt = "公共IP黑名单限制";
-	 			break;
-	 		case 1003:
-	 			txt = "微博黑名单限制";
-	 			break;
-	 		case 1004:
-	 			txt = "单UIN访问微博过快";
-	 			break;	
-	 		case 1472:
-	 			txt = "服务器内部错误导致发表失败";
-	 			break;
- 		 }
-    	  
-    	 tips(txt);
-    }
     
      
 	/**

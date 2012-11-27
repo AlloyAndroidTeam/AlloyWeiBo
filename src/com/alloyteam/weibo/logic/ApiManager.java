@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.net.URLEncoder;
 
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
@@ -59,6 +60,7 @@ public class ApiManager {
 	public static class ApiResult {
 		public ArrayList<Weibo2> weiboList;
 		public Weibo2 weibo;
+		public JSONObject result; 
 
 	}
 
@@ -724,12 +726,12 @@ public class ApiManager {
 
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
-		case 1:
-			addToTencent(account, content, null, listener);
-			break;
-		case 2:
-			addToTencent(account, content, null, listener);
-			break;
+			case Constants.SINA:
+				addToSina(account, content, null, listener);
+				break;
+			case Constants.TENCENT:
+				addToTencent(account, content, null, listener);
+				break;
 		}
 	}
 
@@ -741,12 +743,12 @@ public class ApiManager {
 		Log.v(TAG, "add:" + account.type);
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
-		case 1:
-			addToTencent(account, content, picFilePath, listener);
-			break;
-		case 2:
-			addToTencent(account, content, picFilePath, listener);
-			break;
+			case Constants.SINA:
+				addToSina(account, content, picFilePath, listener);
+				break;
+			case Constants.TENCENT:
+				addToTencent(account, content, picFilePath, listener);
+				break;
 		}
 	}
 
@@ -758,13 +760,32 @@ public class ApiManager {
 
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
-		case 1:
-			readdToTencent(account, tid, content, listener);
-			break;
-		case 2:
-			readdToTencent(account, tid, content, listener);
-			break;
+			case Constants.SINA:
+				readdToTencent(account, tid, content, listener);
+				break;
+			case Constants.TENCENT:
+				readdToTencent(account, tid, content, listener);
+				break;
 		}
+	}
+	
+	/**
+	 * 处理错误码
+	 * 检测不同的错误码：
+	 * 统一返回结果：0表示成功，否则为错误信息
+	 */
+	public static String checkResult(Account account, JSONObject result){
+		String tmp = "操作失败，请重试！";
+		// 微博类型, 1: 新浪, 2: 腾讯
+		switch (account.type) {
+			case Constants.SINA:
+				tmp = checkSinaResult(result);
+				break;
+			case Constants.TENCENT:
+				tmp = checkTencentResult(result);
+				break;
+		}
+		return tmp;
 	}
 
 	/**
@@ -775,12 +796,12 @@ public class ApiManager {
 
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
-		case 1:
-			replyToTencent(account, tid, content, listener);
-			break;
-		case 2:
-			replyToTencent(account, tid, content, listener);
-			break;
+			case Constants.SINA:
+				replyToTencent(account, tid, content, listener);
+				break;
+			case Constants.TENCENT:
+				replyToTencent(account, tid, content, listener);
+				break;
 		}
 	}
 
@@ -792,18 +813,116 @@ public class ApiManager {
 
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
-		case 1:
+		case Constants.SINA:
 			commentToTencent(account, tid, content, listener);
 			break;
-		case 2:
+		case Constants.TENCENT:
 			commentToTencent(account, tid, content, listener);
 			break;
 		}
 	}
 
 	// ********************腾讯相关方法****************************************
+	 
 	/**
-	 * 发布微博，发布到腾讯，不对外
+	 * 处理错误码
+	 */
+	private static String checkTencentResult(JSONObject result){
+		try {							 
+			String errcode = result.getString("errcode");
+			String ret = result.getString("ret");
+			if (errcode.equals("0")){												
+				return "0";
+			}else{								
+				return getTencentErrcodeTxt(Integer.parseInt(ret), Integer.parseInt(errcode)); 
+			} 
+			 
+		} catch (JSONException je) {
+			//Log.d("json", "error");
+			return "发送失败，处理返回数据异常！";
+		}
+		 
+	}
+	 /**
+     * 检查返回的错误
+     */
+    private static String getTencentErrcodeTxt(int ret, int errcode){
+    	 String txt = "发送失败，请重试！";    	  
+		 switch(errcode){
+	 		case 1:
+	 			txt = "必须为用户侧真实ip";
+	 			break;
+	 		case 2:
+	 			txt = "微博内容超出长度限制";
+	 			break;
+// 		 		case 3:
+// 		 			txt = "经度值错误";
+// 		 			break;
+// 		 		case 4:
+// 		 			txt = "纬度值错误";
+// 		 			break;
+	 		case 3:
+	 			txt = "格式错误、用户无效";
+	 			break;	
+	 		
+	 		case 4:
+	 			txt = "有过多脏话";
+	 			break;
+	 		case 5:
+	 			txt = "禁止访问，如城市，uin黑名单限制等";
+	 			break;
+	 		case 9:
+	 			if (ret == 1){
+	 				txt = "图片大小超出限制或为0";
+	 			}else{
+	 				txt = "包含垃圾信息";
+	 			}
+	 			break;
+	 		case 10:
+	 			if (ret == 1){
+	 				txt = "图片格式错误，目前仅支持gif、jpeg、jpg、png、bmp及ico格式";
+	 			}else{
+	 				txt = "发表太快";
+	 			}
+	 			
+	 			break;
+	 		case 12:
+	 			txt = "源消息审核中";
+	 			break;	
+	 		case 13:
+	 			txt = "重复发表";
+	 			break;
+	 		case 14:
+	 			txt = "未实名认证";
+	 			break;
+	 		case 16:
+	 			txt = "服务器内部错误导致发表失败";
+	 			break;
+	 		case 15: 
+	 			
+	 		case 1001:
+	 			txt = "公共uin黑名单限制";
+	 			break;
+	 		case 1002:
+	 			txt = "公共IP黑名单限制";
+	 			break;
+	 		case 1003:
+	 			txt = "微博黑名单限制";
+	 			break;
+	 		case 1004:
+	 			txt = "单UIN访问微博过快";
+	 			break;	
+	 		case 1472:
+	 			txt = "服务器内部错误导致发表失败";
+	 			break;
+ 		 }
+    	 return txt; 
+    }
+	
+    
+    /**
+	 * 发布微博，发布到tencent，不对外
+	 * 
 	 */
 	private static void addToTencent(Account account, String content,
 			String picFilePath, final ApiManager.IApiListener listener)
@@ -817,11 +936,11 @@ public class ApiManager {
 		params.putString("compatibleflag", "0");
 
 		if (picFilePath != null) {
-			ApiManager.postAsync(account, Constants.Tencent.T_ADD_PIC, params,
+			ApiManager.postAsync(account, Constants.Tencent.ADD_PIC, params,
 					picFilePath, listener);
 			Log.v(TAG, "addToTencent width pic");
 		} else {
-			ApiManager.requestAsync(account, Constants.Tencent.T_ADD, params,
+			ApiManager.requestAsync(account, Constants.Tencent.ADD, params,
 					"POST", listener);
 			Log.v(TAG, "addToTencent");
 		}
@@ -841,7 +960,7 @@ public class ApiManager {
 		params.putString("longitude", "");
 		params.putString("syncflag", "1");
 		params.putString("compatibleflag", "0");
-		ApiManager.requestAsync(account, Constants.Tencent.T_REPLY, params,
+		ApiManager.requestAsync(account, Constants.Tencent.REPLY, params,
 				"POST", listener);
 	}
 
@@ -859,7 +978,7 @@ public class ApiManager {
 		params.putString("longitude", "");
 		params.putString("syncflag", "1");
 		params.putString("compatibleflag", "0");
-		ApiManager.requestAsync(account, Constants.Tencent.T_READD, params,
+		ApiManager.requestAsync(account, Constants.Tencent.READD, params,
 				"POST", listener);
 	}
 
@@ -877,8 +996,76 @@ public class ApiManager {
 		params.putString("longitude", "");
 		params.putString("syncflag", "1");
 		params.putString("compatibleflag", "0");
-		ApiManager.requestAsync(account, Constants.Tencent.T_COMMENT, params,
+		ApiManager.requestAsync(account, Constants.Tencent.COMMENT, params,
 				"POST", listener);
 	}
 
+	
+	// ********************新浪相关方法****************************************
+	
+	/**
+	 * 处理错误码
+	 */
+	private static String checkSinaResult(JSONObject result){
+		String errcode = "0";
+		try {							 
+			errcode = result.getString("error_code"); 			 
+		} catch (JSONException je) {  //没有则表示正常
+			return "0";
+		}
+		if (errcode.equals("0")){												
+			return "0";
+		}else{								
+			return getSinaErrcodeTxt(Integer.parseInt(errcode)); 
+		}   
+	}
+	 /**
+     * 检查返回的错误
+     */
+    private static String getSinaErrcodeTxt(int errcode){
+    	 String txt = "发送失败，请重试！";
+    	 /*
+		 switch(errcode){
+	 		case 1:
+	 			txt = "必须为用户侧真实ip";
+	 			break;
+		 }
+		 */
+    	 if (errcode > 10000 && errcode < 20000){
+    		 return "系统出错，稍后再试！";
+    	 }
+    	 if (errcode > 20000){
+    		 return "操作出错，检查内容后再试！";
+    	 }
+    	 return txt; 
+    }
+	/**
+	 * 发布微博，发布到sina，不对外
+	 * source	false	string	采用OAuth授权方式不需要此参数，其他授权方式为必填参数，数值为应用的AppKey。
+	access_token	false	string	采用OAuth授权方式为必填参数，其他授权方式不需要此参数，OAuth授权后获得。
+	status	true	string	要发布的微博文本内容，必须做URLencode，内容不超过140个汉字。
+	visible	false	int	微博的可见性，0：所有人能看，1：仅自己可见，2：密友可见，3：指定分组可见，默认为0。
+	list_id	false	string	微博的保护投递指定分组ID，只有当visible参数为3时生效且必选。
+	lat	false	float	纬度，有效范围：-90.0到+90.0，+表示北纬，默认为0.0。
+	long	false	float	经度，有效范围：-180.0到+180.0，+表示东经，默认为0.0。
+	annotations	false	string	元数据，主要是为了方便第三方应用记录一些适合于自己使用的信息，
+	每条微博可以包含一个或者多个元数据，必须以json字串的形式提交，字串长度不超过512个字符，具体内容可以自
+	 */
+	private static void addToSina(Account account, String content,
+			String picFilePath, final ApiManager.IApiListener listener)
+			throws Exception {
+
+		Bundle params = new Bundle(); 
+		params.putString("status", content);//URLEncoder.encode(content)); 
+
+		if (picFilePath != null) {
+			ApiManager.postAsync(account, Constants.Sina.ADD_PIC, params,
+					picFilePath, listener);
+			Log.v(TAG, "addToSina width pic");
+		} else {
+			ApiManager.requestAsync(account, Constants.Sina.ADD, params,
+					"POST", listener);
+			Log.v(TAG, "addToSina");
+		}
+	}
 }
