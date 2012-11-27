@@ -89,7 +89,7 @@ public class Constants {
 		public static final String COMMENT_LIST = API_ROOT
 				+ "/comments/show.json";//获取评论列表
 		public static final String DELETE = API_ROOT
-				+ "/comments/destroy.json";//获取评论列表
+				+ "/statuses/destroy.json";//获取评论列表
 		public static final String REBOARDCAST_LIST = API_ROOT
 				+ "/statuses/repost_timeline.json";//获取转播列表
 		

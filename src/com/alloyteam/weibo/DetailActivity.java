@@ -50,11 +50,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private long downTimeStamp=0;
 	private int type=0;
 	private Weibo2 weibo;
-	private Account account;
 	private String upId;
 	private String downId;
 	private ImageLoader imageLoader;
 	private String myuid;
+	private Account account;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -79,7 +79,12 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		String name=weibo.nick;
 		nameText.setText(name);
 		String text=weibo.text;
-		textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
+		if(text.length()>0){
+			textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
+		}
+		else{
+			textText.setVisibility(View.GONE);
+		}
 		long date=weibo.timestamp;
 		dateText.setText(Utility.formatDate(date));
 		if(weibo.source==null){
@@ -110,7 +115,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		else{
 			count.setVisibility(View.GONE);
 		}
-		if(weibo.isSelf){
+		if(weibo.uid.equals(myuid)){
 			findViewById(R.id.delete).setOnClickListener(this);
 		}
 		else{
