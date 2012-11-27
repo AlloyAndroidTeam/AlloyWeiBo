@@ -497,7 +497,7 @@ public class ApiManager {
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
 			url = Constants.Tencent.T_COMMENT_LIST;
-			
+			params.putInt("flag", 1);
 			params.putInt("reqnum", pageCount);
 			params.putInt("pageflag", pageFlag);
 			params.putLong("pagetime", timestamp/1000);

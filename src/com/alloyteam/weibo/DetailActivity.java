@@ -105,6 +105,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			imageLoader.displayImage(source.avatarUrl, avatar2, null);
 			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
 			TextView name2=(TextView)findViewById(R.id.name2);
+			Bundle b3=new Bundle();
+			b3.putString("uid", source.uid);
+			b3.putString("nick", source.nick);
+			b3.putString("avatarUrl", source.avatarUrl);
+			avatar2.setTag(b3);
 			avatar2.setOnClickListener(this);
 			name2.setText(source.nick);			
 		}
@@ -132,7 +137,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		b2.putString("nick", weibo.nick);
 		b2.putString("avatarUrl", weibo.avatarUrl);
 		avatar.setTag(b2);
-		
+		avatar.setOnClickListener(this);		
 		initList();
 	}
 	private void re(int type){
