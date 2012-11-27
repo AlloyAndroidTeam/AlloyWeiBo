@@ -867,7 +867,7 @@ public class ApiManager {
 	}
 
 	/**
-	 * 回复微博,统一接口
+	 * 回转发微博,统一接口
 	 */
 	public static void readd(Account account, String tid, String content,
 			final ApiManager.IApiListener listener) throws Exception {
@@ -875,7 +875,7 @@ public class ApiManager {
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
 			case Constants.SINA:
-				readdToTencent(account, tid, content, listener);
+				readdToSina(1, account, tid, content, listener);
 				break;
 			case Constants.TENCENT:
 				readdToTencent(account, tid, content, listener);
@@ -903,7 +903,7 @@ public class ApiManager {
 	}
 
 	/**
-	 * 转发微博,统一接口
+	 * 评论微博,统一接口
 	 */
 	public static void reply(Account account, String tid, String content,
 			final ApiManager.IApiListener listener) throws Exception {
@@ -911,7 +911,7 @@ public class ApiManager {
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
 			case Constants.SINA:
-				replyToTencent(account, tid, content, listener);
+				readdToSina(2, account, tid, content, listener);
 				break;
 			case Constants.TENCENT:
 				replyToTencent(account, tid, content, listener);
@@ -920,7 +920,7 @@ public class ApiManager {
 	}
 
 	/**
-	 * 评论微博,统一接口
+	 * 回复微博,统一接口
 	 */
 	public static void comment(Account account, String tid, String content,
 			final ApiManager.IApiListener listener) throws Exception {
@@ -928,7 +928,7 @@ public class ApiManager {
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
 		case Constants.SINA:
-			commentToTencent(account, tid, content, listener);
+			readdToSina(3, account, tid, content, listener);
 			break;
 		case Constants.TENCENT:
 			commentToTencent(account, tid, content, listener);
@@ -1182,4 +1182,36 @@ public class ApiManager {
 			Log.v(TAG, "addToSina");
 		}
 	}
+	
+	/**
+	 * 转发，评论，回复新浪微博，只是地址不一样，参数都一样
+	 * type操作类型，1转发，2评论, 3回复
+	 */
+	private static void readdToSina(int type, Account account, String tid, String content, 
+			final ApiManager.IApiListener listener)
+			throws Exception {
+		String url = "";
+		switch(type){
+			case 1:
+				url =  Constants.Sina.READD;
+				break;
+			case 2:
+				url =  Constants.Sina.REPLY;
+				break;
+			case 3:
+				url =  Constants.Sina.COMMENT;
+				break;
+			default:
+				return;
+		}
+		Bundle params = new Bundle(); 
+		params.putString("id", tid); 
+		params.putString("status", content); 
+		
+		ApiManager.requestAsync(account, url, params,
+				"POST", listener);
+		Log.v(TAG, "readdToSina:" + type);
+		
+	}
+	
 }

@@ -134,8 +134,12 @@ public class PostActivity extends Activity implements OnClickListener{
     	
     	 if (type != 0){        
     		String uid = bundle.getString("uid");
-	        int weiboType = bundle.getInt("weiboType");
+	        int weiboType = bundle.getInt("weiboType");	        
 	        account = AccountManager.getAccount(uid, weiboType); 
+	        if (account == null){
+	        	tips("获取帐号信息失败，请重试！"); 
+	        }
+	        
        		List<Weibo2> list=DataManager.get(uid);  
        		Weibo2 weibo=list.get(bundle.getInt("position"));
        		tid = weibo.id;
@@ -145,7 +149,7 @@ public class PostActivity extends Activity implements OnClickListener{
        		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
        		btnAddFriend.setLayoutParams(params);
        		*/
-         	Log.v("post", "" + type +", tid:" +tid);
+         	Log.v("post", "" + type +", tid:" +tid+", weiboType:" +weiboType);
          }else{
         	account = AccountManager.getDefaultAccount();        	 
          }
@@ -184,6 +188,8 @@ public class PostActivity extends Activity implements OnClickListener{
 				// TODO Auto-generated catch block
 				Log.v("btnPostSave","保存失败");
 				e.printStackTrace();
+				tips("操作异常，保存失败！");
+				btnSave.setEnabled(true);
 			}
     		break;	
     	}
@@ -434,7 +440,10 @@ public class PostActivity extends Activity implements OnClickListener{
      * 发布
      * @throws Exception 
      */
-    private void save() throws Exception{    	 
+    private void save() throws Exception{    
+    	 if (account == null){
+    		 return ;
+    	 }
     	 String content = tvMain.getText().toString();
 //    	 if (content.length() > 140){
 //    		 return;
@@ -497,12 +506,7 @@ public class PostActivity extends Activity implements OnClickListener{
 				 }else{
 					 ApiManager.add(account, content, listener); 
 				 }
-		}
-			
-		
-		
-		
-		
+		}	
 		
     }
     
@@ -513,8 +517,7 @@ public class PostActivity extends Activity implements OnClickListener{
 	 */
 	private void tips(String msg){
 		if (tipsDlg == null){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this); 
-			//tipsDlg = new AlertDialog.Builder(this);	
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);  
 			builder. setTitle("提示").setIcon(R.drawable.ic_launcher);
 			tipsDlg = builder.create();
 		}
