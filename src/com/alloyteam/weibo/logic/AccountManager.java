@@ -180,7 +180,7 @@ public class AccountManager {
 		if (cursor != null && !cursor.isClosed()) {
 			cursor.close();
 		}
-		Log.v(TAG, "getAccount: " + account);
+		Log.v(TAG, "getAccount: " + account + ", uid: " + uid + ", type: " + type);
 		return account;
 	}
 
