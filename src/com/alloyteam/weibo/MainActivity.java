@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +40,7 @@ import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo2;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;
+import com.alloyteam.weibo.model.UserInfo;
 
 /**
  * @author pxz
@@ -81,7 +83,14 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 				} else {
 					accountSwitchBtn.setText("绑定帐号");
 				}
-			}
+			}/*else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
+				String uid = intent.getStringExtra("uid");
+				int type = intent.getIntExtra("type", 0);
+				Account account = AccountManager.getAccount(uid, type);
+				if(account != null){
+					loadUserInfo(account);
+				}
+			}*/
 			if("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE".equals(action)){
 				initHomeLine();
 			}
@@ -115,6 +124,8 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE");
 		intentFilter.addAction("com.alloyteam.weibo.WEIBO_ADDED");		
+		 intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
+		// intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		this.registerReceiver(broadcastReceiver, intentFilter);
 		if(!AccountManager.hasAccount()){
 			Intent i = new Intent(this, AccountManagerActivity.class);
@@ -123,6 +134,11 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		}
 		imageLoader=new ImageLoader(this);
 		initHomeLine();
+		
+		Account account = AccountManager.getDefaultAccount();
+		if(account != null){
+			loadUserInfo(account);
+		}
 		
 	}
 
@@ -378,10 +394,31 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 	}
 
 	private String getAccountDescption(Account account) {
-		String text = account.uid + "(" + Constants.getProvider(account.type)
+		String text = account.nick + "(" + Constants.getProvider(account.type)
 				+ ")";
 
 		return text;
+	}
+	
+	private void loadUserInfo(final Account account){
+		ApiManager.getUserInfo(account, new ApiManager.IApiResultListener() {
+			
+			@Override
+			public void onSuccess(ApiResult result) {
+				// TODO Auto-generated method stub
+				UserInfo userInfo = result.userInfo;
+				account.nick = userInfo.nick;
+				account.avatar = userInfo.avatar;
+				AccountManager.updateAccount(account);
+				Log.d(TAG, "update nick");
+			}
+			
+			@Override
+			public void onError(int errorCode) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 
 	@Override

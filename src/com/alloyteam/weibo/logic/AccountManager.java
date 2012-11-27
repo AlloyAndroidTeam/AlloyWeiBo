@@ -103,11 +103,14 @@ public class AccountManager {
 			
 			if (old.isDefault) {
 				Account newDefault = getFirstAccount();
-				newDefault.isDefault = true;
-				updateAccount(newDefault);
-//				currentDefaultAccount = newDefault;
-//				broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE",
-//							newDefault);
+				if(newDefault != null){
+					newDefault.isDefault = true;
+					updateAccount(newDefault);
+				}else{
+					currentDefaultAccount = newDefault;
+					broadcastAccountAction("com.alloyteam.weibo.DEFAULT_ACCOUNT_CHANGE",
+								newDefault);
+				}
 			}
 		}
 
