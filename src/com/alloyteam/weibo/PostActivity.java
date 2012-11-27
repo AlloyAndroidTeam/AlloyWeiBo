@@ -170,7 +170,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		Log.v("onClick","" + v.getId());
 		switch(v.getId()){
     	case R.id.btnPostAddFriend : //@好友
-    		//showFriend(v); 
+    		showFriend(v); 
     		break;
     	case R.id.btnPostAddPic : //插入图片
    		 	insertPhoto();
