@@ -144,7 +144,7 @@ public class AccountManagerActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
-		setContentView(R.layout.activity_account_manager);
+		setContentView(R.layout.activity_setting);
 
 		Button addButton = (Button) findViewById(R.id.addNewAccount);
 		addButton.setOnClickListener(onAddBtnClickListener);

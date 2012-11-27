@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+
+import com.alloyteam.weibo.MainActivity;
 import com.alloyteam.weibo.R;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.Weibo;
@@ -44,7 +46,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		mContext=context;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		imageLoader=HomeActivity.imageLoader;//new ImageLoader(context);
+		imageLoader=MainActivity.imageLoader;//new ImageLoader(context);
 	}
 
 	@Override

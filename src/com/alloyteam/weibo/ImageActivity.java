@@ -120,7 +120,7 @@ public class ImageActivity extends Activity {
 		Intent intent = getIntent();
 		String url=intent.getStringExtra("url");
 		image = (ImageView)findViewById(R.id.image);
-		ImageLoader imageLoader=HomeActivity.imageLoader;
+		ImageLoader imageLoader=MainActivity.imageLoader;
 		imageLoader.displayImage(url+"/2000", image, callback);		         
         
 	}
