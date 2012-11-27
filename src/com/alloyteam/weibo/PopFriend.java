@@ -1,6 +1,8 @@
 package com.alloyteam.weibo;
  
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -25,9 +27,12 @@ public class PopFriend extends PopupWindow {
 	private ListView listView;
 	private EditText etFilter;
 	
-	private static final String[] strs = new String[] {
+	private String[] strs = new String[] {
 		    "first", "second", "third", "fourth", "fifth","six", "seven", "eight"
 		    };//定义一个String数组用来显示ListView的内容
+	private ArrayAdapter adapter;
+	private ArrayList<String> dataList=new ArrayList<String>();
+	
 	
 	public PopFriend(Activity context) {  
         super(context);  
@@ -83,15 +88,22 @@ public class PopFriend extends PopupWindow {
 	private void initListView(Context context){
 		listView = (ListView)popView.findViewById(R.id.listViewFriend);
 		/*为ListView设置Adapter来绑定数据*/
-		/**/ 
-		listView.setAdapter(new ArrayAdapter<String>(context,
-		                android.R.layout.simple_list_item_1, strs));
+		dataList.add("111");
+		dataList.add("22");
+		dataList.add("33");
+		dataList.add("33");
+		
+		adapter = new ArrayAdapter<String>(context,
+                android.R.layout.simple_list_item_1, dataList);
+		listView.setAdapter(adapter);
 		
 		listView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {		
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				// TODO Auto-generated method stub
-				Log.v("onItemLongClick", "arg2:" + arg2 + ", arg3:" + arg3); 
+				Log.v("onItemLongClick", "arg2:" + arg2 + ", arg3:" + arg3);
+				dataList.add("after:"+ arg2 );
+				adapter.notifyDataSetChanged();
 			}
 	    });
 		   

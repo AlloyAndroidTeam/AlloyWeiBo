@@ -205,7 +205,13 @@ public class WeiboListAdapter extends BaseAdapter {
 			name = viewCache.getName();
 			time = viewCache.getTime();
 			String avatarUrl = weibo.avatarUrl;
-			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
+			if(weibo.text.length()>0){
+				text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
+				text.setVisibility(View.VISIBLE);
+			}
+			else{
+				text.setVisibility(View.GONE);
+			}
 			name.setText(weibo.nick);
 			time.setText(Utility.formatDate(weibo.timestamp));
 			imageLoader.displayImage(avatarUrl, avatar, callback); 
@@ -219,14 +225,8 @@ public class WeiboListAdapter extends BaseAdapter {
 			avatar2.setTag(b2);
 			name2 = viewCache.getName2();
 			String avatarUrl2 = source.avatarUrl;
-			if(source.text.length()>0){
-				text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
-				text2.setVisibility(View.VISIBLE);
-			}
-			else{
-				text2.setVisibility(View.GONE);
-			}
 			name2.setText(source.nick);
+			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));			
 			imageLoader.displayImage(avatarUrl2, avatar2, callback); 
 			image=viewCache.getImage();
 			count=viewCache.getCount();

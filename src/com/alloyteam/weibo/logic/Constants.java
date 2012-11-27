@@ -98,6 +98,10 @@ public class Constants {
 		public static final String ADD_PIC = API_ROOT
 				+ "/statuses/upload.json";//获取转播列表
 		
+		public static final String READD = API_ROOT + "/statuses/repost.json";//转发
+		public static final String REPLY = API_ROOT + "/comments/reply.json";//回复一条微博（即对话）
+		public static final String COMMENT = API_ROOT + "/comments/create.json";//评论一条微博 
+		
 	}
 
 	public class Tencent {

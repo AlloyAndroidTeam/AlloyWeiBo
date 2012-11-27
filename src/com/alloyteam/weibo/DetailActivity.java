@@ -100,6 +100,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			imageLoader.displayImage(source.avatarUrl, avatar2, null);
 			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
 			TextView name2=(TextView)findViewById(R.id.name2);
+			avatar2.setOnClickListener(this);
 			name2.setText(source.nick);			
 		}
 		TextView count=(TextView)findViewById(R.id.count);
@@ -120,6 +121,8 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		findViewById(R.id.reply).setOnClickListener(this);
 		findViewById(R.id.image).setOnClickListener(this);
 		findViewById(R.id.image2).setOnClickListener(this);
+		avatar.setOnClickListener(this);
+		
 		initList();
 	}
 	private void re(int type){
@@ -130,7 +133,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		bundle.putString("uid", uid);
 		bundle.putString("myuid", myuid);
 		bundle.putInt("type", type);
-		bundle.putInt("weiboType", type);
+		bundle.putInt("accountType", account.type);
 		bundle.putInt("position", position);
 		intent.putExtras(bundle);
 		startActivity(intent);
@@ -148,6 +151,13 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			break;
 		case R.id.reply:
 			re(3);
+			break;
+		case R.id.avatar:
+		case R.id.avatar2:
+			Intent i = new Intent(this, HomeActivity.class);
+			Bundle bundle = (Bundle)v.getTag();
+			i.putExtras(bundle);
+			startActivity(i);
 			break;
 		case R.id.image:
 			Utility.showImage(this,weibo.imageUrl,null);//);
