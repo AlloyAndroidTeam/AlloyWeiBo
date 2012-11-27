@@ -1201,6 +1201,7 @@ public class ApiManager {
 				break;
 			case 2:
 				url =  Constants.Sina.REPLY;
+				params.putString("cid", tid); 
 				params.putString("comment", content); 
 				break;
 			case 3:
