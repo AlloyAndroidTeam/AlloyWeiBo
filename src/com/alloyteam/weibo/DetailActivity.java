@@ -13,6 +13,7 @@ import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
 import com.alloyteam.weibo.model.Account;
@@ -52,6 +53,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private Account account;
 	private String upId;
 	private String downId;
+	private ImageLoader imageLoader;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -61,6 +63,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		TextView textText=(TextView)findViewById(R.id.text);
 		TextView nameText=(TextView)findViewById(R.id.name);
 		TextView dateText=(TextView)findViewById(R.id.date);
+		imageLoader=MainActivity.imageLoader;
 		Intent i=this.getIntent();
 		Bundle b=i.getExtras();
 		String uid=b.getString("uid");
@@ -72,7 +75,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		weibo=list.get(position);
 		Log.d("my","id:"+weibo.id);
 		String avatarUrl=weibo.avatarUrl;
-		HomeActivity.imageLoader.displayImage(avatarUrl, avatar, null);
+		MainActivity.imageLoader.displayImage(avatarUrl, avatar, null);
 		String name=weibo.nick;
 		nameText.setText(name);
 		String text=weibo.text;
@@ -83,18 +86,18 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			ViewGroup source=(ViewGroup)findViewById(R.id.source);
 			source.setVisibility(View.GONE);
 			if(!weibo.imageUrl.equals("")){
-				HomeActivity.imageLoader.displayImage(weibo.imageThumbUrl, imageView, null);
+				imageLoader.displayImage(weibo.imageThumbUrl, imageView, null);
 			}
 		}
 		else{
 			Weibo2 source = weibo.source;
 			ImageView image2=(ImageView)findViewById(R.id.image2);
 			if(!source.imageUrl.equals("")){
-				HomeActivity.imageLoader.displayImage(source.imageThumbUrl, image2, null);
+				imageLoader.displayImage(source.imageThumbUrl, image2, null);
 			}
 			TextView text2=(TextView)findViewById(R.id.text2);
 			ImageView avatar2=(ImageView)findViewById(R.id.avatar2);
-			HomeActivity.imageLoader.displayImage(source.avatarUrl, avatar2, null);
+			imageLoader.displayImage(source.avatarUrl, avatar2, null);
 			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
 			TextView name2=(TextView)findViewById(R.id.name2);
 			name2.setText(source.nick);			
@@ -322,7 +325,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 				holder = (CommentViewHolder) convertView.getTag();
 			}
 			Weibo2 weibo = commentList.get(position);
-			HomeActivity.imageLoader.displayImage(weibo.avatarUrl, holder.avatar,null);
+			imageLoader.displayImage(weibo.avatarUrl, holder.avatar,null);
 			holder.name.setText(weibo.nick);
 			holder.text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			holder.date.setText(Utility.formatDate(weibo.timestamp));
