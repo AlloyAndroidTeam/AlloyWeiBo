@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -269,6 +270,24 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
+		MenuItem setting =  menu.findItem(R.id.menu_settings);
+		setting.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Intent i = new Intent(MainActivity.this, SettingActivity.class);
+				startActivity(i);
+				return false;
+			}
+		});
+		MenuItem account = menu.findItem(R.id.menu_account);
+		account.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Intent i = new Intent(MainActivity.this, AccountManager.class);
+				startActivity(i);
+				return false;
+			}
+		});
 		return true;
 	}
 
