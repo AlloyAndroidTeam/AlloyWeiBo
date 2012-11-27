@@ -134,8 +134,8 @@ public class PostActivity extends Activity implements OnClickListener{
     	
     	 if (type != 0){        
     		String uid = bundle.getString("uid");
-	        int weiboType = bundle.getInt("weiboType");	        
-	        account = AccountManager.getAccount(uid, weiboType); 
+	        int accountType = bundle.getInt("accountType");	        
+	        account = AccountManager.getAccount(uid, accountType); 
 	        if (account == null){
 	        	tips("获取帐号信息失败，请重试！"); 
 	        }
@@ -149,7 +149,7 @@ public class PostActivity extends Activity implements OnClickListener{
        		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
        		btnAddFriend.setLayoutParams(params);
        		*/
-         	Log.v("post", "" + type +", tid:" +tid+", weiboType:" +weiboType);
+         	Log.v("post", "" + type +", tid:" +tid+", accountType:" +accountType);
          }else{
         	account = AccountManager.getDefaultAccount();        	 
          }
@@ -170,7 +170,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		Log.v("onClick","" + v.getId());
 		switch(v.getId()){
     	case R.id.btnPostAddFriend : //@好友
-    		showFriend(v); 
+    		//showFriend(v); 
     		break;
     	case R.id.btnPostAddPic : //插入图片
    		 	insertPhoto();

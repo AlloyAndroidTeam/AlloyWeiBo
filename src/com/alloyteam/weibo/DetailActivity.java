@@ -129,7 +129,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		bundle = new Bundle();
 		bundle.putString("uid", uid);
 		bundle.putInt("type", type);
-		bundle.putInt("weiboType", type);
+		bundle.putInt("accountType", account.type);
 		bundle.putInt("position", position);
 		intent.putExtras(bundle);
 		startActivity(intent);
