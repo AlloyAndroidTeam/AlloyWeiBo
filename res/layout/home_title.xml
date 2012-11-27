@@ -25,4 +25,13 @@
         android:drawableRight="@drawable/arrow_down"
         android:text="帐号切换" />
 
+    <Button
+        android:id="@+id/btnHomeTitleSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnHomeTitleAccount"
+        android:layout_alignBottom="@+id/btnHomeTitleAccount"
+        android:layout_alignParentLeft="true"
+        android:text="设置" />
+
 </RelativeLayout>

@@ -31,17 +31,10 @@
         </activity>
         <activity
             android:name=".SettingActivity"
-            android:label="@string/title_activity_main"
+            android:label="@string/setting"
             android:launchMode="singleTask" >
 
             <!-- 被调用后，如果在栈中存在，则栈中原本处于其后面的activity全被destroy -->
-        </activity>
-        <activity
-            android:name="AccountManagerActivity"
-            android:label="@string/account_manager"
-            android:launchMode="singleTask" >
-
-            <!-- 被调用后，如果在栈中存在，则其在栈中顺序被提到最前，其它activity顺序依次后退 -->
         </activity>
         <activity
             android:name=".PostActivity"
