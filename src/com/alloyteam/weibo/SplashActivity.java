@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
+import android.view.WindowManager;
 
 /**
  * @author pxz
@@ -27,6 +28,9 @@ public class SplashActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        //去掉Activity上面的状态栏  
+        getWindow().setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN,  
+                      WindowManager.LayoutParams. FLAG_FULLSCREEN); 
 		setContentView(R.layout.activity_splash);
 		// 在这里初始化 dbhelper
 		Context context = getApplicationContext();
