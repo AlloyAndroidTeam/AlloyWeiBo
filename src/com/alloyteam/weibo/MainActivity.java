@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -104,7 +105,6 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.activity_main);
@@ -112,8 +112,8 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 				R.layout.home_title);
 		accountSwitchBtn = (Button) findViewById(R.id.btnHomeTitleAccount);
 		accountSwitchBtn.setOnClickListener(this);
-		settingBtn = (Button) findViewById(R.id.btnHomeTitleSetting);
-		settingBtn.setOnClickListener(this);
+		//settingBtn = (Button) findViewById(R.id.btnHomeTitleAccountSetting);
+		//settingBtn.setOnClickListener(this);
 		findViewById(R.id.btnHomeTitlePost).setOnClickListener(this);
 		Account defaultAccount = AccountManager.getDefaultAccount();
 		if (defaultAccount != null) {
@@ -127,7 +127,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		 intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
 		// intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		this.registerReceiver(broadcastReceiver, intentFilter);
-		if(!AccountManager.hasAccount()){
+		if(AccountManager.getAccountCount()==0){
 			Intent i = new Intent(this, AccountManagerActivity.class);
 			startActivity(i);
 			return;
@@ -269,6 +269,24 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
+		MenuItem setting =  menu.findItem(R.id.menu_settings);
+		setting.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Intent i = new Intent(MainActivity.this, SettingActivity.class);
+				startActivity(i);
+				return false;
+			}
+		});
+		MenuItem account = menu.findItem(R.id.menu_account);
+		account.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Intent i = new Intent(MainActivity.this, AccountManagerActivity.class);
+				startActivity(i);
+				return false;
+			}
+		});
 		return true;
 	}
 
@@ -299,8 +317,8 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 			i = new Intent(this, PostActivity.class);
 			startActivity(i);
 			break;
-		case R.id.btnHomeTitleSetting:
-			i = new Intent(this, SettingActivity.class);
+		case R.id.btnHomeTitleAccountSetting:
+			i = new Intent(this, AccountManagerActivity.class);
 			startActivity(i);
 			break;
 		case R.id.btnHomeTitleAccount: // 帐号

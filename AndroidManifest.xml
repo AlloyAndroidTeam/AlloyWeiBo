@@ -37,6 +37,13 @@
             <!-- 被调用后，如果在栈中存在，则栈中原本处于其后面的activity全被destroy -->
         </activity>
         <activity
+            android:name=".AccountManagerActivity"
+            android:label="@string/account_manager"
+            android:launchMode="singleTask" >
+
+            <!-- 被调用后，如果在栈中存在，则栈中原本处于其后面的activity全被destroy -->
+        </activity>
+        <activity
             android:name=".PostActivity"
             android:label="@string/post" >
 

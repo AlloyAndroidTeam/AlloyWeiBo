@@ -22,7 +22,6 @@ import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
