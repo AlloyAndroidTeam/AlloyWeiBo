@@ -1,0 +1,95 @@
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@layout/selector"
+    android:focusable="false"
+    android:paddingBottom="10dp"
+    android:paddingRight="10dp"
+    android:state_pressed="true" >
+    
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/app_name"
+        android:textColor="#000" />
+
+    <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/text"
+        android:layout_below="@+id/text"
+        android:layout_marginTop="5dp"
+        android:background="@layout/rect_gray"
+        android:paddingBottom="10dp"
+        android:paddingRight="10dp"
+        android:state_focused="true"
+        android:state_pressed="true" >
+
+        <ImageView
+            android:id="@+id/avatar2"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/avatar" />
+
+        <TextView
+            android:id="@+id/name2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/avatar2"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toRightOf="@+id/avatar2"
+            android:text="nick" />
+
+        <TextView
+            android:id="@+id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/name2"
+            android:layout_below="@+id/name2"
+            android:text=""
+            android:textColor="#000" />
+
+        <ImageView
+            android:id="@+id/image2"
+        	android:layout_width="80dp"
+        	android:layout_height="80dp"
+            android:layout_alignLeft="@+id/text2"
+            android:layout_below="@+id/text2"
+            android:layout_marginTop="5dp"
+            android:minWidth="100dp"
+        	android:src="@drawable/picture" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/relativeLayout1"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_marginTop="3dp"
+        android:text=""
+        android:textColor="#3333ff" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/count"
+        android:layout_alignBottom="@+id/count"
+        android:layout_alignRight="@+id/relativeLayout1"
+        android:text="@string/hello_world" />
+
+</RelativeLayout>
