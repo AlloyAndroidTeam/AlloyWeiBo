@@ -1191,22 +1191,27 @@ public class ApiManager {
 			final ApiManager.IApiListener listener)
 			throws Exception {
 		String url = "";
+		Bundle params = new Bundle(); 
+		params.putString("id", tid); 
+		
 		switch(type){
 			case 1:
 				url =  Constants.Sina.READD;
+				params.putString("status", content); 
 				break;
 			case 2:
 				url =  Constants.Sina.REPLY;
+				params.putString("comment", content); 
 				break;
 			case 3:
 				url =  Constants.Sina.COMMENT;
+				params.putString("comment", content); 
 				break;
 			default:
 				return;
 		}
-		Bundle params = new Bundle(); 
-		params.putString("id", tid); 
-		params.putString("status", content); 
+		
+		
 		
 		ApiManager.requestAsync(account, url, params,
 				"POST", listener);

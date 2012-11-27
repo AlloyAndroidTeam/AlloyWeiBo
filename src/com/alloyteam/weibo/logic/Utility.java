@@ -182,6 +182,7 @@ public class Utility {
 			HttpPost post = new HttpPost(url);
 			Log.i("http request", "post: " + url);
 			ArrayList<NameValuePair> data = toPostData(params);
+			Log.v("request", params.toString());
 			post.setEntity(new UrlEncodedFormEntity(data, "UTF-8"));
 			request = post;
 			
