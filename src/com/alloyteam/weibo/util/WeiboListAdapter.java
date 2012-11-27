@@ -157,6 +157,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			imageLoader.displayImage(avatarUrl, avatar, callback);
 			if(weibo.imageUrl != null && !weibo.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
+				image.setImageResource(R.drawable.picture);
 				imageLoader.displayImage(weibo.imageThumbUrl, image, null);
 				image.setTag(weibo.imageUrl);
 			}
@@ -205,6 +206,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			count=viewCache.getCount();
 			if(source.imageUrl != null && !source.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
+				image.setImageResource(R.drawable.picture);
 				imageLoader.displayImage(source.imageThumbUrl, image, null);
 				image.setTag(source.imageUrl);
 			}

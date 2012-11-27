@@ -39,11 +39,11 @@ public class SplashActivity extends Activity {
 		ApiManager.init(context);
 		
 		final Intent i = new Intent();
-//		if(AccountManager.hasAccount()){
+		if(hasAccount()){
 			i.setClass(this, MainActivity.class);
-//		}else{
-//			i.setClass(this, AccountManagerActivity.class);
-//		}
+		}else{
+			i.setClass(this, AccountManagerActivity.class);
+		}
 		new Handler().postDelayed(new Runnable(){
 
 			@Override
@@ -55,5 +55,12 @@ public class SplashActivity extends Activity {
 		}, SPLASH_DELAY_TIME_IN_MILLION);
 	}
 	
+	/**
+	 * @return 是否有默认帐号
+	 */
+	private boolean hasAccount(){
+		int count = AccountManager.getAccountCount();
+		return count > 0;
+	}
 
 }

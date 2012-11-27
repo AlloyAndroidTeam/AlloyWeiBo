@@ -105,7 +105,6 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.activity_main);
@@ -128,7 +127,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		 intentFilter.addAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
 		// intentFilter.addAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		this.registerReceiver(broadcastReceiver, intentFilter);
-		if(!AccountManager.hasAccount()){
+		if(AccountManager.getAccountCount()==0){
 			Intent i = new Intent(this, AccountManagerActivity.class);
 			startActivity(i);
 			return;
