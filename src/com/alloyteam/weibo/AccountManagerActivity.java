@@ -183,10 +183,12 @@ public class AccountManagerActivity extends Activity {
 			public void onSuccess(ApiResult result) {
 				// TODO Auto-generated method stub
 				UserInfo userInfo = result.userInfo;
-				account.nick = userInfo.nick;
-				account.avatar = userInfo.avatar;
-				AccountManager.updateAccount(account);
-				Log.d(TAG, "update nick");
+				if(userInfo != null){
+					account.nick = userInfo.nick;
+					account.avatar = userInfo.avatar;
+					AccountManager.updateAccount(account);
+					Log.d(TAG, "update nick");
+				}
 			}
 			
 			@Override
