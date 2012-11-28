@@ -156,9 +156,10 @@ public class AccountManager {
 	}
 
 	/**
-	 * 根据 account.uid 读取 account
+	 * 根据 account.uid 和 account.type 读取 account
 	 * 
 	 * @param uid
+	 * @param type
 	 */
 	public static Account getAccount(String uid, int type) {
 		DBHelper dbHelper = DBHelper.getInstance();
@@ -181,6 +182,34 @@ public class AccountManager {
 			cursor.close();
 		}
 		Log.v(TAG, "getAccount: " + account + ", uid: " + uid + ", type: " + type);
+		return account;
+	}
+	/**
+	 * 根据 account.id 读取 account
+	 * 
+	 * @param id
+	 */
+	public static Account getAccount(String id) {
+		DBHelper dbHelper = DBHelper.getInstance();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		Cursor cursor = db.query(DBHelper.ACCOUNT_TABLE_NAME, // Table Name
+				null, // Columns to return
+				"id=?", // SQL WHERE
+				new String[] { id }, // Selection Args
+				null, // SQL GROUP BY
+				null, // SQL HAVING
+				null, // SQL ORDER BY
+				"1" // limit
+		);
+		Account account = null;
+		if (cursor.moveToFirst()) {
+			account = new Account();
+			parseCursorToAccount(account, cursor);
+		}
+		if (cursor != null && !cursor.isClosed()) {
+			cursor.close();
+		}
+		Log.v(TAG, "getAccount: " + account + ", id: " + id);
 		return account;
 	}
 
