@@ -237,7 +237,8 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		bundle.putInt("type", account.type);
 		bundle.putInt("position", position);//+parent.getFirstVisiblePosition());
 		intent.putExtras(bundle);
-		startActivity(intent);		
+		startActivity(intent);
+		finish();
 	}
 
 	@Override
