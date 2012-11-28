@@ -600,8 +600,10 @@ public class ApiManager {
 						userData = result;
 					}
 					ApiResult apiResult = new ApiResult();
-					apiResult.userInfo = JsonObjectToUserInfo(userData,
+					if(userData != null){
+						apiResult.userInfo = JsonObjectToUserInfo(userData,
 							account.type);
+					}
 					resultListener.onSuccess(apiResult);
 				} catch (JSONException je) {
 					Log.e("json", "error");
