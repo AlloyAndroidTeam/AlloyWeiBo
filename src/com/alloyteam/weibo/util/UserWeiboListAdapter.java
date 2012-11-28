@@ -29,17 +29,18 @@ import com.alloyteam.weibo.R;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.model.Weibo2;
 
-public class WeiboListAdapter extends BaseAdapter {
+public class UserWeiboListAdapter extends BaseAdapter {
 	protected LayoutInflater mInflater;
-	private static final int mResource1 = R.layout.weibo_item;// xml布局文件
-	private static final int mResource2 = R.layout.weibo_item_type2;// xml布局文件
+	private static final int mResource1 = R.layout.user_weibo_item;// xml布局文件
+	private static final int mResource2 = R.layout.user_weibo_item_type2;// xml布局文件
 	List<Weibo2> mItems;
 	ImageLoader imageLoader;
-	Context mContext;
+	HomeActivity mContext;
+	HomeActivity home;
 	
-	public WeiboListAdapter(Context context, List<Weibo2> items) {
+	public UserWeiboListAdapter(Context context, List<Weibo2> items) {
 		mItems = items;
-		mContext=context;
+		mContext=(HomeActivity)context;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		imageLoader=MainActivity.imageLoader;//new ImageLoader(context);
@@ -110,7 +111,7 @@ public class WeiboListAdapter extends BaseAdapter {
 				i = new Intent(mContext, HomeActivity.class);
 				Bundle bundle = (Bundle)v.getTag();
 				i.putExtras(bundle);
-				mContext.startActivity(i);
+				mContext.loadUser(bundle);
 				break;
 			case R.id.image:
 			case R.id.image2:
@@ -129,9 +130,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		int type = getItemViewType(position);
 		Weibo2 weibo = mItems.get(position);
 		TextView text;
-		TextView name;
 		TextView time;
-		ImageView avatar;
 		ImageView image;
 
 		if (type==0) {
@@ -150,20 +149,10 @@ public class WeiboListAdapter extends BaseAdapter {
 
 			}
 			text = viewCache.getText();
-			avatar = viewCache.getAvatar();
-			Bundle b=new Bundle();
-			b.putString("uid", weibo.uid);
-			b.putString("nick", weibo.nick);
-			b.putString("avatarUrl", weibo.avatarUrl);
-			avatar.setTag(b);
-			name = viewCache.getName();
 			time = viewCache.getTime();
 			image = viewCache.getImage();
-			String avatarUrl = weibo.avatarUrl;
 			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
-			name.setText(weibo.nick);
 			time.setText(Utility.formatDate(weibo.timestamp));
-			imageLoader.displayImage(avatarUrl, avatar, callback);
 			if(weibo.imageUrl != null && !weibo.imageUrl.equals("")){
 				image.setVisibility(View.VISIBLE);
 				image.setImageResource(R.drawable.picture);
@@ -174,12 +163,9 @@ public class WeiboListAdapter extends BaseAdapter {
 				image.setVisibility(View.GONE);
 			}			
 			image.setOnClickListener(listener);
-			avatar.setOnClickListener(listener);
 		} else {
 			Weibo2 source = weibo.source;
 			TextView text2;
-			TextView name2;
-			ImageView avatar2;
 			TextView count;
 			ViewCache2 viewCache;
 			if (rowView == null) {
@@ -196,38 +182,26 @@ public class WeiboListAdapter extends BaseAdapter {
 
 			}
 			text = viewCache.getText();
-			avatar = viewCache.getAvatar();
-			Bundle b=new Bundle();
-			b.putString("uid", weibo.uid);
-			b.putString("nick", weibo.nick);
-			b.putString("avatarUrl", weibo.avatarUrl);
-			avatar.setTag(b);
-			name = viewCache.getName();
 			time = viewCache.getTime();
-			String avatarUrl = weibo.avatarUrl;
-			if(weibo.text.length()>0){
-				text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
-				text.setVisibility(View.VISIBLE);
-			}
-			else{
-				text.setVisibility(View.GONE);
-			}
-			name.setText(weibo.nick);
+			text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			time.setText(Utility.formatDate(weibo.timestamp));
-			imageLoader.displayImage(avatarUrl, avatar, callback); 
-			
 			text2 = viewCache.getText2();
-			avatar2 = viewCache.getAvatar2();
+			ImageView avatar2 = viewCache.getAvatar2();
 			Bundle b2=new Bundle();
 			b2.putString("uid", source.uid);
 			b2.putString("nick", source.nick);
 			b2.putString("avatarUrl", source.avatarUrl);
 			avatar2.setTag(b2);
-			name2 = viewCache.getName2();
-			String avatarUrl2 = source.avatarUrl;
+			TextView name2 = viewCache.getName2();
+			if(source.text.length()>0){
+				text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
+				text2.setVisibility(View.VISIBLE);
+			}
+			else{
+				text2.setVisibility(View.GONE);
+			}
 			name2.setText(source.nick);
-			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));			
-			imageLoader.displayImage(avatarUrl2, avatar2, callback); 
+			imageLoader.displayImage(source.avatarUrl, avatar2, callback); 
 			image=viewCache.getImage();
 			count=viewCache.getCount();
 			if(source.imageUrl != null && !source.imageUrl.equals("")){
@@ -247,7 +221,6 @@ public class WeiboListAdapter extends BaseAdapter {
 				count.setVisibility(View.GONE);
 			}
 			image.setOnClickListener(listener);
-			avatar.setOnClickListener(listener);
 			avatar2.setOnClickListener(listener);
 		}
 		return rowView;

@@ -50,36 +50,41 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private long downTimeStamp=0;
 	private int type=0;
 	private Weibo2 weibo;
-	private Account account;
 	private String upId;
 	private String downId;
 	private ImageLoader imageLoader;
+	private String myuid;
+	private Account account;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity_detail);
 		ImageView imageView=(ImageView) findViewById(R.id.image);
 		ImageView avatar=(ImageView) findViewById(R.id.avatar);
-		TextView textText=(TextView)findViewById(R.id.text);
 		TextView nameText=(TextView)findViewById(R.id.name);
+		TextView textText=(TextView)findViewById(R.id.text);
 		TextView dateText=(TextView)findViewById(R.id.date);
 		imageLoader=MainActivity.imageLoader;
 		Intent i=this.getIntent();
 		Bundle b=i.getExtras();
-		String uid=b.getString("uid");
-		this.uid=uid;
+		myuid=b.getString("myuid");
+		uid=b.getString("uid");
 		type=b.getInt("type");
 		List<Weibo2> list=DataManager.get(uid);
 		int position = b.getInt("position");
 		this.position=position;
 		weibo=list.get(position);
-		Log.d("my","id:"+weibo.id);
 		String avatarUrl=weibo.avatarUrl;
-		MainActivity.imageLoader.displayImage(avatarUrl, avatar, null);
+		imageLoader.displayImage(avatarUrl, avatar, null);
 		String name=weibo.nick;
 		nameText.setText(name);
 		String text=weibo.text;
-		textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
+		if(text.length()>0){
+			textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
+		}
+		else{
+			textText.setVisibility(View.GONE);
+		}
 		long date=weibo.timestamp;
 		dateText.setText(Utility.formatDate(date));
 		if(weibo.source==null){
@@ -100,6 +105,12 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			imageLoader.displayImage(source.avatarUrl, avatar2, null);
 			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
 			TextView name2=(TextView)findViewById(R.id.name2);
+			Bundle b3=new Bundle();
+			b3.putString("uid", source.uid);
+			b3.putString("nick", source.nick);
+			b3.putString("avatarUrl", source.avatarUrl);
+			avatar2.setTag(b3);
+			avatar2.setOnClickListener(this);
 			name2.setText(source.nick);			
 		}
 		TextView count=(TextView)findViewById(R.id.count);
@@ -109,7 +120,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		else{
 			count.setVisibility(View.GONE);
 		}
-		if(weibo.isSelf){
+		if(weibo.uid.equals(myuid)){
 			findViewById(R.id.delete).setOnClickListener(this);
 		}
 		else{
@@ -120,6 +131,13 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		findViewById(R.id.reply).setOnClickListener(this);
 		findViewById(R.id.image).setOnClickListener(this);
 		findViewById(R.id.image2).setOnClickListener(this);
+		avatar.setOnClickListener(this);
+		Bundle b2=new Bundle();
+		b2.putString("uid", weibo.uid);
+		b2.putString("nick", weibo.nick);
+		b2.putString("avatarUrl", weibo.avatarUrl);
+		avatar.setTag(b2);
+		avatar.setOnClickListener(this);		
 		initList();
 	}
 	private void re(int type){
@@ -128,8 +146,9 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		intent=new Intent(this, PostActivity.class);
 		bundle = new Bundle();
 		bundle.putString("uid", uid);
+		bundle.putString("myuid", myuid);
 		bundle.putInt("type", type);
-		bundle.putInt("weiboType", type);
+		bundle.putInt("accountType", account.type);
 		bundle.putInt("position", position);
 		intent.putExtras(bundle);
 		startActivity(intent);
@@ -147,6 +166,13 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			break;
 		case R.id.reply:
 			re(3);
+			break;
+		case R.id.avatar:
+		case R.id.avatar2:
+			Intent i = new Intent(this, HomeActivity.class);
+			Bundle bundle = (Bundle)v.getTag();
+			i.putExtras(bundle);
+			startActivity(i);
 			break;
 		case R.id.image:
 			Utility.showImage(this,weibo.imageUrl,null);//);
@@ -182,7 +208,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		mAdapter = new CommentListAdatper(this, R.layout.comment, list);
 		mylist.setAdapter(mAdapter);
 		//mPullDownView.enableAutoFetchMore(true, 1);
-		account = AccountManager.getAccount(uid, type);
+		account = AccountManager.getAccount(myuid, type);
 		if (account == null)
 			return;
 		getCommentList(WHAT_DID_LOAD_DATA);
@@ -325,7 +351,14 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 				holder = (CommentViewHolder) convertView.getTag();
 			}
 			Weibo2 weibo = commentList.get(position);
-			imageLoader.displayImage(weibo.avatarUrl, holder.avatar,null);
+			ImageView avatar=holder.avatar;
+			imageLoader.displayImage(weibo.avatarUrl, avatar,null);
+			Bundle b2=new Bundle();
+			b2.putString("uid", weibo.uid);
+			b2.putString("nick", weibo.nick);
+			b2.putString("avatarUrl", weibo.avatarUrl);
+			avatar.setOnClickListener(DetailActivity.this);
+			avatar.setTag(b2);
 			holder.name.setText(weibo.nick);
 			holder.text.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(weibo.text)));
 			holder.date.setText(Utility.formatDate(weibo.timestamp));

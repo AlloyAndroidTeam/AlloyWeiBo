@@ -283,19 +283,25 @@ public class ApiManager {
 	 * @param listener
 	 *            api回调
 	 */
-	public static void getHomeLine(final Account account, int pageCount,
+	public static void getHomeLine(final Account account, String uid, int pageCount,
 			int pageFlag, long timestamp, String lastId, final IApiResultListener listener) {
 		Bundle params = new Bundle();
 		String url;
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
-			url = Constants.Tencent.HOME_TIMELINE;
 			params.putInt("pageflag", pageFlag);
 			params.putLong("pagetime", timestamp/1000);
 			params.putInt("reqnum", pageCount);
 			params.putInt("type", 0);
 			params.putInt("contenttype", 0);
 			params.putString("format", "json");
+			if(uid!=null){
+				params.putString("name",uid);
+				url = Constants.Tencent.USER_TIMELINE;
+			}
+			else{
+				url = Constants.Tencent.HOME_TIMELINE;				
+			}
 		} else if (account.type == Constants.SINA) {
 			url = Constants.Sina.HOME_TIMELINE;
 			params.putInt("count", pageCount);
@@ -307,6 +313,13 @@ public class ApiManager {
 				params.putLong("max_id", id);
 			} else if (pageFlag == 2) {
 				params.putString("since_id", lastId);
+			}
+			if(uid!=null){
+				params.putString("uid",uid);
+				url = Constants.Sina.USER_TIMELINE;
+			}
+			else{
+				url = Constants.Sina.HOME_TIMELINE;
 			}
 		} else {
 			return;
@@ -484,7 +497,7 @@ public class ApiManager {
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
 			url = Constants.Tencent.T_COMMENT_LIST;
-			
+			params.putInt("flag", 1);
 			params.putInt("reqnum", pageCount);
 			params.putInt("pageflag", pageFlag);
 			params.putLong("pagetime", timestamp/1000);
@@ -620,13 +633,13 @@ public class ApiManager {
 	public static void DeleteWeibo(final Account account, String weiboId, final IApiResultListener listener){
 		Bundle params = new Bundle();
 		String url="";
-		params.putLong("t", System.currentTimeMillis());
+		//params.putLong("t", System.currentTimeMillis());
 		if(account.type==Constants.TENCENT){
-			url = Constants.Tencent.T_DELETE;
+			url = Constants.Tencent.T_DELETE+"?"+System.currentTimeMillis();
 			params.putString("format","json");
 			params.putString("id",weiboId);
 		}else if (account.type == Constants.SINA) {
-			url = Constants.Sina.DELETE;
+			url = Constants.Sina.DELETE+"?"+System.currentTimeMillis();
 			params.putString("id", weiboId);
 		}
 		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
@@ -641,18 +654,23 @@ public class ApiManager {
 
 			@Override
 			public void onComplete(JSONObject result) {
-				int errcode=1;
-				try {
-					errcode = result.getInt("errcode");
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(account.type==Constants.TENCENT){				
+					int errcode=1;
+					try {
+						errcode = result.getInt("errcode");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(errcode==0){
+						listener.onSuccess(null);
+					}
+					else{
+						listener.onError(errcode);
+					}
 				}
-				if(errcode==0){
-					listener.onSuccess(null);
-				}
-				else{
-					listener.onError(errcode);
+				else if(account.type==Constants.SINA){
+					listener.onSuccess(null);				
 				}
 			}
 		};		
@@ -867,7 +885,7 @@ public class ApiManager {
 	}
 
 	/**
-	 * 回复微博,统一接口
+	 * 回转发微博,统一接口
 	 */
 	public static void readd(Account account, String tid, String content,
 			final ApiManager.IApiListener listener) throws Exception {
@@ -875,7 +893,7 @@ public class ApiManager {
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
 			case Constants.SINA:
-				readdToTencent(account, tid, content, listener);
+				readdToSina(1, account, tid, content, listener);
 				break;
 			case Constants.TENCENT:
 				readdToTencent(account, tid, content, listener);
@@ -903,7 +921,7 @@ public class ApiManager {
 	}
 
 	/**
-	 * 转发微博,统一接口
+	 * 评论微博,统一接口
 	 */
 	public static void reply(Account account, String tid, String content,
 			final ApiManager.IApiListener listener) throws Exception {
@@ -911,7 +929,7 @@ public class ApiManager {
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
 			case Constants.SINA:
-				replyToTencent(account, tid, content, listener);
+				readdToSina(2, account, tid, content, listener);
 				break;
 			case Constants.TENCENT:
 				replyToTencent(account, tid, content, listener);
@@ -920,7 +938,7 @@ public class ApiManager {
 	}
 
 	/**
-	 * 评论微博,统一接口
+	 * 回复微博,统一接口
 	 */
 	public static void comment(Account account, String tid, String content,
 			final ApiManager.IApiListener listener) throws Exception {
@@ -928,7 +946,7 @@ public class ApiManager {
 		// 微博类型, 1: 新浪, 2: 腾讯
 		switch (account.type) {
 		case Constants.SINA:
-			commentToTencent(account, tid, content, listener);
+			readdToSina(3, account, tid, content, listener);
 			break;
 		case Constants.TENCENT:
 			commentToTencent(account, tid, content, listener);
@@ -1182,4 +1200,42 @@ public class ApiManager {
 			Log.v(TAG, "addToSina");
 		}
 	}
+	
+	/**
+	 * 转发，评论，回复新浪微博，只是地址不一样，参数都一样
+	 * type操作类型，1转发，2评论, 3回复
+	 */
+	private static void readdToSina(int type, Account account, String tid, String content, 
+			final ApiManager.IApiListener listener)
+			throws Exception {
+		String url = "";
+		Bundle params = new Bundle(); 
+		params.putString("id", tid); 
+		
+		switch(type){
+			case 1:
+				url =  Constants.Sina.READD;
+				params.putString("status", content); 
+				break;
+			case 2:
+				url =  Constants.Sina.REPLY;
+				params.putString("cid", tid); 
+				params.putString("comment", content); 
+				break;
+			case 3:
+				url =  Constants.Sina.COMMENT;
+				params.putString("comment", content); 
+				break;
+			default:
+				return;
+		}
+		
+		
+		
+		ApiManager.requestAsync(account, url, params,
+				"POST", listener);
+		Log.v(TAG, "readdToSina:" + type);
+		
+	}
+	
 }

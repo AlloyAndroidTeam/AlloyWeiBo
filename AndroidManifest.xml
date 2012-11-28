@@ -24,7 +24,7 @@
         </activity>
         <activity
             android:name=".HomeActivity"
-            android:label="@string/title_activity_main"
+            android:label=""
             android:launchMode="singleTask" >
 
             <!-- 被调用后，如果在栈中存在，则栈中原本处于其后面的activity全被destroy -->

@@ -232,7 +232,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 			timestamp=0;
 		}
 		
-		ApiManager.getHomeLine(account, 10, pageflag, timestamp, Id, listener);
+		ApiManager.getHomeLine(account, null, 10, pageflag, timestamp, Id, listener);
 
 	}
 
@@ -446,6 +446,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		Intent intent = new Intent(this, DetailActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("uid", account.uid);
+		bundle.putString("myuid", account.uid);
 		bundle.putInt("type", account.type);
 		bundle.putInt("position", position);//+parent.getFirstVisiblePosition());
 		intent.putExtras(bundle);
