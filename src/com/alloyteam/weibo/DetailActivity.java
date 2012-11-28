@@ -50,11 +50,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private long downTimeStamp=0;
 	private int type=0;
 	private Weibo2 weibo;
-	private Account account;
 	private String upId;
 	private String downId;
 	private ImageLoader imageLoader;
 	private String myuid;
+	private Account account;
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -79,7 +79,12 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		String name=weibo.nick;
 		nameText.setText(name);
 		String text=weibo.text;
-		textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
+		if(text.length()>0){
+			textText.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(text)));
+		}
+		else{
+			textText.setVisibility(View.GONE);
+		}
 		long date=weibo.timestamp;
 		dateText.setText(Utility.formatDate(date));
 		if(weibo.source==null){
@@ -100,6 +105,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			imageLoader.displayImage(source.avatarUrl, avatar2, null);
 			text2.setText(Html.fromHtml(Utility.htmlspecialchars_decode_ENT_NOQUOTES(source.text)));
 			TextView name2=(TextView)findViewById(R.id.name2);
+			Bundle b3=new Bundle();
+			b3.putString("uid", source.uid);
+			b3.putString("nick", source.nick);
+			b3.putString("avatarUrl", source.avatarUrl);
+			avatar2.setTag(b3);
 			avatar2.setOnClickListener(this);
 			name2.setText(source.nick);			
 		}
@@ -110,7 +120,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		else{
 			count.setVisibility(View.GONE);
 		}
-		if(weibo.isSelf){
+		if(weibo.uid.equals(myuid)){
 			findViewById(R.id.delete).setOnClickListener(this);
 		}
 		else{
@@ -127,7 +137,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		b2.putString("nick", weibo.nick);
 		b2.putString("avatarUrl", weibo.avatarUrl);
 		avatar.setTag(b2);
-		
+		avatar.setOnClickListener(this);		
 		initList();
 	}
 	private void re(int type){

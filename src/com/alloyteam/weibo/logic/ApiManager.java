@@ -497,7 +497,7 @@ public class ApiManager {
 		params.putLong("t", System.currentTimeMillis());
 		if (account.type == Constants.TENCENT) {
 			url = Constants.Tencent.T_COMMENT_LIST;
-			
+			params.putInt("flag", 1);
 			params.putInt("reqnum", pageCount);
 			params.putInt("pageflag", pageFlag);
 			params.putLong("pagetime", timestamp/1000);
@@ -633,13 +633,13 @@ public class ApiManager {
 	public static void DeleteWeibo(final Account account, String weiboId, final IApiResultListener listener){
 		Bundle params = new Bundle();
 		String url="";
-		params.putLong("t", System.currentTimeMillis());
+		//params.putLong("t", System.currentTimeMillis());
 		if(account.type==Constants.TENCENT){
-			url = Constants.Tencent.T_DELETE;
+			url = Constants.Tencent.T_DELETE+"?"+System.currentTimeMillis();
 			params.putString("format","json");
 			params.putString("id",weiboId);
 		}else if (account.type == Constants.SINA) {
-			url = Constants.Sina.DELETE;
+			url = Constants.Sina.DELETE+"?"+System.currentTimeMillis();
 			params.putString("id", weiboId);
 		}
 		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
@@ -654,18 +654,23 @@ public class ApiManager {
 
 			@Override
 			public void onComplete(JSONObject result) {
-				int errcode=1;
-				try {
-					errcode = result.getInt("errcode");
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(account.type==Constants.TENCENT){				
+					int errcode=1;
+					try {
+						errcode = result.getInt("errcode");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(errcode==0){
+						listener.onSuccess(null);
+					}
+					else{
+						listener.onError(errcode);
+					}
 				}
-				if(errcode==0){
-					listener.onSuccess(null);
-				}
-				else{
-					listener.onError(errcode);
+				else if(account.type==Constants.SINA){
+					listener.onSuccess(null);				
 				}
 			}
 		};		
