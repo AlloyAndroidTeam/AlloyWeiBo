@@ -357,6 +357,13 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 					}
 				}
 			});
+			builder.setPositiveButton("+ 绑定帐号", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int position) {
+					Intent i = new Intent(MainActivity.this, AccountManagerActivity.class);
+					startActivity(i);
+				}
+			});
 			AlertDialog dialog = builder.create();
 			dialog.setTitle("切换帐号");
 			dialog.setCanceledOnTouchOutside(true);
