@@ -102,6 +102,9 @@ public class Constants {
 		public static final String REPLY = API_ROOT + "/comments/reply.json";//回复一条微博（即对话）
 		public static final String COMMENT = API_ROOT + "/comments/create.json";//评论一条微博 
 		
+		public static final String GET_LISTENERS = API_ROOT
+				+ "/friendships/followers.json";//获取听众列表
+		
 	}
 
 	public class Tencent {
@@ -132,6 +135,7 @@ public class Constants {
 		public static final String REPLY = API_ROOT + "/t/reply";//回复一条微博（即对话）
 		public static final String COMMENT = API_ROOT + "/t/comment";//评论一条微博
 		public static final String GET_LAST_FRIENDS = API_ROOT + "/friends/get_intimate_friends";//获取最近联系人列表
+		public static final String GET_LISTENERS = API_ROOT + "/friends/fanslist";//获取听众列表
 		
 
 	}

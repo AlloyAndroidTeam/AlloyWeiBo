@@ -171,7 +171,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		Log.v("onClick","" + v.getId());
 		switch(v.getId()){
     	case R.id.btnPostAddFriend : //@好友
-    		//showFriend(v); 
+    		showFriend(v); 
     		break;
     	case R.id.btnPostAddPic : //插入图片
    		 	insertPhoto();
@@ -571,11 +571,16 @@ public class PostActivity extends Activity implements OnClickListener{
 		LayoutInflater inflater = LayoutInflater.from(this);
 		//popFrined.setHeight(height)
 		popFrined.showAtLocation(v, Gravity.BOTTOM, 0, 0);
+		//popFrined.setOnDismissListener(onDismissListener)
 		//popFrined.showAsDropDown(btnAddFriend, 0, (- popFrined.getHeight() - 30));
 		
 	}
 	 
 	
+	public void setExitText(String atTxt){
+		Editable edit = tvMain.getEditableText();
+		edit.append(atTxt);
+	}
 	
 	
 	
