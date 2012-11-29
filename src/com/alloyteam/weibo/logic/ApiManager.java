@@ -979,6 +979,8 @@ public class ApiManager {
 	 * @param account
 	 * @param startIndex
 	 * @param listener
+	 * 标准数据格式：{startIndex: int, nextStartIndex : int, list:{}}
+	 * nextStartIndex:-1结束
 	 */
 	public static void getListeners(final Account account, final int startIndex,  
 			final int count,
@@ -1428,16 +1430,48 @@ public class ApiManager {
 			@Override
 			public void onComplete(JSONObject result) {
 				try {							 
-					String errcode = result.getString("errcode");
-					String ret = result.getString("ret");
-					if (errcode.equals("0")){												
-						ApiResult apiResult = new ApiResult();						 
-						JSONObject data = result.getJSONObject("data");
-						
-						listener.onSuccess(apiResult);
-					}else{								
+					String errcode = result.getString("error_code"); 	
+					if (errcode != null && Integer.valueOf(errcode) > 0){												
+						Log.d("getListenersBySina","gonComplete:err");
 						listener.onError(0);
-					} 
+						return;
+					}
+				} catch (JSONException je) {  //没有则表示正常
+					je.printStackTrace();
+				}
+				
+				
+				try {							 
+														
+					ApiResult apiResult = new ApiResult();						 
+					//JSONObject data = result.getJSONObject("users");
+					JSONObject listeners = new JSONObject(); 
+					
+					listeners.put("startIndex", startIndex);//类似于页码
+					
+					if (result.getInt("next_cursor") > 0){
+						listeners.put("nextStartIndex", result.get("next_cursor"));
+					}else{						
+						listeners.put("nextStartIndex", "-1");
+					}
+					
+					
+					JSONArray list = result.getJSONArray("users");//new ArrayList();
+					JSONArray tmpList = new JSONArray();
+					int l = list.length();
+					for (int i = 0; i < l; i++){
+						
+						JSONObject it = list.getJSONObject(i);
+						JSONObject o = new JSONObject();
+						o.put("name", it.getString("idstr"));
+						o.put("nick", it.getString("name"));
+						tmpList.put(o);
+					}
+					listeners.put("list", tmpList);
+					Log.v("getListenersBySina:", listeners.toString());
+					apiResult.listeners = listeners;
+					listener.onSuccess(apiResult);
+					 
 					 
 				} catch (JSONException je) {
 					listener.onError(0);
@@ -1445,10 +1479,10 @@ public class ApiManager {
 				 
 			}
 		};
-		Bundle params = new Bundle(); 		  
-		params.putString("format", "json");
-		params.putInt("startindex", startIndex);
-		params.putInt("reqnum", count);
+		Bundle params = new Bundle(); 		 
+		params.putInt("cursor", startIndex);
+		params.putInt("count", count);
+		params.putString("uid", account.uid);
 		
 		requestAsync(account, Constants.Sina.GET_LISTENERS, params, "GET", httpListener);
 	}
