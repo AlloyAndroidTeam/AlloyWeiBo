@@ -6,7 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import android.graphics.Bitmap;
+import com.alloyteam.weibo.util.ImageLoader.BitmapInfo;
+
 import android.util.Log;
 
 public class MemoryCache {
@@ -14,8 +15,8 @@ public class MemoryCache {
     // 放入缓存时是个同步操作
     // LinkedHashMap构造方法的最后一个参数true代表这个map里的元素将按照最近使用次数由少到多排列，即LRU
     // 这样的好处是如果要将缓存中的元素替换，则先遍历出最近最少使用的元素来替换以提高效率
-    private Map<String, Bitmap> cache = Collections
-                    .synchronizedMap(new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
+    private Map<String, ImageLoader.BitmapInfo> cache = Collections
+                    .synchronizedMap(new LinkedHashMap<String, ImageLoader.BitmapInfo>(5, 1.5f, true));
     // 缓存中图片所占用的字节，初始0，将通过此变量严格控制缓存所占用的堆内存
     private long size = 0;// current allocated size
     // 缓存只能占用的最大堆内存
@@ -31,7 +32,7 @@ public class MemoryCache {
             Log.i(TAG, "MemoryCache will use up to " + limit / 1024. / 1024. + "MB");
     }
 
-    public Bitmap get(String id) {
+    public BitmapInfo get(String id) {
             try {
                     if (!cache.containsKey(id))
                             return null;
@@ -41,12 +42,12 @@ public class MemoryCache {
             }
     }
 
-    public void put(String id, Bitmap bitmap) {
+    public void put(String id, BitmapInfo bitmapInfo) {
             try {
                     if (cache.containsKey(id))
                             size -= getSizeInBytes(cache.get(id));
-                    cache.put(id, bitmap);
-                    size += getSizeInBytes(bitmap);
+                    cache.put(id, bitmapInfo);
+                    size += getSizeInBytes(bitmapInfo);
                     checkSize();
             } catch (Throwable th) {
                     th.printStackTrace();
@@ -61,9 +62,10 @@ public class MemoryCache {
             Log.i(TAG, "cache size=" + size + " length=" + cache.size());
             if (size > limit) {
                     // 先遍历最近最少使用的元素
-                    Iterator<Entry<String, Bitmap>> iter = cache.entrySet().iterator();
+                    Iterator<Entry<String, BitmapInfo>> iter = cache.entrySet().iterator();
                     while (iter.hasNext()) {
-                            Entry<String, Bitmap> entry = iter.next();
+                            Entry<String, BitmapInfo> entry = iter.next();
+                            
                             size -= getSizeInBytes(entry.getValue());
                             iter.remove();
                             if (size <= limit)
@@ -80,13 +82,13 @@ public class MemoryCache {
     /**
      * 图片占用的内存
      * 
-     * @param bitmap
+     * @param bitmapInfo.bm
      * @return
      */
-    long getSizeInBytes(Bitmap bitmap) {
-            if (bitmap == null)
+    long getSizeInBytes(BitmapInfo bitmapInfo) {
+            if (bitmapInfo.bm == null)
                     return 0;
-            return bitmap.getRowBytes() * bitmap.getHeight();
+            return bitmapInfo.bm.getRowBytes() * bitmapInfo.bm.getHeight()+bitmapInfo.bytes.length;
     }
 
 }
