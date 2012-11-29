@@ -41,6 +41,8 @@ public class GifView extends View implements GifAction {
 
     private int showWidth=-1;
     private int showHeight=-1;
+    private int width;
+    private int height;
     private Rect rect=null;
 
     public void setRun(boolean run) {
@@ -207,7 +209,8 @@ public class GifView extends View implements GifAction {
             w=gifDecoder.width;
             h=gifDecoder.height;
         }
-
+        width=w;
+        height=h;
         w+=pleft+pright;
         h+=ptop+pbottom;
 
@@ -218,7 +221,8 @@ public class GifView extends View implements GifAction {
         heightSize=resolveSize(h, heightMeasureSpec);
 
         //Log.d(TAG, "widthSize:"+widthSize+" heightSize:"+heightSize+" w:"+w+" h:"+h);
-
+        width=widthSize;
+        height=heightSize;
         setMeasuredDimension(widthSize, heightSize);
     }
 
@@ -286,10 +290,10 @@ public class GifView extends View implements GifAction {
             showWidth=width;
             showHeight=height;
             rect=new Rect();
-            rect.left=0;
-            rect.top=0;
-            rect.right=width;
-            rect.bottom=height;
+            rect.left=(this.width-showWidth)/2;
+            rect.top=(this.height-showHeight)/2;
+            rect.right=width+rect.left;
+            rect.bottom=height+rect.top;
             requestLayout();
             invalidate();
         }
@@ -333,7 +337,19 @@ public class GifView extends View implements GifAction {
                 
                 Bitmap bitmap=gifFrames.get(0).image;
                 Log.d(TAG, "gif帧间隔为："+gifFrames.get(0).delay);
-                setShowDimension(bitmap.getWidth(), bitmap.getHeight());
+                int w=bitmap.getWidth();
+                int h=bitmap.getHeight();
+                float scale1=width/(float)height;
+                float scale2=w/(float)h;
+                if(scale1<scale2){
+                	w=width;
+                	h=(int) (w/scale2);
+                }
+                else{
+                	h=height;
+                	w=(int) (h*scale2);
+                }
+                setShowDimension(w,h);//bitmap.getWidth(), bitmap.getHeight());
             }
         });
         //}
