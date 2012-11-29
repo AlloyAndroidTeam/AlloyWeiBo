@@ -5,9 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 /**
- * @package：com.huaheng.client.activity.view
- * @author：Allen
- * @email：jaylong1302@163.com
+ * @package：
  * @data：2012-9-27 上午8:59:40
  * @description：The class is for...
  */

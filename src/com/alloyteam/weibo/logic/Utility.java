@@ -4,8 +4,10 @@
  */
 package com.alloyteam.weibo.logic;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -57,7 +59,59 @@ public class Utility {
 	public static Bundle parseUrl(String url) {
 		return parseUrl(url, "?");
 	}
-	
+	public static byte[] Bitmap2Bytes(Bitmap bm){  
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();    
+	    bm.compress(Bitmap.CompressFormat.PNG, 100, baos);    
+	    return baos.toByteArray();  
+	}  	
+	/**
+	  * 将网络图片，转换为 btye 类型
+	  * @param is
+	  * @return
+	  * @throws IOException
+	  */
+	 public static byte[] getBytes(InputStream is) throws IOException {           
+	  ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	  int imgSize = 1024*4;
+	  byte[] b = null;  
+	  byte[] bytes = null;
+	  try {
+	   b= new byte[imgSize];
+	   int len = 0;           
+	   while ((len = is.read(b, 0, imgSize)) != -1)            
+	   {            
+	    baos.write(b, 0, len);            
+	    baos.flush();           
+	   }           
+	   bytes = baos.toByteArray();           
+	   baos.close();
+	   is.close();
+	  } catch (Exception e) {
+	   //Log.i(TAG, "将网络图片，转换为 btye 类型 方法异常"+e.toString());
+	  }
+	  return bytes;
+	 }
+	 
+    public static String getType(byte[] data) {  
+        String type = "BMP";  
+        // Png test:  
+        if (data[1] == 'P' && data[2] == 'N' && data[3] == 'G') {  
+            type = "PNG";  
+            return type;  
+        }  
+        // Gif test:  
+        if (data[0] == 'G' && data[1] == 'I' && data[2] == 'F') {  
+            type = "GIF";  
+            return type;  
+        }  
+        // JPG test:  
+        if (data[6] == 'J' && data[7] == 'F' && data[8] == 'I'  
+                && data[9] == 'F') {  
+            type = "JPG";  
+            return type;  
+        }  
+        return type;  
+    }
     static Hashtable<String, String> html_specialchars_table = new Hashtable<String, String>();
     static {
             html_specialchars_table.put("&lt;","<");
