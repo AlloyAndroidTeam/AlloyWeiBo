@@ -1,6 +1,5 @@
 package com.alloyteam.weibo.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.alloyteam.weibo.R;
+import com.alloyteam.weibo.logic.Utility;
 
 import android.app.Activity;
 import android.content.Context;
@@ -44,12 +44,12 @@ public class ImageLoader {
 		imageViews.put(imageView, url);
 		// 先从内存缓存中查找
 
-		Bitmap bitmap = memoryCache.get(url);
-		if (bitmap != null) {
+		BitmapInfo bitmapInfo = memoryCache.get(url);
+		if (bitmapInfo != null) {
 			if (callback != null) {
-				imageView.setImageBitmap(callback.imageLoaded(bitmap, url));
+				imageView.setImageBitmap(callback.imageLoaded(bitmapInfo, url));
 			} else {
-				imageView.setImageBitmap(bitmap);
+				imageView.setImageBitmap(bitmapInfo.bm);
 			}
 		} else {
 			// 若没有的话则开启新线程加载图片
@@ -64,7 +64,11 @@ public class ImageLoader {
 		executorService.submit(new PhotosLoader(p));
 	}
 
-	private Bitmap getBitmap(String url) {
+	public static class BitmapInfo{
+		public Bitmap bm;
+		public byte[] bytes;
+	}
+	private BitmapInfo getBitmapInfo(String url) {
 		/*
 		 * File f = fileCache.getFile(url);
 		 * 
@@ -84,51 +88,24 @@ public class ImageLoader {
 			// OutputStream os = new FileOutputStream(f);
 			// CopyStream(is, os);
 			// os.close();
-			bitmap = decodeFile(is);
+			BitmapInfo bmInfo = decodeFile(is);
 			is.close();
 			conn.disconnect();
 			Log.d("my", "bitmap decode");
-			return bitmap;
+			return bmInfo;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;
 		}
 	}
-	/**
-	  * 将网络图片，转换为 btye 类型
-	  * @param is
-	  * @return
-	  * @throws IOException
-	  */
-	 private static byte[] getBytes(InputStream is) throws IOException {           
-	  ByteArrayOutputStream baos = new ByteArrayOutputStream();  
-	  int imgSize = 1024*4;
-	  byte[] b = null;  
-	  byte[] bytes = null;
-	  try {
-	   b= new byte[imgSize];
-	   int len = 0;           
-	   while ((len = is.read(b, 0, imgSize)) != -1)            
-	   {            
-	    baos.write(b, 0, len);            
-	    baos.flush();           
-	   }           
-	   bytes = baos.toByteArray();           
-	   baos.close();
-	   is.close();
-	  } catch (Exception e) {
-	   //Log.i(TAG, "将网络图片，转换为 btye 类型 方法异常"+e.toString());
-	  }
-	  return bytes;
-	 }
-	 
 	// decode这个图片并且按比例缩放以减少内存消耗，虚拟机对每张图片的缓存大小也是有限制的
-	private Bitmap decodeFile(InputStream f) throws IOException {
+	private BitmapInfo decodeFile(InputStream f) throws IOException {
 
 		// decode image size
+		BitmapInfo bmInfo=new BitmapInfo();
 		BitmapFactory.Options o = new BitmapFactory.Options();
 		o.inJustDecodeBounds = true;
-		byte[] bt = getBytes(f);
+		byte[] bt = Utility.getBytes(f);
 		BitmapFactory.decodeByteArray(bt, 0, bt.length, o);
 
 		// Find the correct scale value. It should be the power of 2.
@@ -147,7 +124,9 @@ public class ImageLoader {
 		o.inJustDecodeBounds = false;
 		o.inSampleSize = scale;
 		Bitmap bm=BitmapFactory.decodeByteArray(bt, 0, bt.length, o);
-		return bm;
+		bmInfo.bytes=bt;
+		bmInfo.bm=bm;
+		return bmInfo;
 	}
 
 	// Task for the queue
@@ -175,15 +154,15 @@ public class ImageLoader {
 			Log.d("my", "run");
 			if (imageViewReused(photoToLoad))
 				return;
-			Bitmap bmp = getBitmap(photoToLoad.url);
-			memoryCache.put(photoToLoad.url, bmp);
+			BitmapInfo bmpInfo = getBitmapInfo(photoToLoad.url);
+			memoryCache.put(photoToLoad.url, bmpInfo);
 			if (imageViewReused(photoToLoad))
 				return;
-			BitmapDisplayer bd = new BitmapDisplayer(bmp, photoToLoad);
+			BitmapDisplayer bd = new BitmapDisplayer(bmpInfo, photoToLoad);
 			// 更新的操作放在UI线程中
 			Activity a = (Activity) photoToLoad.imageView.getContext();
 			a.runOnUiThread(bd);
-			// bd.run();
+			//photoToLoad.imageView.setImageBitmap(bmp);
 		}
 	}
 
@@ -202,11 +181,11 @@ public class ImageLoader {
 
 	// 用于在UI线程中更新界面
 	class BitmapDisplayer implements Runnable {
-		Bitmap bitmap;
+		BitmapInfo bitmapInfo;
 		PhotoToLoad photoToLoad;
 
-		public BitmapDisplayer(Bitmap b, PhotoToLoad p) {
-			bitmap = b;
+		public BitmapDisplayer(BitmapInfo b, PhotoToLoad p) {
+			bitmapInfo = b;
 			photoToLoad = p;
 		}
 
@@ -214,12 +193,12 @@ public class ImageLoader {
 			if (imageViewReused(photoToLoad))
 				return;
 			Log.d("my", "set");
-			if (bitmap != null) {
+			if (bitmapInfo != null) {
 				if (photoToLoad.callback != null) {
 					photoToLoad.imageView.setImageBitmap(photoToLoad.callback
-							.imageLoaded(bitmap, photoToLoad.url));
+							.imageLoaded(bitmapInfo, photoToLoad.url));
 				} else {
-					photoToLoad.imageView.setImageBitmap(bitmap);
+					photoToLoad.imageView.setImageBitmap(bitmapInfo.bm);
 				}
 			} else {
 				// photoToLoad.imageView.setImageResource(stub_id);
@@ -248,7 +227,7 @@ public class ImageLoader {
 
 	public interface ImageCallback {
 
-		public Bitmap imageLoaded(Bitmap bm, String imageUrl);
+		public Bitmap imageLoaded(BitmapInfo bmInfo, String imageUrl);
 
 	}
 

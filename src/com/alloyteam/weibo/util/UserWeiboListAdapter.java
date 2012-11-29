@@ -96,8 +96,8 @@ public class UserWeiboListAdapter extends BaseAdapter {
 		return position;
 	}
 	public ImageLoader.ImageCallback callback=new ImageLoader.ImageCallback(){
-		public Bitmap imageLoaded(Bitmap bm, String url){
-			return toRoundCorner(bm, 5);
+		public Bitmap imageLoaded(ImageLoader.BitmapInfo bmInfo, String url){
+			return toRoundCorner(bmInfo.bm, 5);
 		}
 	};
 
