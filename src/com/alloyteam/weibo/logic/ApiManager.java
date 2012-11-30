@@ -61,6 +61,7 @@ public class ApiManager {
 		public ArrayList<Weibo2> weiboList;
 		public Weibo2 weibo;
 		public UserInfo userInfo;
+		public boolean isFollow;
 		public JSONObject listeners;//听众列表对象：list, startindex, nextstartindex
 
 	}
@@ -143,6 +144,7 @@ public class ApiManager {
 				Message message = Message.obtain(handler, 1);
 				Bundle data = new Bundle();
 				data.putString("result", result);
+				Log.d("response",result);
 				message.setData(data);
 				handler.sendMessage(message);
 			}
@@ -644,8 +646,169 @@ public class ApiManager {
 		};		
 		requestAsync(account, url, params, "POST", httpListener);
 	}
-	
-	
+	/**
+	 * 收听某人
+	 */
+	public static void check(final Account account, final String uid, final IApiResultListener listener){
+		Bundle params = new Bundle();
+		String url="";
+		//params.putLong("t", System.currentTimeMillis());
+		if(account.type==Constants.TENCENT){
+			url = Constants.Tencent.CHECK+"?"+System.currentTimeMillis();
+			params.putString("format","json");
+			params.putInt("flag",1);
+			params.putString("names",uid);
+		}else if (account.type == Constants.SINA) {
+			url = Constants.Sina.CHECK+"?"+System.currentTimeMillis();
+			params.putString("source_id", uid);
+			params.putString("target_id", account.uid);
+		}
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				if(account.type==Constants.TENCENT){				
+					int errcode=1;
+					try {
+						errcode = result.getInt("errcode");
+
+						if(errcode==0){
+							ApiResult apiResult=new ApiResult();
+							JSONObject data=result.getJSONObject("data");
+							apiResult.isFollow=data.getBoolean(uid);
+							listener.onSuccess(apiResult);
+						}
+						else{
+							listener.onError(errcode);
+						}
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						listener.onError(errcode);
+						e.printStackTrace();
+					}
+				}
+				else if(account.type==Constants.SINA){
+					ApiResult apiResult=new ApiResult();
+					try {
+						JSONObject target = result.getJSONObject("target");
+						apiResult.isFollow=target.getBoolean("following");
+						listener.onSuccess(apiResult);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						listener.onError(0);
+						e.printStackTrace();
+					}			
+				}
+			}
+		};		
+		requestAsync(account, url, params, "GET", httpListener);
+	}
+	/**
+	 * 收听某人
+	 */
+	public static void follow(final Account account, String uid, final IApiResultListener listener){
+		Bundle params = new Bundle();
+		String url="";
+		//params.putLong("t", System.currentTimeMillis());
+		if(account.type==Constants.TENCENT){
+			url = Constants.Tencent.FOLLOW+"?"+System.currentTimeMillis();
+			params.putString("format","json");
+			params.putString("name",uid);
+		}else if (account.type == Constants.SINA) {
+			url = Constants.Sina.FOLLOW+"?"+System.currentTimeMillis();
+			params.putString("uid", uid);
+		}
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				if(account.type==Constants.TENCENT){				
+					int errcode=1;
+					try {
+						errcode = result.getInt("errcode");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(errcode==0){
+						listener.onSuccess(null);
+					}
+					else{
+						listener.onError(errcode);
+					}
+				}
+				else if(account.type==Constants.SINA){
+					listener.onSuccess(null);				
+				}
+			}
+		};		
+		requestAsync(account, url, params, "POST", httpListener);
+	}
+	/**
+	 * 收听某人
+	 */
+	public static void destroyFollow(final Account account, String uid, final IApiResultListener listener){
+		Bundle params = new Bundle();
+		String url="";
+		//params.putLong("t", System.currentTimeMillis());
+		if(account.type==Constants.TENCENT){
+			url = Constants.Tencent.DESTROY_FOLLOW+"?"+System.currentTimeMillis();
+			params.putString("format","json");
+			params.putString("name",uid);
+		}else if (account.type == Constants.SINA) {
+			url = Constants.Sina.DESTROY_FOLLOW+"?"+System.currentTimeMillis();
+			params.putString("uid", uid);
+		}
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				if(account.type==Constants.TENCENT){				
+					int errcode=1;
+					try {
+						errcode = result.getInt("errcode");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(errcode==0){
+						listener.onSuccess(null);
+					}
+					else{
+						listener.onError(errcode);
+					}
+				}
+				else if(account.type==Constants.SINA){
+					listener.onSuccess(null);				
+				}
+			}
+		};		
+		requestAsync(account, url, params, "POST", httpListener);
+	}
 
 	/**
 	 * 发布微博,统一接口

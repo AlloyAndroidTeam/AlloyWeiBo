@@ -95,6 +95,11 @@ public class Constants {
 		
 		public static final String ADD = API_ROOT
 				+ "/statuses/update.json";//发布一条新微博
+		public static final String FOLLOW = API_ROOT
+				+ "/friendships/create.json";//关注某人
+		public static final String DESTROY_FOLLOW = API_ROOT
+				+ "/friendships/destroy.json";//取消关注某人
+		public static final String CHECK = API_ROOT + "/friendships/show.json";
 		public static final String ADD_PIC = API_ROOT
 				+ "/statuses/upload.json";//获取转播列表
 		
@@ -128,9 +133,13 @@ public class Constants {
 		public static final String T_COMMENT_LIST = API_ROOT
 				+ "/t/re_list";//获取评论和转播列表
 		public static final String ADD = API_ROOT + "/t/add"; //写微博
+		public static final String FOLLOW = API_ROOT + "/friends/add";//收听某人
+		public static final String DESTROY_FOLLOW = API_ROOT
+				+ "/friends/del";//取消收听某人
 		public static final String ADD_PIC = API_ROOT + "/t/add_pic";//写微博pic
 		public static final String T_DELETE = API_ROOT
 				+ "/t/del";//删除微博
+		public static final String CHECK = API_ROOT + "/friends/check";
 		public static final String READD = API_ROOT + "/t/re_add";//转发
 		public static final String REPLY = API_ROOT + "/t/reply";//回复一条微博（即对话）
 		public static final String COMMENT = API_ROOT + "/t/comment";//评论一条微博

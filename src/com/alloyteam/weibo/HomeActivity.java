@@ -22,29 +22,37 @@ import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.alloyteam.weibo.PullDownView.OnPullDownListener;
+import com.alloyteam.weibo.logic.AccountManager;
+import com.alloyteam.weibo.logic.ApiManager;
+import com.alloyteam.weibo.logic.ApiManager.ApiResult;
+import com.alloyteam.weibo.model.Account;
+import com.alloyteam.weibo.model.DataManager;
+import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.util.ImageLoader;
+import com.alloyteam.weibo.util.UserWeiboListAdapter;
 
 /**
  * @author pxz
  * 
  */
-public class HomeActivity extends Activity implements OnPullDownListener, OnItemClickListener{
+public class HomeActivity extends Activity implements OnPullDownListener, OnItemClickListener, OnClickListener{
 	public static final String TAG = "HomeActivity";
 	public ImageView bigImageView;
 	static public ImageLoader imageLoader;
@@ -61,7 +69,10 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	private Account account;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
+	private Button followBtn;
+	private Button destroyBtn;
 	private String uid;
+	private Boolean isFollow=false;
 	
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -91,6 +102,9 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		Intent i=this.getIntent();
 		Bundle b=i.getExtras();
 		loadUser(b);
+		followBtn=(Button)findViewById(R.id.follow);
+		followBtn.setOnClickListener(this);
+		isFollow();
 	}
 
 	public void initHomeLine() {
@@ -248,6 +262,77 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	@Override
 	public void onMore() {
 		loadData(WHAT_DID_MORE);
+	}
+	public void isFollow(){
+		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
+			@Override
+			public void onSuccess(ApiResult result) {
+				if(result.isFollow){
+					followBtn.setText("取消收听");
+					isFollow=true;		
+				}
+				followBtn.setVisibility(View.VISIBLE);
+			}
+			@Override
+			public void onError(int errorCode) {
+			
+			}
+		};
+		ApiManager.check(account, uid, listener);		
+	}
+	//收听某人
+	public void follow(){
+		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
+			@Override
+			public void onSuccess(ApiResult result) {
+				new AlertDialog.Builder(HomeActivity.this)
+				.setMessage("收听成功")
+				.setNegativeButton("确定", null).show();
+				followBtn.setText("取消收听");
+				isFollow=true;
+			}
+			@Override
+			public void onError(int errorCode) {
+				new AlertDialog.Builder(HomeActivity.this)
+				.setMessage("收听失败")
+				.setNegativeButton("确定", null).show();				
+			}
+		};
+		ApiManager.follow(account, uid, listener);
+	}
+	//取消收听某人
+	public void destroyFollow(){
+		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
+			@Override
+			public void onSuccess(ApiResult result) {
+				new AlertDialog.Builder(HomeActivity.this)
+				.setMessage("取消收听成功")
+				.setNegativeButton("确定", null).show();
+				followBtn.setText("收听");
+				isFollow=false;
+			}
+			@Override
+			public void onError(int errorCode) {
+				new AlertDialog.Builder(HomeActivity.this)
+				.setMessage("取消收听失败")
+				.setNegativeButton("确定", null).show();				
+			}
+		};
+		ApiManager.destroyFollow(account, uid, listener);
+	}
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		switch (v.getId()) {
+		case R.id.follow: // @发表
+			if(isFollow){
+				destroyFollow();
+			}
+			else{
+				follow();
+			}
+			break;
+		}
 	}
 	
 }
