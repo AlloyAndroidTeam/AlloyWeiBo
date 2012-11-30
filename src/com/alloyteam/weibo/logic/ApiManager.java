@@ -63,6 +63,8 @@ public class ApiManager {
 		public Weibo2 weibo;
 		public UserInfo userInfo;
 		public boolean isFollow;
+		public JSONObject listeners;//听众列表对象：list, startindex, nextstartindex
+
 	}
 
 	private static Context apiContext;
@@ -1119,6 +1121,47 @@ public class ApiManager {
 			break;
 		}
 	}
+	/**
+	 * 
+	 * @param account
+	 * @param listener
+	 */
+	public static void getLastFriends(final Account account, 
+			final IApiResultListener listener) {
+		
+		// 微博类型, 1: 新浪, 2: 腾讯
+				switch (account.type) {
+				case Constants.SINA:
+					getLastFriendsBySina(account, listener);
+					break;
+				case Constants.TENCENT:
+					getLastFriendsByTencent(account, listener);
+					break;
+				}
+	}
+	/**
+	 * 获取听众列表
+	 * @param account
+	 * @param startIndex
+	 * @param listener
+	 * 标准数据格式：{startIndex: int, nextStartIndex : int, 
+	 * 					list:[{name: "", nick:""},{name: "", nick:""},...]}
+	 * nextStartIndex:-1结束
+	 */
+	public static void getListeners(final Account account, final int startIndex,  
+			final int count,
+			final IApiResultListener listener) {
+		
+		// 微博类型, 1: 新浪, 2: 腾讯
+				switch (account.type) {
+				case Constants.SINA:
+					getListenersBySina(account, startIndex, count, listener);
+					break;
+				case Constants.TENCENT:
+					getListenersByTencent(account, startIndex, count, listener);
+					break;
+				}
+	}
 
 	// ********************腾讯相关方法****************************************
 	 
@@ -1298,7 +1341,122 @@ public class ApiManager {
 				"POST", listener);
 	}
 
+	/**
+	 * 获取最近联系人
+	 * @param account
+	 * @param listener
+	 */
+	private static void getLastFriendsByTencent(final Account account, 
+			final IApiResultListener listener){
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				Log.d("json","getLastFriendsByTencent:err1");
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				Log.d("json","getLastFriendsByTencent:err");
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				try {							 
+					String errcode = result.getString("errcode");
+					String ret = result.getString("ret");
+					if (errcode.equals("0")){												
+						ApiResult apiResult = new ApiResult();						 
+						JSONObject data = result.getJSONObject("data");
+						
+						listener.onSuccess(apiResult);
+					}else{								
+						listener.onError(0);
+					} 
+					 
+				} catch (JSONException je) {
+					listener.onError(0);
+				}
+				 
+			}
+		};
+			
+		requestAsync(account, Constants.Tencent.GET_LAST_FRIENDS, null, "GET", httpListener);
+	}
+	/**
+	 * 获取腾讯听众列表
+	 * @param account
+	 * @param startIndex 拉取页面的起至索引，由上一次返回，第一页为0
+	 * @param count 一页拉取的数目
+	 * @param listener
+	 */
 	
+	private static void getListenersByTencent(final Account account, final int startIndex, 
+			final int count,
+			final IApiResultListener listener){
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				Log.d("json","getLastFriendsByTencent:err1");
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				Log.d("json","getLastFriendsByTencent:err");
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				try {							 
+					String errcode = result.getString("errcode");
+					String ret = result.getString("ret");
+					if (errcode.equals("0")){												
+						ApiResult apiResult = new ApiResult();						 
+						JSONObject data = result.getJSONObject("data");
+						JSONObject listeners = new JSONObject();
+						//listeners.put("total", data.get(name));
+						listeners.put("startIndex", startIndex);//类似于页码
+						
+						if (data.getInt("hasnext") == 1){
+							listeners.put("nextStartIndex", "-1");
+						}else{						
+							listeners.put("nextStartIndex", data.get("nextstartpos"));
+						}
+						
+						
+						JSONArray list = data.getJSONArray("info");//new ArrayList();
+						JSONArray tmpList = new JSONArray();
+						int l = list.length();
+						for (int i = 0; i < l; i++){
+							
+							JSONObject it = list.getJSONObject(i);
+							JSONObject o = new JSONObject();
+							o.put("name", it.getString("name"));
+							o.put("nick", it.getString("nick"));
+							tmpList.put(o);
+						}
+						listeners.put("list", tmpList);
+						Log.v("getLastFriendsByTencent:", listeners.toString());
+						apiResult.listeners = listeners;
+						listener.onSuccess(apiResult);
+					}else{								
+						listener.onError(0);
+					} 
+					 
+				} catch (JSONException je) {
+					listener.onError(0);
+				}
+				 
+			}
+		};
+		Bundle params = new Bundle(); 		  
+		params.putString("format", "json");
+		params.putInt("startindex", startIndex);
+		params.putInt("reqnum", count);
+		
+		requestAsync(account, Constants.Tencent.GET_LISTENERS, params, "GET", httpListener);
+	}
 	// ********************新浪相关方法****************************************
 	
 	/**
@@ -1396,12 +1554,102 @@ public class ApiManager {
 				return;
 		}
 		
-		
-		
 		ApiManager.requestAsync(account, url, params,
 				"POST", listener);
 		Log.v(TAG, "readdToSina:" + type);
 		
 	}
+	/**
+	 * 获取最近联系人
+	 * @param account
+	 * @param listener
+	 */
+	private static void getLastFriendsBySina(final Account account, 
+			final IApiResultListener listener){
+		
+	}
 	
+	
+	/**
+	 * 获取sina听众列表
+	 * @param account
+	 * @param startIndex 拉取页面的起至索引，由上一次返回，第一页为0
+	 * @param count 一页拉取的数目
+	 * @param listener
+	 */
+	
+	private static void getListenersBySina(final Account account, final int startIndex, 
+			final int count,
+			final IApiResultListener listener){
+		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
+			@Override
+			public void onJSONException(JSONException exception) {
+				Log.d("json","getLastFriendsByTencent:err1");
+				listener.onError(0);
+			}
+
+			public void onFailure(String msg) {
+				Log.d("json","getLastFriendsByTencent:err");
+				listener.onError(1);
+			}
+
+			@Override
+			public void onComplete(JSONObject result) {
+				try {							 
+					String errcode = result.getString("error_code"); 	
+					if (errcode != null && Integer.valueOf(errcode) > 0){												
+						Log.d("getListenersBySina","gonComplete:err");
+						listener.onError(0);
+						return;
+					}
+				} catch (JSONException je) {  //没有则表示正常
+					je.printStackTrace();
+				}
+				
+				
+				try {							 
+														
+					ApiResult apiResult = new ApiResult();						 
+					//JSONObject data = result.getJSONObject("users");
+					JSONObject listeners = new JSONObject(); 
+					
+					listeners.put("startIndex", startIndex);//类似于页码
+					
+					if (result.getInt("next_cursor") > 0){
+						listeners.put("nextStartIndex", result.get("next_cursor"));
+					}else{						
+						listeners.put("nextStartIndex", "-1");
+					}
+					
+					
+					JSONArray list = result.getJSONArray("users");//new ArrayList();
+					JSONArray tmpList = new JSONArray();
+					int l = list.length();
+					for (int i = 0; i < l; i++){
+						
+						JSONObject it = list.getJSONObject(i);
+						JSONObject o = new JSONObject();
+						o.put("name", it.getString("idstr"));
+						o.put("nick", it.getString("name"));
+						tmpList.put(o);
+					}
+					listeners.put("list", tmpList);
+					Log.v("getListenersBySina:", listeners.toString());
+					apiResult.listeners = listeners;
+					listener.onSuccess(apiResult);
+					 
+					 
+				} catch (JSONException je) {
+					listener.onError(0);
+				}
+				 
+			}
+		};
+		Bundle params = new Bundle(); 		 
+		params.putInt("cursor", startIndex);
+		params.putInt("count", count);
+		params.putString("uid", account.uid);
+		
+		requestAsync(account, Constants.Sina.GET_LISTENERS, params, "GET", httpListener);
+	}
 }
