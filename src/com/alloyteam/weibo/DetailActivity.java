@@ -11,7 +11,6 @@ import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.DataManager;
-import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;

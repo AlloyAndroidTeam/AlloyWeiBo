@@ -7,96 +7,99 @@
     <EditText
         android:id="@+id/etPostMain"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"  
-	    android:layout_marginBottom="100dp" 
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="100dp"
+        android:ems="10"
         android:gravity="top"
-        android:ems="10" 
-        android:textSize="16dp"  
-        android:inputType="textMultiLine" >
+        android:inputType="textMultiLine"
+        android:textSize="16dp" >
+
         <requestFocus />
-    </EditText>     
-     <TextView
-	           android:id="@+id/tvPostTips"
-	           android:textColor="#ccc"  
-	           android:layout_width="wrap_content"
-	           android:layout_height="wrap_content" 
-			   android:layout_alignParentLeft="true"
-			   android:layout_alignParentTop="true" 
-			   android:layout_marginLeft="12dp" 
-			   android:layout_marginTop="6dp"  
-			   android:textSize="16dp"   
-	           android:text="说点儿什么吧..." />     
-     <RelativeLayout          
-          android:layout_width="fill_parent"
-	      android:layout_height="50dp"
-	       android:orientation="horizontal"
-	        android:layout_alignParentBottom="true" 
-		  android:layout_marginBottom="35dp"  >
-        <LinearLayout 
+    </EditText>
+
+    <TextView
+        android:id="@+id/tvPostTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="6dp"
+        android:text="说点儿什么吧..."
+        android:textColor="#ccc"
+        android:textSize="16dp" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="35dp"
+        android:orientation="horizontal" >
+
+        <LinearLayout
             android:id="@+id/postStatebar"
-	        android:layout_width="wrap_content"
-	        android:layout_height="fill_parent"
-	        android:orientation="horizontal" >            
-        </LinearLayout>	
-	       <TextView
-	           android:id="@+id/tvPostCount"
-	           android:textColor="#00f"  
-	           android:layout_width="wrap_content"
-	           android:layout_height="wrap_content" 
-	           android:layout_alignParentRight="true"  
-	           android:layout_centerVertical="true"
-	           android:layout_marginRight="5dp"        
-	           android:text="140" />        
-     </RelativeLayout>
-   
-    
-    <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal" >
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvPostCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:text="140"
+            android:textColor="#00f" />
+    </RelativeLayout>
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="35dp"
-        android:orientation="horizontal"        
-        android:layout_alignParentBottom="true" > 
-        <RelativeLayout 
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <RelativeLayout
             android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"  >
-	        
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
             <Button
-		        android:id="@+id/btnPostAddPic"
-		        android:layout_width="wrap_content" 
-		        android:layout_height="35dp" 
-		        android:focusable="false" 
-		        android:paddingTop="5dp" 
-		        android:layout_margin="0dp"
-		        android:textColor="#060"
-		        android:textSize="12dp" 		        
-		        android:layout_centerInParent="true"
-		        android:text="@string/btn_add_pic" /> 
-		        
-	         <Button
-		        android:id="@+id/btnPostAddFriend"
-		        android:layout_width="wrap_content" 
-		        android:layout_height="35dp" 
-		        android:focusable="false" 
-		        android:paddingTop="5dp" 
-		        android:layout_margin="0dp"
-		        android:textColor="#060"
-		        android:textSize="12dp"		        
-		        android:layout_alignParentLeft="true"
-		        android:text="@string/btn_add_friend" />
-	         
-	         
-	        
-	        <Button
-		        android:id="@+id/btnPostAddTopic"
-		        android:layout_width="wrap_content" 
-		        android:layout_height="35dp" 
-		        android:focusable="false" 
-		        android:paddingTop="5dp" 
-		        android:layout_margin="0dp"
-		        android:textColor="#060"
-		        android:textSize="12dp" 
-		        android:layout_alignParentRight="true"
-		        android:text="@string/btn_add_topic" />
+                android:id="@+id/btnPostAddPic"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_centerInParent="true"
+                android:layout_margin="0dp"
+                android:focusable="false"
+                android:paddingTop="5dp"
+                android:text="@string/btn_add_pic"
+                android:textColor="#060"
+                android:textSize="12dp" />
+
+            <Button
+                android:id="@+id/btnPostAddFriend"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_alignParentLeft="true"
+                android:layout_margin="0dp"
+                android:focusable="false"
+                android:paddingTop="5dp"
+                android:text="@string/btn_add_friend"
+                android:textColor="#060"
+                android:textSize="12dp" />
+
+            <Button
+                android:id="@+id/btnPostAddTopic"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_alignParentRight="true"
+                android:layout_margin="0dp"
+                android:focusable="false"
+                android:paddingTop="5dp"
+                android:text="@string/btn_add_topic"
+                android:textColor="#060"
+                android:textSize="12dp" />
         </RelativeLayout>
     </LinearLayout>
 

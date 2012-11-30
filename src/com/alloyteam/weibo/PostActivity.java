@@ -16,13 +16,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.alloyteam.net.HttpConnection;
 import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
-import com.alloyteam.weibo.model.Weibo; 
 import com.alloyteam.weibo.model.Weibo2;
 
 import android.app.Activity;

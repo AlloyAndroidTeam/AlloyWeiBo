@@ -16,5 +16,15 @@
         android:gravity="center_vertical"
         android:text="azrael(腾讯微博)"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <RadioButton
+        android:id="@+id/currentAccountRadio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/currentAccountText"
+        android:layout_marginRight="15dp"
+        android:clickable="false"
+        android:focusable="false" />
 
 </RelativeLayout>

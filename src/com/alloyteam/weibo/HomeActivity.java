@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.UserInfo;
-import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.UserWeiboListAdapter;

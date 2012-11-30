@@ -2,6 +2,7 @@ package com.alloyteam.weibo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +12,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -24,8 +27,11 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TabHost;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TabHost.TabSpec;
@@ -35,6 +41,7 @@ import com.alloyteam.weibo.PullDownView.OnPullDownListener;
 import com.alloyteam.weibo.logic.AccountManager;
 import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
+import com.alloyteam.weibo.logic.DBHelper;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
@@ -110,11 +117,17 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		setContentView(R.layout.activity_main);
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 				R.layout.home_title);
+		Context context = getApplicationContext();
+		DBHelper.init(context);
+		AccountManager.init(context);
+		ApiManager.init(context);
+		
 		accountSwitchBtn = (Button) findViewById(R.id.btnHomeTitleAccount);
 		accountSwitchBtn.setOnClickListener(this);
 		//settingBtn = (Button) findViewById(R.id.btnHomeTitleAccountSetting);
 		//settingBtn.setOnClickListener(this);
 		findViewById(R.id.btnHomeTitlePost).setOnClickListener(this);
+		
 		Account defaultAccount = AccountManager.getDefaultAccount();
 		if (defaultAccount != null) {
 			accountSwitchBtn.setText(getAccountDescption(defaultAccount));
@@ -348,15 +361,6 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 					0, accounts);
 
 			builder = new AlertDialog.Builder(this);
-			builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int position) {
-					Account account = adapter.getItem(position);
-					if (account != null) {
-						AccountManager.switchDefaultAccount(account);
-					}
-				}
-			});
 			builder.setPositiveButton("+ 绑定帐号", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int position) {
@@ -364,7 +368,43 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 					startActivity(i);
 				}
 			});
-			AlertDialog dialog = builder.create();
+			final AlertDialog dialog = builder.create();
+			
+			ListView listView = new ListView(this);
+			listView.setBackgroundColor(Color.WHITE);
+			listView.setAdapter(adapter);
+			listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+			
+			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					Account account = adapter.getItem(position);
+					if (account != null) {
+//						for(int i = 0, len = parent.getChildCount(); i < len;i ++){
+//							View v = parent.getChildAt(i);
+//							RadioButton radio = (RadioButton) v.findViewById(R.id.currentAccountRadio);
+//							radio.setChecked(position == i);
+//						}
+						AccountManager.switchDefaultAccount(account);
+					}
+					dialog.dismiss();
+				}
+				
+			} );
+			
+//			builder.setView(listView);
+//			builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+//				@Override
+//				public void onClick(DialogInterface dialog, int position) {
+//					Account account = adapter.getItem(position);
+//					if (account != null) {
+//						AccountManager.switchDefaultAccount(account);
+//					}
+//				}
+//			});
+			
+			dialog.setView(listView, 0, 0, 0, 0);
 			dialog.setTitle("切换帐号");
 			dialog.setCanceledOnTouchOutside(true);
 			dialog.show();
@@ -380,6 +420,11 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		private Context context;
 		private LayoutInflater layoutInflater;
 
+		class ViewHolder{
+			TextView textView;
+			RadioButton radioButton;
+		}
+		
 		/**
 		 * @param context
 		 * @param textViewResourceId
@@ -400,18 +445,22 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		 */
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder viewHolder;
 			if (convertView == null) {
 				convertView = this.layoutInflater.inflate(
 						R.layout.account_switch_item, null);
+				viewHolder = new ViewHolder();
+				viewHolder.textView = (TextView) convertView
+						.findViewById(R.id.currentAccountText);
+				viewHolder.radioButton = (RadioButton) convertView.findViewById(R.id.currentAccountRadio);
+				convertView.setTag(viewHolder);
+			}else{
+				viewHolder = (ViewHolder)convertView.getTag();
 			}
-			TextView textView = (TextView) convertView
-					.findViewById(R.id.currentAccountText);
 			Account account = this.getItem(position);
 			String text = getAccountDescption(account);
-			if (account.isDefault) {
-				text += " ∨";
-			}
-			textView.setText(text);
+			viewHolder.textView.setText(text);
+			viewHolder.radioButton.setChecked(account.isDefault);
 
 			return convertView;
 		}

@@ -31,7 +31,6 @@ import com.alloyteam.weibo.AuthActivity;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.UserInfo;
-import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.model.Weibo2;
 
 /**
@@ -74,41 +73,7 @@ public class ApiManager {
 
 	// private static ArrayList<RequestObject> requestQueue;
 
-	/**
-	 * 同步调用微博 api
-	 * 
-	 * @param account
-	 * @param url
-	 * @param params
-	 * @param method
-	 * @return
-	 * @throws JSONException
-	 * @throws IOException
-	 * @deprecated
-	 */
-	public static JSONObject request(Account account, String url,
-			Bundle params, String method) throws JSONException, IOException {
-
-		params = fillParams(account, params);
-
-		String result;
-		JSONObject jsonObject;
-		try {
-			result = Utility.request(url, method, params);
-
-			try {
-				jsonObject = new JSONObject(result);
-			} catch (JSONException e) {
-				e.printStackTrace();
-				throw e;
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw e;
-		}
-		return jsonObject;
-	}
+	
 
 	/**
 	 * 异步调用微博 api
@@ -679,179 +644,8 @@ public class ApiManager {
 		};		
 		requestAsync(account, url, params, "POST", httpListener);
 	}
-	/**
-	 * @deprecated
-	 * @param info
-	 * @return
-	 * @throws JSONException
-	 */
-	public static List<Weibo> JsonArrayToWeiboList(JSONArray info)
-			throws JSONException {
-		List<Weibo> tmpList = new ArrayList<Weibo>();
-		for (int i = 0; i < info.length(); ++i) {
-			JSONObject item = info.getJSONObject(i);
-			int status = item.getInt("status");
-			if (status != 0) {
-				continue;
-			}
-			tmpList.add(JsonToWeibo(item));
-		}
-		return tmpList;
-	}
-
-	/**
-	 * @deprecated
-	 * @param item
-	 * @return
-	 * @throws JSONException
-	 */
-	public static Weibo JsonToWeibo(JSONObject item) throws JSONException {
-		String text = item.getString("text");
-		String name = item.getString("name");
-		String avatarUrl = item.getString("head");
-		int type = item.getInt("type");
-		Weibo weibo = new Weibo();
-		weibo.text = text;
-		weibo.name = name;
-		weibo.avatarUrl = avatarUrl;
-		long timestamp = item.getLong("timestamp");
-		weibo.type = type;
-		weibo.timestamp = timestamp;
-		weibo.id = item.getString("id");
-		if (type == 1||type==3) {
-			if (item.get("image") != JSONObject.NULL) {
-				Log.d("my", "image");
-				JSONArray images = item
-						.getJSONArray("image");
-				weibo.imageUrl = images.getString(0);
-			}
-		} else {
-			JSONObject source = item.getJSONObject("source");
-			String text2 = source.getString("text");
-			String name2 = source.getString("name");
-			String avatarUrl2 = source.getString("head");
-			weibo.text2 = text2;
-			weibo.avatarUrl2 = avatarUrl2;
-			weibo.name2 = name2;
-			if (source.get("image") != JSONObject.NULL) {
-				Log.d("my", "image");
-				JSONArray images = source.getJSONArray("image");
-				weibo.imageUrl = images.getString(0);
-			}
-			weibo.count = item.getInt("count");
-		}
-		return weibo;
-	}
-
-	/**
-	 * 获取主页时间线
-	 * 
-	 * @deprecated
-	 */
-	public static void getHomeLine(Account account, int pageflag,
-			long timeStamp, final GetListListener listener) {
-
-		Bundle params = new Bundle();
-
-		params.putInt("pageflag", pageflag);
-		params.putLong("pagetime", timeStamp);
-		params.putInt("reqnum", 10);
-		params.putInt("type", 0);
-		params.putInt("contenttype", 0);
-		params.putString("format", "json");
-		params.putLong("t", System.currentTimeMillis());
-		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
-
-			@Override
-			public void onJSONException(JSONException exception) {
-				listener.onError(0);
-			}
-
-			public void onFailure(String msg) {
-				listener.onError(1);
-			}
-
-			@Override
-			public void onComplete(JSONObject result) {
-				try {
-					if (result.get("data") == JSONObject.NULL) {
-						listener.onSuccess(null);
-					} else {
-						List<Weibo> tmpList = new ArrayList<Weibo>();
-						JSONObject data = result.getJSONObject("data");
-						JSONArray info = data.getJSONArray("info");
-						tmpList = JsonArrayToWeiboList(info);
-						listener.onSuccess(tmpList);
-					}
-
-				} catch (JSONException je) {
-					Log.d("json", "error");
-					listener.onError(0);
-				}
-			}
-		};
-		requestAsync(account, Constants.Tencent.HOME_TIMELINE, params, "GET",
-				httpListener);
-	}
-
-	/**
-	 * @deprecated
-	 * 
-	 */
-	public static interface GetListListener {
-		void onSuccess(List<Weibo> list);
-
-		void onError(int type);
-	}
-
-	/**
-	 * 获取主页时间线
-	 * @deprecated
-	 */
-	public static void getCommentList(Account account, String id, int pageflag,
-			long timeStamp, final GetListListener listener) {
-		Bundle params = new Bundle();
-		params.putInt("pageflag", pageflag);
-		params.putLong("pagetime", timeStamp);
-		params.putInt("reqnum", 10);
-		params.putString("rootid", id);
-		params.putInt("twitterid", 0);
-		params.putString("format", "json");
-		params.putLong("t", System.currentTimeMillis());
-		ApiManager.IApiListener httpListener = new ApiManager.IApiListener() {
-
-			@Override
-			public void onJSONException(JSONException exception) {
-				listener.onError(0);
-			}
-
-			public void onFailure(String msg) {
-				listener.onError(1);
-			}
-
-			@Override
-			public void onComplete(JSONObject result) {
-				try {
-					Log.d("json", result.toString());
-					if (result.get("data") == JSONObject.NULL) {
-						listener.onSuccess(null);
-					} else {
-						List<Weibo> tmpList = new ArrayList<Weibo>();
-						JSONObject data = result.getJSONObject("data");
-						JSONArray info = data.getJSONArray("info");
-						tmpList = JsonArrayToWeiboList(info);
-						listener.onSuccess(tmpList);
-					}
-
-				} catch (JSONException je) {
-					Log.d("json", "error");
-					listener.onError(0);
-				}
-			}
-		};
-		requestAsync(account, Constants.Tencent.T_COMMENT_LIST, params, "GET",
-				httpListener);
-	}
+	
+	
 
 	/**
 	 * 发布微博,统一接口
