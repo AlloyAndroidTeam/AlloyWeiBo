@@ -3,33 +3,24 @@
  */
 package com.alloyteam.weibo;
  
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File; 
+import java.util.List; 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
- 
-import org.json.JSONArray;
+  
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.alloyteam.net.HttpConnection;
+ 
 import com.alloyteam.weibo.logic.AccountManager;
-import com.alloyteam.weibo.logic.ApiManager;
-import com.alloyteam.weibo.logic.Constants;
+import com.alloyteam.weibo.logic.ApiManager; 
 import com.alloyteam.weibo.model.Account;
-import com.alloyteam.weibo.model.DataManager;
-import com.alloyteam.weibo.model.Weibo; 
+import com.alloyteam.weibo.model.DataManager; 
 import com.alloyteam.weibo.model.Weibo2;
 
 import android.app.Activity;
 import android.app.AlertDialog; 
-import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.app.Dialog; 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,24 +30,20 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images.Media;
+import android.provider.MediaStore; 
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup.LayoutParams;
+import android.view.View; 
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout; 
 import android.widget.TextView;
 import android.widget.Toast;
 
