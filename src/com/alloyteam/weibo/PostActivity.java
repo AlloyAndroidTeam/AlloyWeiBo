@@ -3,31 +3,28 @@
  */
 package com.alloyteam.weibo;
  
-import java.io.File;
+import java.io.File; 
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.List; 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
- 
-import org.json.JSONArray;
+  
 import org.json.JSONException;
 import org.json.JSONObject;
-
+ 
+import com.alloyteam.weibo.AccountManagerActivity.AccountViewHolder;
 import com.alloyteam.weibo.logic.AccountManager;
-import com.alloyteam.weibo.logic.ApiManager;
+import com.alloyteam.weibo.logic.ApiManager; 
 import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.model.Account;
-import com.alloyteam.weibo.model.DataManager;
+import com.alloyteam.weibo.model.DataManager; 
 import com.alloyteam.weibo.model.Weibo2;
 
 import android.app.Activity;
 import android.app.AlertDialog; 
-import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.app.Dialog; 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,24 +34,23 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images.Media;
+import android.provider.MediaStore; 
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup.LayoutParams;
+import android.view.View; 
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.LinearLayout; 
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,7 +89,9 @@ public class PostActivity extends Activity implements OnClickListener{
 	private Account account;
 	
 	
+	private ListView accountListView;
 	
+	private AccountAvatarArrayAdapter accountListAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +127,11 @@ public class PostActivity extends Activity implements OnClickListener{
         btnAddPic = (Button)findViewById(R.id.btnPostAddPic);
     	btnAddFriend = (Button)findViewById(R.id.btnPostAddFriend);
     	btnAddTopic = (Button)findViewById(R.id.btnPostAddTopic);
+    	
+    	accountListView = (ListView) findViewById(R.id.postAccountListView);
+    	accountListAdapter = new AccountAvatarArrayAdapter(this, 0, AccountManager.getAccounts());
+    	accountListView.setAdapter(accountListAdapter);
+    	
     	
     	 if (type != 0){        
     		String uid = bundle.getString("uid");
@@ -580,6 +583,78 @@ public class PostActivity extends Activity implements OnClickListener{
 		edit.append(atTxt);
 	}
 	
+	class AccountAvatarArrayAdapter extends ArrayAdapter<Account>{
+		ArrayList<Account> accounts;
+
+		LayoutInflater layoutInflater;
+		
+		ArrayList<Integer> selectedAccount;
+		
+		class ViewHolder{
+			ImageView avatar;
+			ImageView icon;
+			View mask;
+		}
+		
+		/**
+		 * @param context
+		 * @param textViewResourceId
+		 * @param objects
+		 */
+		public AccountAvatarArrayAdapter(Context context, int textViewResourceId,
+				ArrayList<Account> objects) {
+			super(context, textViewResourceId, objects);
+
+			this.layoutInflater = LayoutInflater.from(context);
+
+			this.accounts = objects;
+			
+			selectedAccount = new ArrayList<Integer>();
+		}
+		
+		/* (non-Javadoc)
+		 * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
+		 */
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			if (convertView == null) {
+				holder = new ViewHolder();
+				convertView = layoutInflater.inflate(R.layout.post_account_item, null);
+				holder.avatar = (ImageView) convertView.findViewById(R.id.accountAvatar);
+				holder.icon = (ImageView) convertView.findViewById(R.id.accountAvatarTypeIcon);
+				holder.mask = (View) convertView.findViewById(R.id.accountAvatarMask);
+				convertView.setTag(holder);
+			} else {
+				holder = (ViewHolder) convertView.getTag();
+			}
+			if(selectedAccount.contains(position)){
+				holder.mask.setBackgroundResource(R.color.opacity_50_black);
+			}else{
+				holder.mask.setBackgroundColor(Color.TRANSPARENT);
+			}
+			Account account = this.getItem(position);
+			if(account.avatar != null && !"".equals(account.avatar)){
+				Log.d("post avatar", account.avatar);
+				MainActivity.imageLoader.displayImage(account.avatar, holder.avatar, null);
+//				holder.avatar.setImageURI(Uri.parse(account.avatar));
+			}
+			if(account.type == Constants.SINA){
+				holder.icon.setImageResource(R.drawable.icon_sina);
+			}else if(account.type == Constants.TENCENT){
+				holder.icon.setImageResource(R.drawable.icon_tencent);
+			}
+			
+//			holder.mask.setOnClickListener(new OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					
+//				}
+//			});
+			return convertView;
+		}
+		
+	}
 	
 	
 	

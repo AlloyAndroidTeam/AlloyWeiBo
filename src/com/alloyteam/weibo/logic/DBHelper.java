@@ -15,7 +15,7 @@ import android.util.Log;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-	public static final int DATABASE_VERSION = 8;
+	public static final int DATABASE_VERSION = 9;
 	public static final String DB_NAME = "alloyweibo.db";
 	public static final String ACCOUNT_TABLE_NAME = "account";
 
@@ -65,7 +65,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ "refreshToken varchar, "
 				+ "isDefault int, "
 				+ "invalidTime varchar, " 
-				+ "authTime varchar)";
+				+ "authTime varchar," 
+				+ "avatar varchar)";
 		db.execSQL(sql);
 		
 	}
@@ -80,8 +81,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int arg1, int arg2) {
 		//TODO 正式版可不能这么随意删除数据库
-		db.execSQL("DROP TABLE IF EXISTS " + ACCOUNT_TABLE_NAME);
-		onCreate(db);
+//		db.execSQL("DROP TABLE IF EXISTS " + ACCOUNT_TABLE_NAME);
+		db.execSQL("ALTER TABLE " + ACCOUNT_TABLE_NAME + " ADD avatar varchar ");
+//		onCreate(db);
 		Log.v("dbhelper", "db upgrade");
 	}
 	

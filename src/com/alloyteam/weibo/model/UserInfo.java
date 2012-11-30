@@ -19,5 +19,14 @@ public class UserInfo {
 	public String nick;
 	
 	public String avatar;
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "UserInfo [uid=" + uid + ", nick=" + nick + ", avatar=" + avatar
+				+ "]";
+	}
 	
 }

@@ -590,7 +590,7 @@ public class ApiManager {
 		}else if(type == Constants.TENCENT){
 			userInfo.uid = jsonObject.getString("name");
 			userInfo.nick = jsonObject.getString("nick");
-			userInfo.avatar = jsonObject.getString("head");
+			userInfo.avatar = jsonObject.getString("head") + "/40";
 		}
 		return userInfo;
 	}
@@ -773,7 +773,8 @@ public class ApiManager {
 	 * @param account
 	 * @param startIndex
 	 * @param listener
-	 * 标准数据格式：{startIndex: int, nextStartIndex : int, list:{}}
+	 * 标准数据格式：{startIndex: int, nextStartIndex : int, 
+	 * 					list:[{name: "", nick:""},{name: "", nick:""},...]}
 	 * nextStartIndex:-1结束
 	 */
 	public static void getListeners(final Account account, final int startIndex,  

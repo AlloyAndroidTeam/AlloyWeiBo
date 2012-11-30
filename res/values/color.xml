@@ -2,4 +2,5 @@
     <drawable name="darkgray">#dddddddd</drawable>
     <drawable name="white">#FFFFFFFF</drawable>
     <drawable name="silver">#00ffffff</drawable>   <!-- 透明色 -->
+    <color name="opacity_50_black">#50000000</color>
 </resources>

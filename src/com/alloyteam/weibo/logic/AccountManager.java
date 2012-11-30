@@ -55,6 +55,7 @@ public class AccountManager {
 		values.put("uid", account.uid);
 		values.put("nick", account.nick);
 		values.put("type", account.type);
+		values.put("avatar", account.avatar);
 
 		values.put("openId", account.openId);
 		values.put("openKey", account.openKey);
@@ -135,6 +136,7 @@ public class AccountManager {
 			SQLiteDatabase db = DBHelper.getInstance().getWritableDatabase();
 			ContentValues values = new ContentValues();
 			values.put("nick", account.nick);
+			values.put("avatar", account.avatar);
 
 			values.put("openId", account.openId);
 			values.put("openKey", account.openKey);
@@ -387,6 +389,7 @@ public class AccountManager {
 
 		account.invalidTime = new Date(cursor.getLong(index++));
 		account.authTime = new Date(cursor.getLong(index++));
+		account.avatar = cursor.getString(index++);
 	}
 
 }
