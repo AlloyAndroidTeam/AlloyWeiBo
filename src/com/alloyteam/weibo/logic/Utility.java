@@ -269,7 +269,7 @@ public class Utility {
 	public static boolean isHttpSuccessExecuted(HttpResponse response) {
 		int statusCode = response.getStatusLine().getStatusCode();
 		Log.d("response",""+statusCode);
-		return (statusCode > 199) && (statusCode < 400);
+		return (statusCode > 199) && (statusCode <= 400);
 	}
 	
 	 

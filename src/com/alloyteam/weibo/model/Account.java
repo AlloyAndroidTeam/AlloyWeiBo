@@ -78,6 +78,9 @@ public class Account {
 	/* 判断两个帐号是否是同一个, 只判断了 uid, 和 type
 	 */
 	public boolean equals(Account o) {
+		if(o == null){
+			return false;
+		}
 		return this.uid.equals(o.uid) && this.type == o.type;
 	}
 	

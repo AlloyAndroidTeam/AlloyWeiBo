@@ -45,6 +45,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -86,7 +87,7 @@ public class PostActivity extends Activity implements OnClickListener{
 	
 	private TextView tvTips;
 	
-	private Account account;
+	private Account currentAccount;
 	
 	
 	private ListView accountListView;
@@ -129,33 +130,39 @@ public class PostActivity extends Activity implements OnClickListener{
     	btnAddTopic = (Button)findViewById(R.id.btnPostAddTopic);
     	
     	accountListView = (ListView) findViewById(R.id.postAccountListView);
-    	accountListAdapter = new AccountAvatarArrayAdapter(this, 0, AccountManager.getAccounts());
+		if (type != 0) {
+			String uid = bundle.getString("uid");
+			String myuid = bundle.getString("myuid");
+			int accountType = bundle.getInt("accountType");
+			currentAccount = AccountManager.getAccount(myuid, accountType);
+			if (currentAccount == null) {
+				tips("获取帐号信息失败，请重试！");
+			}
+
+			List<Weibo2> list = DataManager.get(uid);
+			Weibo2 weibo = list.get(bundle.getInt("position"));
+			tid = weibo.id;
+			btnAddPic.setVisibility(View.INVISIBLE);
+			/*
+			 * RelativeLayout.LayoutParams params = new
+			 * RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,100);
+			 * params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+			 * btnAddFriend.setLayoutParams(params);
+			 */
+			Log.v("post", "" + type + ", tid:" + tid + ", accountType:"
+					+ accountType);
+		} else {
+			currentAccount = AccountManager.getDefaultAccount();
+		}
+		ArrayList<Account> toSelectAccountList;
+    	if(type == 0/* || type == 1*/){
+    		toSelectAccountList = AccountManager.getAccounts();
+    	}else{
+    		toSelectAccountList = new ArrayList<Account>();
+    		toSelectAccountList.add(currentAccount);
+    	}
+    	accountListAdapter = new AccountAvatarArrayAdapter(this, 0, toSelectAccountList);
     	accountListView.setAdapter(accountListAdapter);
-    	
-    	
-    	 if (type != 0){        
-    		String uid = bundle.getString("uid");
-    		String myuid = bundle.getString("myuid");
-	        int accountType = bundle.getInt("accountType");	        
-	        account = AccountManager.getAccount(myuid, accountType); 
-	        if (account == null){
-	        	tips("获取帐号信息失败，请重试！"); 
-	        }
-	        
-       		List<Weibo2> list=DataManager.get(uid);  
-       		Weibo2 weibo=list.get(bundle.getInt("position"));
-       		tid = weibo.id;
-       		btnAddPic.setVisibility(View.INVISIBLE); 
-       		/*
-       		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,100);
-       		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-       		btnAddFriend.setLayoutParams(params);
-       		*/
-         	Log.v("post", "" + type +", tid:" +tid+", accountType:" +accountType);
-         }else{
-        	account = AccountManager.getDefaultAccount();        	 
-         }
-    	 
     	
     	btnBack.setOnClickListener(this);
     	btnSave.setOnClickListener(this);
@@ -443,7 +450,7 @@ public class PostActivity extends Activity implements OnClickListener{
      * @throws Exception 
      */
     private void save() throws Exception{    
-    	 if (account == null){
+    	 if (currentAccount == null){
     		 return ;
     	 }
     	 String content = tvMain.getText().toString();
@@ -475,7 +482,7 @@ public class PostActivity extends Activity implements OnClickListener{
 				public void onComplete(JSONObject result) {
 					Log.d("add", "onComplete"+result.toString());
 					String checkTxt = "发送失败，请重试！";					 					 
-					checkTxt = ApiManager.checkResult(account, result); 
+					checkTxt = ApiManager.checkResult(result); 
 					if (checkTxt.equals("0")){												
 						//tips("发送成功.");
 						Intent intent = new Intent();						    	
@@ -494,20 +501,28 @@ public class PostActivity extends Activity implements OnClickListener{
 		////操作类型，0写，1转发，2评论
 		switch(type){
 			case 1:
-				ApiManager.readd(account, tid, content, listener);  
+//				for (Account account : accountList) {
+//					ApiManager.readd(account, tid, content, listener);  
+//				}
+				ApiManager.readd(currentAccount, tid, content, listener);
 				break;
 			case 2:
-				ApiManager.reply(account, tid, content, listener);
+				ApiManager.reply(currentAccount, tid, content, listener);
 				break;
 			case 3:
-				ApiManager.comment(account, tid, content, listener);
+				ApiManager.comment(currentAccount, tid, content, listener);
 				break;	
 			default:
-				if (picFilePath != null){
-					ApiManager.add(account, content, picFilePath, listener);  
-				 }else{
-					 ApiManager.add(account, content, listener); 
-				 }
+				ArrayList<Account> accountList = accountListAdapter.getSelectedAccounts();
+				for (Account account : accountList) {
+					if (picFilePath != null) {
+						ApiManager.add(account, content, picFilePath,
+								listener);
+					} else {
+						ApiManager.add(account, content, listener);
+					}
+				}
+				
 		}	
 		
     }
@@ -616,7 +631,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		 * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
 		 */
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(final int position, View convertView, ViewGroup parent) {
 			ViewHolder holder;
 			if (convertView == null) {
 				holder = new ViewHolder();
@@ -628,30 +643,53 @@ public class PostActivity extends Activity implements OnClickListener{
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			if(selectedAccount.contains(position)){
-				holder.mask.setBackgroundResource(R.color.opacity_50_black);
-			}else{
-				holder.mask.setBackgroundColor(Color.TRANSPARENT);
-			}
 			Account account = this.getItem(position);
+			if(account.equals(currentAccount) && !selectedAccount.contains(position)){
+				selectedAccount.add(Integer.valueOf(position));
+			}
+			
+			if(selectedAccount.contains(position)){
+				holder.mask.setBackgroundColor(Color.TRANSPARENT);
+			}else{
+				holder.mask.setBackgroundColor(Color.argb(150, 0, 0, 0));
+			}
+			
 			if(account.avatar != null && !"".equals(account.avatar)){
 				Log.d("post avatar", account.avatar);
 				MainActivity.imageLoader.displayImage(account.avatar, holder.avatar, null);
 //				holder.avatar.setImageURI(Uri.parse(account.avatar));
 			}
+				
 			if(account.type == Constants.SINA){
 				holder.icon.setImageResource(R.drawable.icon_sina);
 			}else if(account.type == Constants.TENCENT){
 				holder.icon.setImageResource(R.drawable.icon_tencent);
 			}
 			
-//			holder.mask.setOnClickListener(new OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					
-//				}
-//			});
+			holder.mask.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(type != 0/* && type != 1*/){
+						return;
+					}
+					if(selectedAccount.contains(position)){
+						selectedAccount.remove(Integer.valueOf(position));
+						v.setBackgroundColor(Color.argb(150, 0, 0, 0));
+					}else{
+						selectedAccount.add(position);
+						v.setBackgroundColor(Color.TRANSPARENT);
+					}
+				}
+			});
 			return convertView;
+		}
+		
+		public ArrayList<Account> getSelectedAccounts(){
+			ArrayList<Account> accountList = new ArrayList<Account>();
+			for (int index : selectedAccount) {
+				accountList.add(accounts.get(index));
+			}
+			return accountList;
 		}
 		
 	}

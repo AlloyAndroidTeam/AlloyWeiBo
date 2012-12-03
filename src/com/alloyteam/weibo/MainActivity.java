@@ -95,7 +95,8 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 				String uid = intent.getStringExtra("uid");
 				int type = intent.getIntExtra("type", 0);
 				Account account = AccountManager.getAccount(uid, type);
-				if (account != null) {
+				Account defaultAccount = AccountManager.getDefaultAccount();
+				if (account.equals(defaultAccount)) {
 					accountSwitchBtn.setText(getAccountDescption(account));
 				}
 			}
@@ -150,7 +151,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		
 		Account account = AccountManager.getDefaultAccount();
 		if(account != null){
-			loadUserInfo(account);
+			loadUserInfo();
 		}
 		
 	}
@@ -474,27 +475,34 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 		return text;
 	}
 	
-	private void loadUserInfo(final Account account){
-		ApiManager.getUserInfo(account, new ApiManager.IApiResultListener() {
-			
-			@Override
-			public void onSuccess(ApiResult result) {
-				// TODO Auto-generated method stub
-				UserInfo userInfo = result.userInfo;
-				if(userInfo != null){
-					account.nick = userInfo.nick;
-					account.avatar = userInfo.avatar;
-					AccountManager.updateAccount(account);
-					Log.d(TAG, "update nick");
-				}
+	
+	private ApiManager.IApiResultListener userInfoListener = new ApiManager.IApiResultListener() {
+		
+		@Override
+		public void onSuccess(ApiResult result) {
+			// TODO Auto-generated method stub
+			UserInfo userInfo = result.userInfo;
+			if(userInfo != null){
+				Account account = AccountManager.getAccount(userInfo.uid, userInfo.type);
+				Log.d(TAG, "update nick, from:" + account.nick + ", to:" + userInfo.nick);
+				account.nick = userInfo.nick;
+				account.avatar = userInfo.avatar;
+				AccountManager.updateAccount(account);
 			}
+		}
+		
+		@Override
+		public void onError(int errorCode) {
+			// TODO Auto-generated method stub
 			
-			@Override
-			public void onError(int errorCode) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		}
+	};
+	
+	private void loadUserInfo(){
+		ArrayList<Account> accounts = AccountManager.getAccounts();
+		for (Account account : accounts) {
+			ApiManager.getUserInfo(account, userInfoListener);
+		}
 	}
 
 	@Override

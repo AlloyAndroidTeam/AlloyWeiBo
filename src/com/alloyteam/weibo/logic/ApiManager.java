@@ -111,6 +111,11 @@ public class ApiManager {
 					boolean success = !result.equals("fail");
 					if (success) {
 						JSONObject jsonObject = new JSONObject(result);
+						JSONObject accountObject = new JSONObject();
+						accountObject.put("id", account.id);
+						accountObject.put("uid", account.uid);
+						accountObject.put("type", account.type);
+						jsonObject.put("account", accountObject);
 						if (listener != null) {
 							listener.onComplete(jsonObject);
 						}
@@ -585,6 +590,7 @@ public class ApiManager {
 	
 	private static UserInfo JsonObjectToUserInfo(JSONObject jsonObject, int type) throws JSONException{
 		UserInfo userInfo = new UserInfo();
+		userInfo.type = type;
 		if(type == Constants.SINA){
 			userInfo.uid = jsonObject.getString("id");
 			userInfo.nick = jsonObject.getString("name");
@@ -866,10 +872,16 @@ public class ApiManager {
 	 * 检测不同的错误码：
 	 * 统一返回结果：0表示成功，否则为错误信息
 	 */
-	public static String checkResult(Account account, JSONObject result){
+	public static String checkResult(JSONObject result){
 		String tmp = "操作失败，请重试！";
 		// 微博类型, 1: 新浪, 2: 腾讯
-		switch (account.type) {
+		int accountType = 0;
+		try {
+			accountType = result.getJSONObject("account").getInt("type");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		switch (accountType) {
 			case Constants.SINA:
 				tmp = checkSinaResult(result);
 				break;
