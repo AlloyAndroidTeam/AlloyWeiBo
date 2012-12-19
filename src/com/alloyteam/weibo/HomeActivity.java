@@ -268,7 +268,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 			@Override
 			public void onSuccess(ApiResult result) {
 				if(result.isFollow){
-					followBtn.setText("取消收听");
+					followBtn.setText("鍙栨秷鏀跺惉");
 					isFollow=true;		
 				}
 				followBtn.setVisibility(View.VISIBLE);
@@ -280,42 +280,42 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 		};
 		ApiManager.check(account, uid, listener);		
 	}
-	//收听某人
+	//鏀跺惉鏌愪汉
 	public void follow(){
 		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
 			@Override
 			public void onSuccess(ApiResult result) {
 				new AlertDialog.Builder(HomeActivity.this)
-				.setMessage("收听成功")
-				.setNegativeButton("确定", null).show();
-				followBtn.setText("取消收听");
+				.setMessage("鏀跺惉鎴愬姛")
+				.setNegativeButton("纭畾", null).show();
+				followBtn.setText("鍙栨秷鏀跺惉");
 				isFollow=true;
 			}
 			@Override
 			public void onError(int errorCode) {
 				new AlertDialog.Builder(HomeActivity.this)
-				.setMessage("收听失败")
-				.setNegativeButton("确定", null).show();				
+				.setMessage("鏀跺惉澶辫触")
+				.setNegativeButton("纭畾", null).show();				
 			}
 		};
 		ApiManager.follow(account, uid, listener);
 	}
-	//取消收听某人
+	//鍙栨秷鏀跺惉鏌愪汉
 	public void destroyFollow(){
 		ApiManager.IApiResultListener listener = new ApiManager.IApiResultListener() {
 			@Override
 			public void onSuccess(ApiResult result) {
 				new AlertDialog.Builder(HomeActivity.this)
-				.setMessage("取消收听成功")
-				.setNegativeButton("确定", null).show();
-				followBtn.setText("收听");
+				.setMessage("鍙栨秷鏀跺惉鎴愬姛")
+				.setNegativeButton("纭畾", null).show();
+				followBtn.setText("鏀跺惉");
 				isFollow=false;
 			}
 			@Override
 			public void onError(int errorCode) {
 				new AlertDialog.Builder(HomeActivity.this)
-				.setMessage("取消收听失败")
-				.setNegativeButton("确定", null).show();				
+				.setMessage("鍙栨秷鏀跺惉澶辫触")
+				.setNegativeButton("纭畾", null).show();				
 			}
 		};
 		ApiManager.destroyFollow(account, uid, listener);
@@ -324,7 +324,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
-		case R.id.follow: // @发表
+		case R.id.follow: // @鍙戣〃
 			if(isFollow){
 				destroyFollow();
 			}

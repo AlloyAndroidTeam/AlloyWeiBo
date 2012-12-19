@@ -7,12 +7,16 @@
 
     <Button
         android:id="@+id/btnHomeTitlePost"
+        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="发表" />
-
+
     <Button
         android:id="@+id/btnHomeTitleAccount"
         style="?android:attr/buttonStyleSmall"
@@ -24,7 +28,8 @@
         android:layout_centerVertical="true"
         android:drawableRight="@drawable/arrow_down"
         android:text="帐号切换" />
-
+
+
     <Button
         android:id="@+id/btnHomeTitleAccountSetting"
         android:layout_width="wrap_content"

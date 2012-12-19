@@ -351,7 +351,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 					.setPositiveButton("继续添加", new AlertDialog.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							Intent i = new Intent(MainActivity.this, SettingActivity.class);
+							Intent i = new Intent(MainActivity.this, AccountManagerActivity.class);
 							startActivity(i);
 						}
 					}).show();

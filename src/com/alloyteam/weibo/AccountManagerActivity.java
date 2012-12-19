@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,7 +39,8 @@ public class AccountManagerActivity extends Activity {
 	static String TAG = "AccountManagerActivity";
 
 	AccountListAdatper accountListAdatper;
-
+	
+	TextView setDefaultTips; 
 
 	int currentDefaultAccountPosition = -1;
 
@@ -55,9 +57,8 @@ public class AccountManagerActivity extends Activity {
 				Account account = AccountManager.getAccount(uid, type);
 				accountListAdatper.add(account);
 				loadUserInfo(account);
-				
+				setDefaultTips.setVisibility(View.VISIBLE);
 			}else if("com.alloyteam.weibo.ACCOUNT_UPDATE".equals(action)){
-				//TODO 未测试
 				Account account = AccountManager.getAccount(uid, type);
 				int position = accountListAdatper.getPositionByAccount(account);
 				accountListAdatper.accounts.set(position, account);
@@ -71,6 +72,8 @@ public class AccountManagerActivity extends Activity {
 						accountListAdatper.accounts.set(position, newDefault);
 						accountListAdatper.notifyDataSetChanged();
 					}
+				}else{
+					setDefaultTips.setVisibility(View.GONE);
 				}
 				
 //				if(newDefault != null){
@@ -148,12 +151,18 @@ public class AccountManagerActivity extends Activity {
 
 		Button addButton = (Button) findViewById(R.id.addNewAccount);
 		addButton.setOnClickListener(onAddBtnClickListener);
-
+		
+		setDefaultTips = (TextView) findViewById(R.id.setDefaultTips);
+		
 		ArrayList<Account> accounts = AccountManager.getAccounts();
 		accountListAdatper = new AccountListAdatper(this, 0, accounts);
 		ListView accountListView = (ListView) findViewById(R.id.accountList);
 		accountListView.setAdapter(accountListAdatper);
-
+		
+		if(accounts.size() == 0){
+			setDefaultTips.setVisibility(View.GONE);
+		}
+		
 		accountListView.setOnItemClickListener(onAccListItemClickListener);
 
 		IntentFilter intentFilter = new IntentFilter();
@@ -174,6 +183,20 @@ public class AccountManagerActivity extends Activity {
 		if (broadcastReceiver != null) {
 			this.unregisterReceiver(broadcastReceiver);
 		}
+	}
+	
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
+			&& event.getAction() == KeyEvent.ACTION_DOWN) {
+			if(AccountManager.getAccountCount() > 0){
+				Intent intent = new Intent(this, MainActivity.class);
+				this.startActivity(intent);
+				this.finish();
+				return true;
+			}
+		}
+		return super.dispatchKeyEvent(event);
 	}
 	
 	private void loadUserInfo(final Account account){

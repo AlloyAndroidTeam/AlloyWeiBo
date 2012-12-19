@@ -113,10 +113,11 @@ public class AuthActivity extends Activity {
 		Log.i(TAG,
 				account.authTime.getTime() + " : "
 						+ values.getString("expires_in"));
+		int accountCount = AccountManager.getAccountCount();
 		if(old != null){
 			account.isDefault = old.isDefault;
 		}else{
-			account.isDefault = AccountManager.getAccountCount() == 0;
+			account.isDefault = accountCount == 0;
 		}
 		
 //		Intent intent = new Intent();
@@ -126,12 +127,13 @@ public class AuthActivity extends Activity {
 //			Toast.makeText(AuthActivity.this, "该帐号已绑定，请勿重复绑定",
 //					Toast.LENGTH_SHORT).show();
 			AccountManager.updateAccount(account);
-//			intent.setAction("com.alloyteam.weibo.ACCOUNT_UPDATE");
 		}else {
 			AccountManager.addAccount(account);
-//			intent.setAction("com.alloyteam.weibo.NEW_ACCOUNT_ADD");
 		}
-//		context.sendBroadcast(intent);
+		if(accountCount == 0){
+			Intent intent = new Intent(this, MainActivity.class);
+			context.startActivity(intent);
+		}
 		context.finish();
 	}
 }
