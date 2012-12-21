@@ -11,7 +11,7 @@ import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.DataManager;
-import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 
@@ -44,11 +44,11 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	private static final int WHAT_DID_REFRESH = 2;
 	private static final int WHAT_DID_MORE = 1;
 	private CommentListAdatper mAdapter;
-	private List<Weibo2> list;
+	private List<Weibo> list;
 	private long upTimeStamp=0;
 	private long downTimeStamp=0;
 	private int type=0;
-	private Weibo2 weibo;
+	private Weibo weibo;
 	private String upId;
 	private String downId;
 	private ImageLoader imageLoader;
@@ -69,7 +69,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		myuid=b.getString("myuid");
 		uid=b.getString("uid");
 		type=b.getInt("type");
-		List<Weibo2> list=DataManager.get(uid);
+		List<Weibo> list=DataManager.get(uid);
 		int position = b.getInt("position");
 		this.position=position;
 		weibo=list.get(position);
@@ -94,7 +94,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			}
 		}
 		else{
-			Weibo2 source = weibo.source;
+			Weibo source = weibo.source;
 			ImageView image2=(ImageView)findViewById(R.id.image2);
 			if(!source.imageUrl.equals("")){
 				imageLoader.displayImage(source.imageThumbUrl, image2, null);
@@ -202,7 +202,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 	public void initList() {
 		mPullDownView = (PullDownView) findViewById(R.id.commentList);
 		mPullDownView.setOnPullDownListener(this);
-		list = new ArrayList<Weibo2>();
+		list = new ArrayList<Weibo>();
 		mylist = mPullDownView.getListView();
 		mAdapter = new CommentListAdatper(this, R.layout.comment, list);
 		mylist.setAdapter(mAdapter);
@@ -233,14 +233,14 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 					pullCallback(pageflag);
 					return;
 				}
-				ArrayList<Weibo2> tmpList = result.weiboList;
+				ArrayList<Weibo> tmpList = result.weiboList;
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
 					if(tmpList.size()>0){
-						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						Weibo lastWeibo=tmpList.get(tmpList.size()-1);
 						downId=lastWeibo.id;
 						downTimeStamp=lastWeibo.timestamp;
-						Weibo2 firstWeibo=tmpList.get(0);
+						Weibo firstWeibo=tmpList.get(0);
 						upId=firstWeibo.id;
 						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(tmpList);							
@@ -249,7 +249,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
 					if(tmpList.size()>0){
-						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						Weibo lastWeibo=tmpList.get(tmpList.size()-1);
 						downId=lastWeibo.id;
 						downTimeStamp=lastWeibo.timestamp;
 						list.addAll(tmpList);
@@ -258,7 +258,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 				else{				
 					mPullDownView.notifyDidRefresh();
 					if(tmpList.size()>0){
-						Weibo2 firstWeibo=tmpList.get(0);
+						Weibo firstWeibo=tmpList.get(0);
 						upId=firstWeibo.id;
 						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(0, tmpList);
@@ -311,9 +311,9 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		TextView date;
 	}
 
-	class CommentListAdatper extends ArrayAdapter<Weibo2> {
+	class CommentListAdatper extends ArrayAdapter<Weibo> {
 
-		List<Weibo2> commentList;
+		List<Weibo> commentList;
 
 		LayoutInflater layoutInflater;
 		
@@ -325,7 +325,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 		 * @param list
 		 */
 		public CommentListAdatper(Context context, int resourceId,
-				List<Weibo2> list) {
+				List<Weibo> list) {
 			super(context, resourceId, list);
 
 			this.layoutInflater = LayoutInflater.from(context);
@@ -349,7 +349,7 @@ public class DetailActivity extends Activity implements OnPullDownListener, OnCl
 			else{
 				holder = (CommentViewHolder) convertView.getTag();
 			}
-			Weibo2 weibo = commentList.get(position);
+			Weibo weibo = commentList.get(position);
 			ImageView avatar=holder.avatar;
 			imageLoader.displayImage(weibo.avatarUrl, avatar,null);
 			Bundle b2=new Bundle();

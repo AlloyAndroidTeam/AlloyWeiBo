@@ -45,7 +45,7 @@ import com.alloyteam.weibo.logic.DBHelper;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
-import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.WeiboListAdapter;
 import com.alloyteam.weibo.model.UserInfo;
@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 	private static final int WHAT_DID_REFRESH = 2;
 	private static final int WHAT_DID_MORE = 1;
 	private WeiboListAdapter mAdapter;
-	private List<Weibo2> list;
+	private List<Weibo> list;
 	private String upId;
 	private String downId;
 	private Account account;
@@ -159,7 +159,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 	public void initHomeLine() {
 		mPullDownView = (PullDownView) findViewById(R.id.pull_down_view);
 		mPullDownView.setOnPullDownListener(this);
-		list = new ArrayList<Weibo2>();
+		list = new ArrayList<Weibo>();
 		mylist = mPullDownView.getListView();
 		mAdapter = new WeiboListAdapter(
 				this, list);
@@ -192,14 +192,14 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 					pullCallback(pageflag);
 					return;
 				}
-				ArrayList<Weibo2> tmpList = result.weiboList;
+				ArrayList<Weibo> tmpList = result.weiboList;
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
 					if(tmpList.size()>0){
-						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						Weibo lastWeibo=tmpList.get(tmpList.size()-1);
 						downId=lastWeibo.id;
 						downTimeStamp=lastWeibo.timestamp;
-						Weibo2 firstWeibo=tmpList.get(0);
+						Weibo firstWeibo=tmpList.get(0);
 						upId=firstWeibo.id;
 						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(tmpList);							
@@ -209,7 +209,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
 					if(tmpList.size()>0){
-						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						Weibo lastWeibo=tmpList.get(tmpList.size()-1);
 						downId=lastWeibo.id;
 						downTimeStamp=lastWeibo.timestamp;
 						list.addAll(tmpList);
@@ -218,7 +218,7 @@ public class MainActivity extends Activity implements OnPullDownListener, OnClic
 				else{				
 					mPullDownView.notifyDidRefresh();
 					if(tmpList.size()>0){
-						Weibo2 firstWeibo=tmpList.get(0);
+						Weibo firstWeibo=tmpList.get(0);
 						upId=firstWeibo.id;
 						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(0, tmpList);

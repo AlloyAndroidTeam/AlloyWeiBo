@@ -10,7 +10,7 @@ import android.R.integer;
  * @author azraellong
  * 
  */
-public class Weibo2 {
+public class Weibo {
 
 	
 	/**
@@ -111,7 +111,7 @@ public class Weibo2 {
 	/**
 	 * 当微博类型 type = 2时 ,source就是被转播的weibo
 	 */
-	public Weibo2 source = null;
+	public Weibo source = null;
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

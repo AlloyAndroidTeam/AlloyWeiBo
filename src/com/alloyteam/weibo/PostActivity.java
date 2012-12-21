@@ -20,7 +20,7 @@ import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.Constants;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager; 
-import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.model.Weibo;
 
 import android.app.Activity;
 import android.app.AlertDialog; 
@@ -74,7 +74,7 @@ public class PostActivity extends Activity implements OnClickListener{
 	private String picFilePath;
 	
 	private int type = 0;//操作类型，0写，1转发，2评论, 3回复
-	private String tid;
+	private Weibo relativedWeibo;//被转发/评论/回复的微博
 	
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();  //定时关闭
 	private Runnable runner;
@@ -93,6 +93,8 @@ public class PostActivity extends Activity implements OnClickListener{
 	private ListView accountListView;
 	
 	private AccountAvatarArrayAdapter accountListAdapter;
+	
+	private int saveCount = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -139,9 +141,9 @@ public class PostActivity extends Activity implements OnClickListener{
 				tips("获取帐号信息失败，请重试！");
 			}
 
-			List<Weibo2> list = DataManager.get(uid);
-			Weibo2 weibo = list.get(bundle.getInt("position"));
-			tid = weibo.id;
+			List<Weibo> list = DataManager.get(uid);
+			Weibo weibo = list.get(bundle.getInt("position"));
+			relativedWeibo = weibo;
 			btnAddPic.setVisibility(View.INVISIBLE);
 			/*
 			 * RelativeLayout.LayoutParams params = new
@@ -149,13 +151,13 @@ public class PostActivity extends Activity implements OnClickListener{
 			 * params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 			 * btnAddFriend.setLayoutParams(params);
 			 */
-			Log.v("post", "" + type + ", tid:" + tid + ", accountType:"
+			Log.v("post", "" + type + ", tid:" + relativedWeibo.id + ", accountType:"
 					+ accountType);
 		} else {
 			currentAccount = AccountManager.getDefaultAccount();
 		}
 		ArrayList<Account> toSelectAccountList;
-    	if(type == 0/* || type == 1*/){
+    	if(type == 0 || type == 1){
     		toSelectAccountList = AccountManager.getAccounts();
     	}else{
     		toSelectAccountList = new ArrayList<Account>();
@@ -445,6 +447,14 @@ public class PostActivity extends Activity implements OnClickListener{
         String path = cursor.getString(column_index);  	
     	return path;
     }
+    
+    private void saveFinish(){
+    	saveCount --;
+    	if(saveCount <= 0){
+    		this.finish();
+    	}
+    }
+    
     /**
      * 发布
      * @throws Exception 
@@ -488,7 +498,7 @@ public class PostActivity extends Activity implements OnClickListener{
 						Intent intent = new Intent();						    	
 				    	intent.setAction("com.alloyteam.weibo.WEIBO_ADDED"); 					
 						_context.sendBroadcast(intent);								 
-						finish();
+						saveFinish();
 					}else{								
 						tips(checkTxt);
 					} 					 
@@ -499,12 +509,25 @@ public class PostActivity extends Activity implements OnClickListener{
 		//Account account = AccountManager.getDefaultAccount(); 
 		
 		////操作类型，0写，1转发，2评论
+		ArrayList<Account> accountList;
+		String tid = relativedWeibo.id;
 		switch(type){
 			case 1:
-//				for (Account account : accountList) {
-//					ApiManager.readd(account, tid, content, listener);  
-//				}
-				ApiManager.readd(currentAccount, tid, content, listener);
+				accountList = accountListAdapter.getSelectedAccounts();
+				saveCount = accountList.size();
+				String repostToOtherString = null;
+				for (Account account : accountList) {
+					if(account.equals(currentAccount)){
+						ApiManager.readd(account, tid, content, listener);
+					}else{
+						if(repostToOtherString == null){
+						repostToOtherString = content + Constants.WEIBO_SEPERATOR[relativedWeibo.type] + "@"
+								+ relativedWeibo.nick + ":"
+								+ relativedWeibo.text;
+						}
+						ApiManager.add(account, repostToOtherString, listener);
+					}
+				}
 				break;
 			case 2:
 				ApiManager.reply(currentAccount, tid, content, listener);
@@ -513,7 +536,8 @@ public class PostActivity extends Activity implements OnClickListener{
 				ApiManager.comment(currentAccount, tid, content, listener);
 				break;	
 			default:
-				ArrayList<Account> accountList = accountListAdapter.getSelectedAccounts();
+				accountList = accountListAdapter.getSelectedAccounts();
+				saveCount = accountList.size();
 				for (Account account : accountList) {
 					if (picFilePath != null) {
 						ApiManager.add(account, content, picFilePath,
@@ -669,10 +693,15 @@ public class PostActivity extends Activity implements OnClickListener{
 			holder.mask.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					if(type != 0/* && type != 1*/){
+					if(type != 0 && type != 1){
 						return;
 					}
 					if(selectedAccount.contains(position)){
+						if(selectedAccount.size() == 1){
+							Toast.makeText(PostActivity.this, "至少要选择一个帐号哟",
+									Toast.LENGTH_SHORT).show();
+							return;
+						}
 						selectedAccount.remove(Integer.valueOf(position));
 						v.setBackgroundColor(Color.argb(150, 0, 0, 0));
 					}else{

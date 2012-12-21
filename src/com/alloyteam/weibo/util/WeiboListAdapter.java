@@ -27,17 +27,17 @@ import com.alloyteam.weibo.HomeActivity;
 import com.alloyteam.weibo.MainActivity;
 import com.alloyteam.weibo.R;
 import com.alloyteam.weibo.logic.Utility;
-import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.model.Weibo;
 
 public class WeiboListAdapter extends BaseAdapter {
 	protected LayoutInflater mInflater;
 	private static final int mResource1 = R.layout.weibo_item;// xml布局文件
 	private static final int mResource2 = R.layout.weibo_item_type2;// xml布局文件
-	List<Weibo2> mItems;
+	List<Weibo> mItems;
 	ImageLoader imageLoader;
 	Context mContext;
 	
-	public WeiboListAdapter(Context context, List<Weibo2> items) {
+	public WeiboListAdapter(Context context, List<Weibo> items) {
 		mItems = items;
 		mContext=context;
 		mInflater = (LayoutInflater) context
@@ -48,7 +48,7 @@ public class WeiboListAdapter extends BaseAdapter {
 	@Override
 	public int getItemViewType(int position) {
 		// TODO Auto-generated method stub
-		Weibo2 weibo = (Weibo2) this.getItem(position);
+		Weibo weibo = (Weibo) this.getItem(position);
 		return weibo.source==null?0:1;
 	}
 
@@ -127,7 +127,7 @@ public class WeiboListAdapter extends BaseAdapter {
 		View rowView = convertView;
 
 		int type = getItemViewType(position);
-		Weibo2 weibo = mItems.get(position);
+		Weibo weibo = mItems.get(position);
 		TextView text;
 		TextView name;
 		TextView time;
@@ -176,7 +176,7 @@ public class WeiboListAdapter extends BaseAdapter {
 			image.setOnClickListener(listener);
 			avatar.setOnClickListener(listener);
 		} else {
-			Weibo2 source = weibo.source;
+			Weibo source = weibo.source;
 			TextView text2;
 			TextView name2;
 			ImageView avatar2;

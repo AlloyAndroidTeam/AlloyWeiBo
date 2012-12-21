@@ -31,7 +31,7 @@ import com.alloyteam.weibo.AuthActivity;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.UserInfo;
-import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.model.Weibo;
 
 /**
  * @author azraellong
@@ -58,8 +58,8 @@ public class ApiManager {
 	}
 
 	public static class ApiResult {
-		public ArrayList<Weibo2> weiboList;
-		public Weibo2 weibo;
+		public ArrayList<Weibo> weiboList;
+		public Weibo weibo;
 		public UserInfo userInfo;
 		public boolean isFollow;
 		public JSONObject listeners;//听众列表对象：list, startindex, nextstartindex
@@ -348,10 +348,10 @@ public class ApiManager {
 		if (statuses == null) {
 			return null;
 		}
-		ArrayList<Weibo2> weiboList = new ArrayList<Weibo2>();
+		ArrayList<Weibo> weiboList = new ArrayList<Weibo>();
 		for (int i = 0, len = statuses.length(); i < len; i++) {
 			JSONObject item = statuses.getJSONObject(i);
-			Weibo2 weibo = JsonObjectToWeibo(item, type);
+			Weibo weibo = JsonObjectToWeibo(item, type);
 			if (weibo != null) {
 				weiboList.add(weibo);
 			}
@@ -361,12 +361,12 @@ public class ApiManager {
 		return apiResult;
 	}
 
-	private static Weibo2 JsonObjectToWeibo(JSONObject status, int type) throws JSONException {
-		Weibo2 weibo = new Weibo2();
+	private static Weibo JsonObjectToWeibo(JSONObject status, int type) throws JSONException {
+		Weibo weibo = new Weibo();
 		if (type == Constants.TENCENT) {
 			weibo.status = status.getInt("status");
 			if (weibo.status > 2) {// 大于2的都是已删除的
-				weibo.status = Weibo2.WEIBO_STATUS_DELETE;
+				weibo.status = Weibo.WEIBO_STATUS_DELETE;
 				return null;
 			}
 			weibo.uid = status.getString("name");
@@ -406,7 +406,7 @@ public class ApiManager {
 					return null;
 				}
 			}catch(Exception e){
-				weibo.status = Weibo2.WEIBO_STATUS_NORMAL;
+				weibo.status = Weibo.WEIBO_STATUS_NORMAL;
 			}
 			JSONObject user = status.getJSONObject("user");
 
@@ -432,15 +432,15 @@ public class ApiManager {
 			JSONObject source = null;
 			try{
 				source = status.getJSONObject("retweeted_status");
-				weibo.type = Weibo2.WEIBO_TYPE_REBROADCAST;
+				weibo.type = Weibo.WEIBO_TYPE_REBROADCAST;
 			}catch(Exception e){
-				weibo.type = Weibo2.WEIBO_TYPE_ORIGINAL;
+				weibo.type = Weibo.WEIBO_TYPE_ORIGINAL;
 			}
 			try{
 				source = status.getJSONObject("status");
-				weibo.type = Weibo2.WEIBO_TYPE_COMMENT;
+				weibo.type = Weibo.WEIBO_TYPE_COMMENT;
 			}catch(Exception e){
-				weibo.type = Weibo2.WEIBO_TYPE_ORIGINAL;
+				weibo.type = Weibo.WEIBO_TYPE_ORIGINAL;
 			}
 			if (source != null) {
 				weibo.source = JsonObjectToWeibo(source, type);

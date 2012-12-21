@@ -17,7 +17,7 @@ import com.alloyteam.weibo.logic.Utility;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.Listeners;
-import com.alloyteam.weibo.model.Weibo2;  
+import com.alloyteam.weibo.model.Weibo;  
 
 import android.accounts.Account;
 import android.app.Activity;

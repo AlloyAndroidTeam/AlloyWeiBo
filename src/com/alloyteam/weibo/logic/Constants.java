@@ -15,6 +15,8 @@ public class Constants {
 
 	public static final int TENCENT = 2;
 
+	public static final String[] WEIBO_SEPERATOR = new String[] { "||"/*default*/, "//", "||" };
+	
 	private static String[] providers = new String[] { "新浪微博", "腾讯微博" };
 
 	public static String[] getProviders() {

@@ -2,33 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:descendantFocusability="blocksDescendants"
-    android:orientation="vertical" >
+    android:descendantFocusability="blocksDescendants" >
 
-    <ImageView
-        android:id="@+id/accountAvatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:src="@drawable/avatar" />
-
-    <ImageView
-        android:id="@+id/accountAvatarTypeIcon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_alignBottom="@+id/accountAvatar"
-        android:layout_alignRight="@+id/accountAvatar"
-        android:src="@drawable/icon_sina" />
-
-    <View
-        android:id="@+id/accountAvatarMask"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:background="@color/opacity_50_black" />
+        android:layout_marginTop="5dp" >
+
+        <ImageView
+            android:id="@+id/accountAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/avatar" />
+
+        <ImageView
+            android:id="@+id/accountAvatarTypeIcon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignBottom="@+id/accountAvatar"
+            android:layout_alignRight="@+id/accountAvatar"
+            android:src="@drawable/icon_sina" />
+
+        <View
+            android:id="@+id/accountAvatarMask"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@color/opacity_50_black" >
+        </View>
+    </RelativeLayout>
 
 </RelativeLayout>

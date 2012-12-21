@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import com.alloyteam.weibo.model.DataManager;
 import com.alloyteam.weibo.model.UserInfo;
-import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.UserWeiboListAdapter;
 import com.alloyteam.weibo.util.WeiboListAdapter;
@@ -44,7 +44,7 @@ import com.alloyteam.weibo.logic.ApiManager;
 import com.alloyteam.weibo.logic.ApiManager.ApiResult;
 import com.alloyteam.weibo.model.Account;
 import com.alloyteam.weibo.model.DataManager;
-import com.alloyteam.weibo.model.Weibo2;
+import com.alloyteam.weibo.model.Weibo;
 import com.alloyteam.weibo.util.ImageLoader;
 import com.alloyteam.weibo.util.UserWeiboListAdapter;
 
@@ -63,7 +63,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	private static final int WHAT_DID_REFRESH = 2;
 	private static final int WHAT_DID_MORE = 1;
 	private UserWeiboListAdapter mAdapter;
-	private List<Weibo2> list;
+	private List<Weibo> list;
 	private String upId;
 	private String downId;
 	private Account account;
@@ -110,7 +110,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 	public void initHomeLine() {
 		mPullDownView = (PullDownView) findViewById(R.id.pull_down_view);
 		mPullDownView.setOnPullDownListener(this);
-		list = new ArrayList<Weibo2>();
+		list = new ArrayList<Weibo>();
 		mylist = mPullDownView.getListView();
 		mAdapter = new UserWeiboListAdapter(
 				this, list);
@@ -160,14 +160,14 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 					pullCallback(pageflag);
 					return;
 				}
-				ArrayList<Weibo2> tmpList = result.weiboList;
+				ArrayList<Weibo> tmpList = result.weiboList;
 				if(pageflag==WHAT_DID_LOAD_DATA){
 					mPullDownView.notifyDidLoad();
 					if(tmpList.size()>0){
-						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						Weibo lastWeibo=tmpList.get(tmpList.size()-1);
 						downId=lastWeibo.id;
 						downTimeStamp=lastWeibo.timestamp;
-						Weibo2 firstWeibo=tmpList.get(0);
+						Weibo firstWeibo=tmpList.get(0);
 						upId=firstWeibo.id;
 						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(tmpList);							
@@ -177,7 +177,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				else if(pageflag==WHAT_DID_MORE){
 					mPullDownView.notifyDidMore();								
 					if(tmpList.size()>0){
-						Weibo2 lastWeibo=tmpList.get(tmpList.size()-1);
+						Weibo lastWeibo=tmpList.get(tmpList.size()-1);
 						downId=lastWeibo.id;
 						downTimeStamp=lastWeibo.timestamp;
 						list.addAll(tmpList);
@@ -186,7 +186,7 @@ public class HomeActivity extends Activity implements OnPullDownListener, OnItem
 				else{				
 					mPullDownView.notifyDidRefresh();
 					if(tmpList.size()>0){
-						Weibo2 firstWeibo=tmpList.get(0);
+						Weibo firstWeibo=tmpList.get(0);
 						upId=firstWeibo.id;
 						upTimeStamp=firstWeibo.timestamp;
 						list.addAll(0, tmpList);
