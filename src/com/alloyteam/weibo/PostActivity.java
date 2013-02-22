@@ -197,7 +197,7 @@ public class PostActivity extends Activity implements OnClickListener{
 				save();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				Log.v("btnPostSave","保存失败");
+				Log.v("btnPostSave", e.getMessage());
 				e.printStackTrace();
 				tips("操作异常，保存失败！");
 				btnSave.setEnabled(true);
@@ -510,7 +510,7 @@ public class PostActivity extends Activity implements OnClickListener{
 		
 		////操作类型，0写，1转发，2评论
 		ArrayList<Account> accountList;
-		String tid = relativedWeibo.id;
+		String tid = null == relativedWeibo ? null : relativedWeibo.id;
 		switch(type){
 			case 1:
 				accountList = accountListAdapter.getSelectedAccounts();

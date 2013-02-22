@@ -6,11 +6,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.http.SslError;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -38,7 +40,7 @@ public class AuthActivity extends Activity {
 
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
+		
 		webView = (WebView) findViewById(R.id.authWebView);
 
 		progressBar = (ProgressBar) findViewById(R.id.authProgressBar);
@@ -68,11 +70,29 @@ public class AuthActivity extends Activity {
 				progressBar.setVisibility(View.GONE);
 				super.onPageFinished(view, url);
 			}
+			
+			/* (non-Javadoc)
+			 * @see android.webkit.WebViewClient#onReceivedSslError(android.webkit.WebView, android.webkit.SslErrorHandler, android.net.http.SslError)
+			 */
+			@Override
+			public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+			    // TODO Auto-generated method stub
+			    super.onReceivedSslError(view, handler, error);
+			    handler.proceed();
+			}
 
 		});
 		webView.loadUrl(url);
 	}
-
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onDestroy()
+	 */
+	@Override
+	protected void onDestroy() {
+	    // TODO Auto-generated method stub
+	    super.onDestroy();
+	    webView.destroy();
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_auth, menu);
